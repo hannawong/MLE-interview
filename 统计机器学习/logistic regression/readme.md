@@ -30,7 +30,7 @@
 
 为了更方便求解，我们对等式两边同取对数，写成对数似然函数：
 
-![\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))](https://www.zhihu.com/equation?tex=%5Csum_%7Bi%3D1%7D%5EN%20y_ilogp(x_i)%20%2B%20(1-y_i)log(1-p(x_i)))
+​                                                          $$\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))$$
 
 从另一个角度来讲，对于一个样本来说，它的交叉熵损失函数为：
 
@@ -52,13 +52,13 @@
 
 对一个样本做梯度下降，
 
-![\theta^{t+1} = \theta^{t} - \alpha \frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha (y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))
+![\theta^{t+1} = \theta^{t} - \alpha \frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha (y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i)
 
 - 并行化
 
 LR的一个好处就是它能够并行化，效率很高。使用小批量梯度下降：
 
-![\theta^{t+1} = \theta^{t} - \alpha \sum_{i=1}^m\frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha \sum_{i=1}^m(y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))
+![\theta^{t+1} = \theta^{t} - \alpha \sum_{i=1}^m\frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha \sum_{i=1}^m(y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i)
 
 这些操作均可用矩阵运算来并行解决。
 

@@ -1,10 +1,8 @@
-最近准备开始如同考研一般的秋招复习了！感觉要复习的东西真的是浩如烟海;) 有2023届做算法的同学可以加我，我们一起复习~
 
-------
 
 ### 1. 介绍
 
-逻辑回归假设数据服从伯努利分布(因为是二分类),通过极大化似然函数的方法，运用梯度下降来求解参数，来达到将数据二分类的目的。
+逻辑回归假设数据服从①**伯努利分布**(因为是二分类),通过②**极大化似然函数**的方法，运用③**梯度下降**来求解参数，来达到将数据④**二分类**的目的。
 
 - 决策函数：
 
@@ -16,35 +14,35 @@
 
 ![img](https://pic4.zhimg.com/v2-2a9742ad65ddecb5800e05061b50e7ef_b.png)
 
-sigmoid函数
 
-- 损失函数
+
+- 损失函数（会推导）
 
 在统计学中，常常使用极大似然估计法来求解参数。即找到一组参数，使得在这组参数下，我们的数据的似然度（概率）最大。
 
 设：
 
-![\begin{aligned} P(Y=1|x) &= p(x) \\  P(Y=0|x) &= 1- p(x) \end{aligned}\\](https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D%20P(Y%3D1%7Cx)%20%26%3D%20p(x)%20%5C%5C%20%20P(Y%3D0%7Cx)%20%26%3D%201-%20p(x)%20%5Cend%7Baligned%7D%5C%5C)\begin{aligned} P(Y=1|x) &= p(x) \\  P(Y=0|x) &= 1- p(x) \end{aligned}\\
+![\begin{aligned} P(Y=1|x) &= p(x) \\  P(Y=0|x) &= 1- p(x) \end{aligned}\\](https://www.zhihu.com/equation?tex=%5Cbegin%7Baligned%7D%20P(Y%3D1%7Cx)%20%26%3D%20p(x)%20%5C%5C%20%20P(Y%3D0%7Cx)%20%26%3D%201-%20p(x)%20%5Cend%7Baligned%7D%5C%5C)
 
 那么，似然函数为：
 
-![L(w)=\prod_i[p(x_{i})]^{y_{i}}[1-p(x_{i})]^{1-y_{i}}  \\](https://www.zhihu.com/equation?tex=L(w)%3D%5Cprod_i%5Bp(x_%7Bi%7D)%5D%5E%7By_%7Bi%7D%7D%5B1-p(x_%7Bi%7D)%5D%5E%7B1-y_%7Bi%7D%7D%20%20%5C%5C)L(w)=\prod_i[p(x_{i})]^{y_{i}}[1-p(x_{i})]^{1-y_{i}}  \\
+![L(w)=\prod_i[p(x_{i})]^{y_{i}}[1-p(x_{i})]^{1-y_{i}}  \\](https://www.zhihu.com/equation?tex=L(w)%3D%5Cprod_i%5Bp(x_%7Bi%7D)%5D%5E%7By_%7Bi%7D%7D%5B1-p(x_%7Bi%7D)%5D%5E%7B1-y_%7Bi%7D%7D%20%20%5C%5C)
 
 为了更方便求解，我们对等式两边同取对数，写成对数似然函数：
 
-![\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))](https://www.zhihu.com/equation?tex=%5Csum_%7Bi%3D1%7D%5EN%20y_ilogp(x_i)%20%2B%20(1-y_i)log(1-p(x_i)))\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i)) 
+![\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))](https://www.zhihu.com/equation?tex=%5Csum_%7Bi%3D1%7D%5EN%20y_ilogp(x_i)%20%2B%20(1-y_i)log(1-p(x_i)))
 
 从另一个角度来讲，对于一个样本来说，它的交叉熵损失函数为：
 
-![-[(1-y)log(1-\sigma(\theta^Tx))+ylog(\sigma(\theta^Tx))]](https://www.zhihu.com/equation?tex=-%5B(1-y)log(1-%5Csigma(%5Ctheta%5ETx))%2Bylog(%5Csigma(%5Ctheta%5ETx))%5D)-[(1-y)log(1-\sigma(\theta^Tx))+ylog(\sigma(\theta^Tx))] 
+![-[(1-y)log(1-\sigma(\theta^Tx))+ylog(\sigma(\theta^Tx))]](https://www.zhihu.com/equation?tex=-%5B(1-y)log(1-%5Csigma(%5Ctheta%5ETx))
 
 所有样本的交叉熵损失函数为：
 
-![\frac{1}{N}\sum_{i=1}^N-[(1-y_i)log(1-\sigma(\theta^Tx_i))+y_ilog(\sigma(\theta^Tx_i))]](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7BN%7D%5Csum_%7Bi%3D1%7D%5EN-%5B(1-y_i)log(1-%5Csigma(%5Ctheta%5ETx_i))%2By_ilog(%5Csigma(%5Ctheta%5ETx_i))%5D)\frac{1}{N}\sum_{i=1}^N-[(1-y_i)log(1-\sigma(\theta^Tx_i))+y_ilog(\sigma(\theta^Tx_i))]
+![\frac{1}{N}\sum_{i=1}^N-[(1-y_i)log(1-\sigma(\theta^Tx_i))+y_ilog(\sigma(\theta^Tx_i))]](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7BN%7D%5Csum_%7Bi%3D1%7D%5EN-%5B(1-y_i)log(1-%5Csigma(%5Ctheta%5ETx_i))
 
-这就是对数似然函数取相反数嘛！所以，在逻辑回归模型中，最大化对数似然函数和最小化损失函数实际上是等价的。
+这就是对数似然函数取相反数嘛！所以，在逻辑回归模型中，**最大化对数似然函数和最小化损失函数实际上是等价的。**
 
-和线性回归一样，逻辑回归的损失函数也可以加上正则化项：
+和线性回归一样，逻辑回归的损失函数也可以加上**正则化**项：
 
 ![img](https://pic3.zhimg.com/80/v2-0d6004d8ed9e9f5e286bfa93c4ef1861_1440w.png)
 
@@ -54,13 +52,13 @@ sigmoid函数
 
 对一个样本做梯度下降，
 
-![\theta^{t+1} = \theta^{t} - \alpha \frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha (y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))\theta^{t+1} = \theta^{t} - \alpha \frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha (y_i - \sigma(\theta^Tx_i))x_i) 
+![\theta^{t+1} = \theta^{t} - \alpha \frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha (y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))
 
 - 并行化
 
 LR的一个好处就是它能够并行化，效率很高。使用小批量梯度下降：
 
-![\theta^{t+1} = \theta^{t} - \alpha \sum_{i=1}^m\frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha \sum_{i=1}^m(y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))\theta^{t+1} = \theta^{t} - \alpha \sum_{i=1}^m\frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha \sum_{i=1}^m(y_i - \sigma(\theta^Tx_i))x_i)
+![\theta^{t+1} = \theta^{t} - \alpha \sum_{i=1}^m\frac{\partial L(\theta)}{\partial \theta} =  \theta^{t} - \alpha \sum_{i=1}^m(y_i - \sigma(\theta^Tx_i))x_i)](https://www.zhihu.com/equation?tex=%5Ctheta%5E%7Bt%2B1%7D%20%3D%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em%5Cfrac%7B%5Cpartial%20L(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%20%3D%20%20%5Ctheta%5E%7Bt%7D%20-%20%5Calpha%20%5Csum_%7Bi%3D1%7D%5Em(y_i%20-%20%5Csigma(%5Ctheta%5ETx_i))x_i))
 
 这些操作均可用矩阵运算来并行解决。
 

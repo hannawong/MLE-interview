@@ -1,8 +1,10 @@
-#### LTR：Pointwise, Pairwise, Listwise
+## LTR：Pointwise, Pairwise, Listwise
 
 对于一个query q和document d，我们需要用神经信息检索的方法来计算q和d的相似程度 ![f(q,d)](https://www.zhihu.com/equation?tex=f(q%2Cd)).
 
 ![img](https://pic4.zhimg.com/v2-7ed50e1422f2e97b5dd1c3a6e4554cdb_b.png)
+
+
 
 但是对于基于排序的评价指标(**MAP,NDCG,MRR**)通常是**不可微**的，不能直接优化。所以需要一些可微的损失函数来优化Learning-to-Rank神经网络。
 

@@ -10,6 +10,14 @@
 
 ​                                                    ![F1 = \frac{2}{\frac{1}{Precision}+\frac{1}{Recall}}](https://www.zhihu.com/equation?tex=F1%20%3D%20%5Cfrac%7B2%7D%7B%5Cfrac%7B1%7D%7BPrecision%7D%2B%5Cfrac%7B1%7D%7BRecall%7D%7D) //二者的调和平均数
 
+TP, TN, FP, FN 构成了混淆矩阵。
+
+Precision 和 Recall是”此消彼长“的关系，所以需要F1-score来综合二者。事实上，Precision-Recall构成了P-R曲线：
+
+![img](https://camo.githubusercontent.com/8089392d2b45c88b4a9490831c315d258757802f6a2c44a1474214bcbd5ccd31/687474703a2f2f7777312e73696e61696d672e636e2f6c617267652f303036674f6569536c793167343067796f673065386a33306176303972676e392e6a7067)
+
+
+
 **（2）ROC曲线和AUC**
 
 TPR(True Positive Rate): ![\frac{TP}{TP+FN}](https://www.zhihu.com/equation?tex=%5Cfrac%7BTP%7D%7BTP%2BFN%7D), 就是recall
@@ -46,6 +54,46 @@ def AUC(label,pre):
                 cnt += 0
     return cnt / (len(pos)*len(neg))
 ```
+
+
+
+**（3）多分类问题**
+
+**1) Macro F1**： 宏平均
+
+Macro 算法在计算 Precision 与 Recall 时是先分别计算每个类别的Precision 与 Recall， 然后再进行平均。
+
+​                                                     $$Macro_{F1-score}=\frac{1}{N}\sum_{i=0}^N F1-score_i$$
+
+其中，N为类别数。
+
+Macro F1 本质上是所有类别的统计指标的算术平均值来求得的，这样单纯的平均忽略了**样本之间分布可能存在极大不平衡的情况**。
+
+
+
+**2) Micro F1** ：微平均
+
+Micro 算法在计算 Precision 与 Recall 时会将所有类直接放到一起来计算。
+$$
+\text{Precision}_{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FP} \\
+\text{Recall}{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FN} \\
+
+\text{Micro F1} = \frac{2 \cdot \text{Precision}_{micro} \cdot \text{Recall}
+_{micro}}{\text{Precision}_{micro} + \text{Recall}_{micro}}
+$$
+
+
+**Macro vs Micro** 
+
+Macro 相对 Micro 而言，**小类别起到的作用更大**。考虑到实际的环境中，这种指标明显是有问题的，因为小类别起到的作用太大。 而对于 Micro 来说，其考虑到了这种样本不均衡的问题， 因此在这种情况下相对较佳。
+
+总的来说， 如果你的类别比较均衡，则随便； 如果你认为大样本的类别应该占据更重要的位置， 使用Micro； 如果你认为小样本也应该占据重要的位置，则使用 Macro。
+
+为了解决 Macro 无法衡量样本均衡问题，一个很好的方法是求加权的 Macro， 因此 Weighted F1 出现了。
+
+**3). Weight F1**
+
+Weighted 算法算术 Macro 算法的改良版，是为了解决Macro中没有考虑样本不均衡的原因， 在计算 Precision与Recall 时候，各个类别的 Precision 与 Recall要乘以**该类在总样本中的占比**来求和。
 
 
 

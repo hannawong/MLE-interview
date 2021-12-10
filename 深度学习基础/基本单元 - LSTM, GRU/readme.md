@@ -40,15 +40,19 @@
 
 **梯度消失有几种常见的解决方法：**
 
-（1）用下文提到的LSTM/GRU
+（1）用下文提到的LSTM/GRU (其实这也是一种skip-connection)
 
 （2）加上一些skip-connection, 让梯度直接流过而不经过bottleneck。例如resnet：
 
 ![img](https://pic3.zhimg.com/80/v2-a5fda1b72295d90d9cbbe2c924a69636_1440w.jpg)
 
-- 用Relu、Leaky relu等激活函数
-  **ReLu：** 让激活函数的导数为1
-  **LeakyReLu：** 包含了ReLu的几乎所有优点，同时解决了ReLu中0区间带来的影响
+（3）用Relu、Leaky relu等激活函数
+**ReLu：** 让激活函数的导数为1
+**LeakyReLu：** 包含了ReLu的几乎所有优点，同时解决了ReLu中0区间带来的影响
+
+（4）使用BatchNorm/LayerNorm, 让数据分布在非饱和区、远离死区
+
+（5）合适的权重初始化
 
 
 

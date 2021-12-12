@@ -105,3 +105,6 @@ Dropout 往往会在卷积层和全连接层之间是有来防止过拟合。 �
 一般都是以推荐超参数设置方案来作为第一次的设置，然后围绕这个设置点**上下浮动**。
 
 ![1639278634907](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1639278634907.png)
+
+
+

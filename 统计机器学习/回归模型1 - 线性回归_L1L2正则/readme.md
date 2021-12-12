@@ -16,7 +16,7 @@
 
 简单模型：low variance, high bias
 
-我们常常需要【正则化方法】来解决过拟合问题。这里提一下L1和L2正则化方法。
+我们常常需要**【正则化方法】**来解决过拟合问题。这里提一下L1和L2正则化方法。
 
 ### 2.1 L2正则化 --- ridge regression
 
@@ -65,4 +65,3 @@
 ![img](https://pic1.zhimg.com/80/v2-d9a9f887cf7bf3b48792da598418b297_1440w.png)
 
 
-  

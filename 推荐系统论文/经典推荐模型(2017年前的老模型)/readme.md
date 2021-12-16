@@ -1,7 +1,0 @@
-- LR
-- GBDT+LR
-- FM
-- FFM
-- Wide&Deep
-- NFM
-- DeepFM

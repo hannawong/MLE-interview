@@ -18,8 +18,6 @@
 
 之前已经讲过了Word2vec，即是利用Skip-gram/CBOW两种任务，使用大规模语料集来最大化[似然函数](https://www.zhihu.com/search?q=%E4%BC%BC%E7%84%B6%E5%87%BD%E6%95%B0&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22%3A%22article%22%2C%22sourceId%22%3A439751231%7D)（最小化损失函数），最后得到每个词的预训练向量表示。
 
-[word2vec] (https://zhuanlan.zhihu.com/p/435792015)
-
 潜在语义分析（Latent Semantic Analysis）使用的这种**count based**模型与Word2Vec 这种**direct prediction**模型，它们各有优缺点。
 
 Count based模型:

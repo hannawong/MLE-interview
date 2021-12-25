@@ -19,7 +19,7 @@
 
 在传统NLP中，每个词被看作一个离散的symbol，这就是 localist representation。每个词都可以被表示成一个one-hot向量，如：
 
-​                                                               $motel=[0,0,0,0,0,0,0,1,0,0,0,0] \\ hotel=[0,0,1,0,0,0,0,0,0,0,0,0]  $
+                                                               $motel=[0,0,0,0,0,0,0,1,0,0,0,0] \\ hotel=[0,0,1,0,0,0,0,0,0,0,0,0]  $
 
 向量的维度就是词汇表vocab的大小，比如500000维。
 
@@ -40,7 +40,7 @@
 
 一个好的word representation 能够把握住词语的syntactic(句法，如主谓宾)与semantic(词语的语义含义)信息，例如，一个优秀的词语表示可以做到：
 
-​                                     $$WR(“China”) - WR(“Beijing”) + WR(“Tokyo”) = WR(“Japan”)\\ WR(“King”) - WR(“Queen”) + WR(“Woman”) = WR(“Man”) $$
+                                     $$WR(“China”) - WR(“Beijing”) + WR(“Tokyo”) = WR(“Japan”)\\ WR(“King”) - WR(“Queen”) + WR(“Woman”) = WR(“Man”) $$
 
 ### 2. Word2vec
 
@@ -57,7 +57,7 @@ Word2vec ([Mikolov et al. 2013](https://arxiv.org/pdf/1301.3781.pdf))是学习�
 
 ![img](https://pic2.zhimg.com/v2-e88f8d529acf05a47dee3001915cac79_b.png)
 
-​                                                                                  skip-gram示意图
+                                                                                  skip-gram示意图
 
 #### 2.2 word2vec的目标函数
 

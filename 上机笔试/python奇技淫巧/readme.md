@@ -78,3 +78,8 @@ def is_prime4(x):
 
 - list.remove()只能去掉一个元素
 - bin(n)直接把十进制转为2进制; oct转为八进制；hex转16进制
+
+
+
+
+

@@ -59,7 +59,7 @@ MMoE在Youtube推荐场景下的实践
 
 出自论文 SNR: Sub-Network Routing for Flexible Parameter Sharing in Multi-Task Learning。MMoE主要针对多个共享的expert 网络的输出进行attention组合(也就是门控)。SNR 在这种模块化的基础上，使用编码变量（coding variables）控制子网络之间的连接，实现多任务模型中不同程度的参数共享。SNR 的提出主要解决级间的参数共享问题，达到最佳组合的网络结构。简言之，SNR和MMoE的不同之处就是，MMoE拿多个子网络的输出做加权直接输入到了每个任务各自的tower中；而SNR对不同子网络的输出进行组合又输入到了下一层子网络，形成子网络的组合。
 
-SNR设计了两种类型的连接方式：SNR-Trans 和 SNR-Aver来学习子网络的组合，最终得到特定多任务场景的最优网络结构。
+SNR设计了两种类型的连接方式：SNR-Trans 和 SNR-Aver来学习**子网络的组合**，最终得到特定多任务场景的最优网络结构。
 
 ![img](https://pic4.zhimg.com/v2-91aa0a4f16e8a2a4911cc192ae101bc3_b.jpeg)
 
@@ -81,7 +81,7 @@ SNR设计了两种类型的连接方式：SNR-Trans 和 SNR-Aver来学习子网�
 
 
 
-(4) PLE（Progressive Layered Extraction）
+**(4) PLE（Progressive Layered Extraction）**
 
 RecSys2020最佳长论文 Progressive Layered Extraction (PLE): A Novel Multi-Task Learning (MTL) Model for Personalized Recommendations.
 
@@ -110,7 +110,28 @@ PLE就是上述CGC网络的多层叠加，以获得更加丰富的表征能力�
 
 注意，在底层的Extraction网络中，除了各个task-specifict的门控网络外，还有一个share部分的门控网络，这部分门控网络的输入包含了所有input，而各个task-specific的门控网络的输入是task-specific和share两部分。
 
+5）ESMM（Entire Space Multitask ）
 
+CVR都是在clicked item上训练的，因为只有点击了才会有后续的转化。但是，在预测的时候是对全空间曝光item来说的。这样就有了一个selection bias。同时还带来了数据稀疏的问题，因为点击item远远小于曝光item。
+
+- pCTR：点击的概率，是针对所有曝光物品来说的。
+
+- pCVR = 点击之后，转化的概率。是针对点击物品来说的。
+- pCTCVR: **点击，且转化的概率**。是针对所有曝光物品来说的。
+
+pCVR * pCTR = pCTCVR, 我们要求的是pCVR。由于pCTR和pCTCVR都是针对所有曝光物品来说的，所以pCVR也是针对所有曝光物品说的，这就解决了选择偏差的问题。此外，由于pCVR和pCTR的底层参数是共享的，这解决了数据少的问题（类似transfer learning）。
+
+![[公式]](https://www.zhihu.com/equation?tex=%5Cunderbrace%7B+p%28z%5C%26y%3D1+%7C+%5Cbm%7Bx%7D%29+%7D_%7BpCTCVR%7D+%3D+%5Cunderbrace%7B+p%28z%3D1+%7Cy%3D1%2C+%5Cbm%7Bx%7D%29++%7D_%7BpCVR%7D+~+%5Cunderbrace%7B+p%28y%3D1+%7C+%5Cbm%7Bx%7D%29++%7D_%7BpCTR%7D%2C++~~~~~~~~~~~~~~~~~~~~~~~%281%29)
+
+模型结构：
+
+![img](https://pic2.zhimg.com/80/v2-d999a47e9ebfcc3fe1b61559b421e2c9_1440w.jpg)
+
+目标函数是pCTR和pCTCVR相加。这样可以隐式地来学pCVR.
+
+![[公式]](https://www.zhihu.com/equation?tex=L%28%5Ctheta_%7Bcvr%7D%2C+%5Ctheta_%7Bctr%7D%29+%3D+%5Csum_%7Bi%3D1%7D%5E%7BN%7D+l+%28+y_i%2C+f%28%5Cbm%7Bx%7D_i%3B%5Ctheta_%7Bctr%7D%29+%29+%2B+%5Csum_%7Bi%3D1%7D%5E%7BN%7D+l+%28+y_i%5C%26z_i%2C+f%28%5Cbm%7Bx%7D_i%3B%5Ctheta_%7Bctr%7D%29%2Af%28%5Cbm%7Bx%7D_i%3B%5Ctheta_%7Bcvr%7D+%29%29+%EF%BC%8C)
+
+再思考下，ESMM的结构是基于“乘”的关系设计——pCTCVR=pCVR*pCTR，是不是也可以通过“除”的关系得到pCVR，即 pCVR = pCTCVR / pCTR ？例如分别训练一个CTCVR和CTR模型，然后相除得到pCVR，其实也是可以的，但这有个明显的缺点：真实场景预测出来的pCTR、pCTCVR值都比较小，“除”的方式容易造成**数值上的不稳定**。作者在实验中对比了这种方法。
 
 ### 梯度优化
 

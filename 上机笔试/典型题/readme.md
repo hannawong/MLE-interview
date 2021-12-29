@@ -114,3 +114,19 @@ class Solution:
                 now_idx = tmp
 ```
 
+
+
+
+
+# 【典型题】二维数组
+
+##### 1. Leetcode221 最大正方形
+
+在一个由 `'0'` 和 `'1'` 组成的二维矩阵内，找到只包含 `'1'` 的最大正方形，并返回其面积。
+
+![img](https://assets.leetcode.com/uploads/2020/11/26/max1grid.jpg)
+
+我们用 $\textit{dp}(i, j)$ 表示以 (i, j) 为右下角，且只包含 1的正方形的边长最大值。
+
+$dp(i,j)=min(dp(i−1,j),dp(i−1,j−1),dp(i,j−1))+1$
+

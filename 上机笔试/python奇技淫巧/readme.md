@@ -57,6 +57,49 @@ s = s[1:] // 删除第1个
       return arr
   ```
 
+  - 手写快排：
+
+  每次选择一个轴点(**pivot**), 使得左边的元素均小于它，右边的元素都大于它。
+
+  ![img](https://pic1.zhimg.com/80/v2-2b70124e17ea9fea9eda1e9bfb745a58_1440w.jpg)
+
+  把前半部分和后半部分分别排序之后，原序列自然有序。因此整体的递归结构如下：
+
+  ```cpp
+  void quick_sort(int* arr,int low,int high){//左闭右闭
+      if(low >= high) return; //单元素向量必定有序
+      int mid = find_partition(arr, low,high); //构造轴点，此时左边都<轴点，右边都>轴点
+      quick_sort(arr, low,mid - 1); //排序左边
+      quick_sort(arr, mid+1,high); //排序右边
+  }
+  ```
+
+  现在就剩下find_partition函数了。mergesort的难点在于**合**，而quicksort的难点在于**分**。如何能够实现上述的划分呢？--- 培养一个轴点
+
+  1. 首先，选择最后一个元素--pivot = A[right]作为我们要培养的轴点
+  2. 一个指针j从low遍历到high-1；另外维护一个split，使得[low,split]的值都<轴点，[split+1,high]的值都>轴点
+
+  ![img](https://pic1.zhimg.com/80/v2-92d87d44c985b2f9589b7626f58c6ba0_1440w.jpg)
+
+  - 在考察j时，如果arr[j]>=pivot, 不用动；如果arr[j] < pivot, 交换arr[split+1]和arr[j], split++
+
+  \3. 最终，交换arr[split+1]和arr[right], 返回split+1
+
+  ```cpp
+  int find_partition(int* arr, int low,int high){
+      int pivot = arr[high];
+      int split = low-1;
+      for(int j = low; j<=high-1;j++){
+          if(arr[j]<pivot){
+              swap(arr[split+1],arr[j]);
+              split++;
+          }
+      }
+      swap(arr[split+1],arr[high]);
+      return split+1;
+  }
+  ```
+
 
 - 数子串个数: count
 

@@ -4,7 +4,9 @@
 
 ### 1. GCN的局限
 
-GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要把**所有节点都参与训练**才能得到node embedding，如果新node来了，没法得到新node的embedding。而GraphSAGE使用**Inductive Learning**，解决了这个问题。
+GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要把**所有节点都参与训练**才能得到node embedding，如果新node来了，没法得到新node的embedding。所以，GCN是transductive的。（Transductive任务是指：训练阶段与测试阶段都基于同样的图结构）
+
+而GraphSAGE是inductive的。inductive任务是指：训练阶段与测试阶段需要处理的graph不同。通常是训练阶段只是在子图（subgraph）上进行，测试阶段需要处理未知的顶点。
 
 **得到新节点的表示的难处：**
 

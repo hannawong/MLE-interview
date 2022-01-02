@@ -45,7 +45,7 @@ FFM认为，一个特征和另一个特征的关系，不仅仅是这两个特�
 
 
 
-由于引入了Field，公式不能像FM那样进行改写，所以FFM模型进行**\*推断*** 时的时间复杂度为![O(kn^2)](https://private.codecogs.com/gif.latex?O%28kn%5E2%29)
+由于引入了Field，公式不能像FM那样进行改写，所以FFM模型进行 **推断** 时的时间复杂度为![O(kn^2)](https://private.codecogs.com/gif.latex?O%28kn%5E2%29)
 
 将公式简单的展开：
 

@@ -25,7 +25,7 @@ FM之前的模型都没有**自动**进行**特征交叉**，而一般依赖**�
 
 这样有两个缺点：
 
-一是，要学习的二阶参数$w_{ij}$太多了，$O(n^2)$。
+一是，要学习的二阶参数 wij 太多了，O(n^2)。
 
 二是，这些权重之间没有任何联系(泛化能力差)。比如说有两个特征，一个是性别，一个是城市。推荐一个火锅，先遇到一个样本是 男x重庆 ，结果是点击了，男x重庆这个二阶特征有权重了，下次再遇到一个女性样本，也是重庆，女x重庆的二阶特征却没有权重。可是从人的理解来说，吃不吃辣其实重庆这个特征占了很大的权重，难道我就不可以猜女x重庆也应该有一个较大的起始值才对嘛？
 
@@ -35,11 +35,11 @@ FM之前的模型都没有**自动**进行**特征交叉**，而一般依赖**�
 
 所以，FM把特征的交叉做了一步**分解**，使用了隐含的embedding，所以叫做“因子分解机”。这样的分解，让模型有了**泛化能力**。
 
-![x∈R^d](https://www.zhihu.com/equation?tex=x%E2%88%88R%5Ed) 表示$d$个特征，这些特征一般都是极度稀疏的。 $y$是预测的label，例如"click","non-click".那么，二阶的特征交互就是：
+![x∈R^d](https://www.zhihu.com/equation?tex=x%E2%88%88R%5Ed) 表示d个特征，这些特征一般都是极度稀疏的。 y$是预测的label，例如"click","non-click".那么，二阶的特征交互就是：
 
 ![img](https://pic1.zhimg.com/v2-e71480993d3845d1392415a5fb0a6978_b.png)
 
-其中， ![V∈R^{d×k}](https://www.zhihu.com/equation?tex=V%E2%88%88R%5E%7Bd%C3%97k%7D)是d个特征的embedding table， ![⟨v_i,v_j⟩](https://www.zhihu.com/equation?tex=%E2%9F%A8v_i%2Cv_j%E2%9F%A9)直接做向量内积来做交叉特征的系数（一个数），最后得到 ![n(n-1)/2](https://www.zhihu.com/equation?tex=n(n-1)%2F2)个二阶交叉特征的值，将它们相加就得到了最后一项$\sum_{i=1}^d\sum_{j=i+1}^d<v_i,v_j>x_i x_j$ , 这是一个数。最后，将一阶特征输入到LR中，再加上二阶交叉项，得到最后的输出logit。整个模型的示意图如下所示：
+其中， ![V∈R^{d×k}](https://www.zhihu.com/equation?tex=V%E2%88%88R%5E%7Bd%C3%97k%7D)是d个特征的embedding table， ![⟨v_i,v_j⟩](https://www.zhihu.com/equation?tex=%E2%9F%A8v_i%2Cv_j%E2%9F%A9)直接做向量内积来做交叉特征的系数（一个数），最后得到 ![n(n-1)/2](https://www.zhihu.com/equation?tex=n(n-1)%2F2)个二阶交叉特征的值，将它们相加就得到了最后一项 ![\sum_{i=1}^d\sum_{j=i+1}^d<v_i,v_j>x_i x_j](https://www.zhihu.com/equation?tex=%5Csum_%7Bi%3D1%7D%5Ed%5Csum_%7Bj%3Di%2B1%7D%5Ed%3Cv_i%2Cv_j%3Ex_i%20x_j)  , 这是一个数。最后，将一阶特征输入到LR中，再加上二阶交叉项，得到最后的输出logit。整个模型的示意图如下所示：
 
 ![img](https://pic3.zhimg.com/v2-fdcd14d4434853b4f96adf9996fe52da_b.png)
 
@@ -57,15 +57,15 @@ FM有一个复杂度问题，也是这篇文章的一个卖点，经常出现在
 
 
 
-空间上，假如有两个field，它们的特征取值个数分别为$n_1,n_2$，那么按照原来的方法就是要求$n_1n_2$个参数；用FM进行embedding的方法，只需求$(n_1+n_2)d$个参数。
+空间上，假如有两个field，它们的特征取值个数分别为n1,n2，那么按照原来的方法就是要求n1,n2个参数；用FM进行embedding的方法，只需求 (n1+n2)d 个参数。
 
 
 
 ## 4. 总结
 
-**优点：**对训练集中未出现的交叉特征也可以进行泛化（embedding table）。
+**优点：** 对训练集中未出现的交叉特征也可以进行泛化（embedding table）。
 
-**缺点：**只考虑了二阶交叉特征，没有考虑更高阶的交叉特征。
+**缺点：** 只考虑了二阶交叉特征，没有考虑**更高阶**的交叉特征。
 
 
 
@@ -85,5 +85,3 @@ cross_term = 0.5 * reduce_sum(cross_term, axis=2, keep_dims=False)##(?, 1)
 ```
 
 一阶交叉项和常数项直接交给LR去做即可。
-
-### 

@@ -6,7 +6,7 @@
 
 当前大多数的研究主要集中在设计更复杂的网络架构来更好的捕获显式或隐式的特征交互。而另一个主要的部分，即Embedding模块同样十分重要，出于以下两个原因：
 
-1）Embedding模块是FI模块的上游模块，直接影响FI模块的效果； 2）CTR模型中的大多数参数集中在Embedding模块(巨大的embedding table！)，对于模型效果有十分重要的影响。
+1）Embedding模块是FI模块的**上游**模块，直接影响FI模块的效果； 2）CTR模型中的大多数参数集中在Embedding模块(巨大的embedding table！)，对于模型效果有十分重要的影响。
 
 但是，Embedding模块却很少有工作进行深入研究，特别是对于连续特征的embedding方面。现有的处理方式由于其硬离散化(hard discretization)的方式，通常suffer from low model capacity。而本文提出的AutoDis框架具有high model capacity, end-to-end training, 以及unique representation. 
 
@@ -20,13 +20,13 @@
 
 ![img](https://pic2.zhimg.com/v2-17a7c017d37624d7fed97dacc98bd60d_b.png)
 
-​                     其中， $e_1,e_2,...e_n$ 是field embedding。
+​                     其中，e1,e2,...en 是field embedding。
 
 ​        由于同一field的特征共享同一个embedding，并基于不同的取值对embedding进行缩放，这类方法的表达能力也是有限的。
 
 - Discretization: 即将连续特征进行离散化，是工业界最常用的方法。这类方法通常是两阶段的，即首先将连续特征转换为对应的离散值，再通过look-up的方式转换为对应的embedding。
 
-​       【为什么要将连续特征离散化呢？】将连续特征进行离散化给模型引入了**非线性**，能够提升模型表达能力，而对于离散化的方式，常用的有以下几种：
+​       【为什么要将连续特征离散化呢？】将连续特征进行离散化给模型引入了**非线性**(可以做特征交叉)，能够提升模型表达能力，而对于离散化的方式，常用的有以下几种：
 
 1） 等宽/等深分箱。对于等宽分箱，首先基于特征的最大值和最小值、以及要划分的桶的个数 ![H_j](https://www.zhihu.com/equation?tex=H_j)，来计算每个样本取值要放到哪个箱子里。对于等深分箱，则是基于数据中特征的**频次**进行分桶，每个桶内特征取值的个数是大致相同的。
 
@@ -50,7 +50,7 @@ AutoDis的全称为Automatic end-to-end embedding learning framework for numeric
 
 为了提升model capacity，一种朴素的处理连续特征的方式是给每一个特征取值赋予一个独立的embedding。显然，这种方法参数量巨大（因为你可以有无穷个连续特征取值！），无法在实践中进行使用。另一方面，Field Embedding对同一域内的特征赋予相同的embedding，尽管降低了参数数量，但model capacity也受到了一定的限制。
 
-为了平衡参数数量和模型容量，AutoDis设计了Meta-embedding模块: **对于第 $j$ 个连续特征，对应 ![H_j](https://www.zhihu.com/equation?tex=H_j)个Meta-Embedding**（可以看作是分 ![H_j](https://www.zhihu.com/equation?tex=H_j)个桶，每一个桶对应一个embedding）。第$j$个特征的Meta-Embedding表示为：  
+为了平衡参数数量和模型容量，AutoDis设计了Meta-embedding模块: **对于第 $j$ 个连续特征，对应 ![H_j](https://www.zhihu.com/equation?tex=H_j)个Meta-Embedding**（可以看作是分 ![H_j](https://www.zhihu.com/equation?tex=H_j)个**桶**，每一个桶对应一个embedding）。第$j$个特征的Meta-Embedding表示为：  
 
 ​                                                               ![ME_j \in \mathbb{R}^{H_j \times d}](https://www.zhihu.com/equation?tex=ME_j%20%5Cin%20%5Cmathbb%7BR%7D%5E%7BH_j%20%5Ctimes%20d%7D)  ( ![H_j](https://www.zhihu.com/equation?tex=H_j)个桶，每个桶是d维的)
 
@@ -74,9 +74,9 @@ Automatic Discretization模块可以对连续特征进行自动的离散化，�
 
 其实就是对 ![H_j](https://www.zhihu.com/equation?tex=H_j)个桶的embedding进行加权求和。
 
-## 
 
-模型的训练过程同一般的CTR过程相似，采用二分类的logloss指导模型训练，损失如下：
+
+模型的**训练**过程同一般的CTR过程相似，采用二分类的logloss指导模型训练，损失如下：
 
 ![img](https://pic4.zhimg.com/v2-09bb6e99597b6cdec91eb176830e6887_b.jpg)
 
@@ -139,8 +139,8 @@ DHE将整个特征嵌入分为编码阶段(encoding)和解码阶段(decoding)。
 
 然而，直接用上面得到的编码表示是不合适的，因此作者进行了两个变换操作来保证数值稳定性：
 
-- 均匀分布（Uniform Distribution）：把 ![E'(s)](https://www.zhihu.com/equation?tex=E%27(s))E'(s) 中的每个值映射到[-1,1]之间
-- 高斯分布（Gaussian Distribution）：把经过均匀分布后的向量转化为高斯分布 ![N(0,1)](https://www.zhihu.com/equation?tex=N(0%2C1))N(0,1) 。
+- 均匀分布（Uniform Distribution）：把 ![E'(s)](https://www.zhihu.com/equation?tex=E%27(s))中的每个值映射到[-1,1]之间
+- 高斯分布（Gaussian Distribution）：把经过均匀分布后的向量转化为高斯分布 ![N(0,1)](https://www.zhihu.com/equation?tex=N(0%2C1)) 。
 
 (作者说，这里是受到GAN网络的启发，用服从高斯分布的随机变量做GAN网络的输入。)
 

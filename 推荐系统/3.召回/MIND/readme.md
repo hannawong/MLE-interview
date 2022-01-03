@@ -1,6 +1,6 @@
 # MIND
 
-这次介绍的论文是来自阿里的一篇文章Multi-Interest Network with Dynamic Routing for Recommendation at Tmall(下面简称MIND)，主要作用是学习user embedding，以用作召回。这篇文章值得细细精读。
+这次介绍的论文是来自阿里的一篇文章Multi-Interest Network with Dynamic Routing for Recommendation at Tmall(下面简称MIND)，主要作用是学习user embedding，以用作召回。
 
 ### 摘要
 
@@ -12,9 +12,9 @@
 
 - 协同过滤的隐向量。缺点：sparsity problem, 计算资源耗费大
 - 用**单一向量**表示用户embedding，然后输入MLP。缺点：bottleneck, 不能表示多样的用户兴趣
-- DIN模型使用attention来赋予不同历史商品不同的权重。缺点：计算极为**耗时**，只能用于ranking(千级数据排序)，不能用于matching(亿级数据召回)。
+- DIN模型使用attention来赋予不同历史商品不同的权重。缺点：计算极为**耗时**（因为粒度太细了），只能用于ranking(千级数据排序)，不能用于matching(亿级数据召回)。
 
-本文提出的MIND可以**对一个用户输出多个embedding**, 每个embedding代表一类用户兴趣。
+本文提出的MIND可以**对一个用户输出多个embedding**,但是是比DIN更加粗粒度的聚类，每个embedding代表一类用户兴趣。
 
 ### 3. METHOD
 
@@ -24,9 +24,9 @@
 
 ![img](https://pic3.zhimg.com/v2-0d30a3b56ceb380f2159e89dad3fff4e_b.jpeg)
 
-MIND的任务就是要根据用户的基础特征(gender,age...)以及用户历史行为来**计算她的embedding**。**注意这里的embedding是K个向量，它们代表着K个不同类的兴趣**。一个用户需要用向量组{$v_1$,...$v_k$}表示。
+MIND的任务就是要根据用户的基础特征(gender,age...)以及用户历史行为来**计算她的embedding**。**注意这里的embedding是K个向量，它们代表着K个不同类的兴趣**。一个用户需要用向量组{v1,...vk}表示。
 
-同时，对于亿级的商品，也对每个商品做embedding，为$e_i$.
+同时，对于亿级的商品，也对每个商品做embedding，为ei.
 
 召回阶段其实就是从这亿级商品中，选择top N(N=1000+)个和用户最为相关的商品。其相关性度量如下：
 
@@ -54,7 +54,7 @@ Embedding & Pooling 层对应图中的最底层：
 
 ![img](https://pic4.zhimg.com/v2-187f2e58d3e5055f73c80c2ffa847617_b.jpeg)
 
-### 3.3.1 动态路由
+#### 3.3.1 动态路由
 
 对于一层网络，第一层有m个节点，每个节点对应着一个长度为 ![N_l](https://www.zhihu.com/equation?tex=N_l) 的向量；第二层有n个节点，每个节点对应一个长度为 ![N_h](https://www.zhihu.com/equation?tex=N_h) 的向量。动态路由试图根据第一层的节点向量，通过迭代的方法，得到第二层的节点向量：
 
@@ -145,4 +145,3 @@ Model Training Platform:
 
 
 
-  

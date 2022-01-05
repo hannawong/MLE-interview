@@ -20,7 +20,7 @@
 
 ![img](https://pic2.zhimg.com/v2-4afd123329662418ff6bad1585c2765d_b.png)
 
-decoder RNN 的第一个输入是 <START>， 每一步的hidden state再经过一个全连接层得到整个词汇表的概率分布，之后取一个概率最大的词(argmax)作为此时的翻译。每一个 timestep 的翻译词作为下一个timestep的输入，以此继续，直到最后输出<END>
+decoder RNN 的第一个输入是 \<START\>， 每一步的hidden state再经过一个全连接层得到整个词汇表的概率分布，之后取一个概率最大的词(argmax)作为此时的翻译。每一个 timestep 的翻译词作为下一个timestep的输入，以此继续，直到最后输出\<END\>
 
 **1.2.2 解决局部极小 – beam search**
 
@@ -38,7 +38,7 @@ decoder RNN 的第一个输入是 <START>， 每一步的hidden state再经过�
 
 ![img](https://pic4.zhimg.com/v2-1a4a20c7482bab9a2620f32cfca70047_b.png)
 
-<START>后面概率最大的两个词是"I"和"he",概率的log值分别为-0.9和-0.7。我们就取这两个词继续往下递归，"<start>he"再往后概率最大的两个词是"hit"和"struck"，其概率的对数加上之前的-0.7，分别得到-1.7和-2.9，也就是"he hit"和"he struck"的得分分别为 -1.7 和-2.9 。同理，“I was" 和 "I got"的得分分别为 -1.6 和-1.8. 在这一步，又取得分最高的两句话"he hit"(-1.7)和"I was"(-1.6)往下递归，在此省略若干步骤…
+\<START\>后面概率最大的两个词是"I"和"he",概率的log值分别为-0.9和-0.7。我们就取这两个词继续往下递归，"\<start\>he"再往后概率最大的两个词是"hit"和"struck"，其概率的对数加上之前的-0.7，分别得到-1.7和-2.9，也就是"he hit"和"he struck"的得分分别为 -1.7 和-2.9 。同理，“I was" 和 "I got"的得分分别为 -1.6 和-1.8. 在这一步，又取得分最高的两句话"he hit"(-1.7)和"I was"(-1.6)往下递归，在此省略若干步骤…
 
 ​    迭代若干步之后得到：
 
@@ -50,7 +50,7 @@ decoder RNN 的第一个输入是 <START>， 每一步的hidden state再经过�
 
 beam search 的终止条件：
 
-​    在 beam search中，不同的词语选择方法会导致在不同的时候出现<END>,所以每个hypothesis(翻译句子)的长度都不一样。当一个hypothesis最终预测出了<END>,就说明这句话已经预测完毕了，就可以把这句话先放在一边，然后再用beam search取搜索其他的句子。
+​    在 beam search中，不同的词语选择方法会导致在不同的时候出现\<EN\D>,所以每个hypothesis(翻译句子)的长度都不一样。当一个hypothesis最终预测出了\<END\>,就说明这句话已经预测完毕了，就可以把这句话先放在一边，然后再用beam search取搜索其他的句子。
 
 所以，beam search的终止条件可以为：
 
@@ -97,7 +97,7 @@ BLEU(Bilingual Evaluation Understudy) 比较了我们的机器翻译结果和人
 
 ![img](https://pic3.zhimg.com/v2-c6d71577b6b557e6b2d933337b78d3e6_b.png)
 
-在训练语料里面she比较有可能是nurse;he比较有可能是programmer，所以出现了&amp;quot;性别歧视&amp;quot;
+在训练语料里面she比较有可能是nurse;he比较有可能是programmer，所以出现了性别歧视
 
 再看一个更可怕的例子：
 
@@ -128,11 +128,11 @@ on each step of the decoder, use **direct connection** to the encoder to focus o
 
 用概率分布去乘以encoder每一步的hidden state，得到一个加权的source sentence表示：
 
-​    **step2：**用概率分布去乘以encoder每一步的hidden state，得到一个加权的source sentence表示。
+​    **step2：** 用概率分布去乘以encoder每一步的hidden state，得到一个加权的source sentence表示。
 
 ![img](https://pic1.zhimg.com/v2-8ce867ddb4ad5b9820644197e5ced1ec_b.png)
 
-step3：之后，把source sentence的表示和decoderRNN每一步的hidden state拼接在一起，得到一个长向量。然后再经过一层全连接网络，得到整个词汇表的概率分布。取一个argmax即得到这一步的预测值。
+**step3：** 之后，把source sentence的表示和decoderRNN每一步的hidden state拼接在一起，得到一个长向量。然后再经过一层全连接网络，得到整个词汇表的概率分布。取一个argmax即得到这一步的预测值。
 
 ![img](https://pic3.zhimg.com/v2-b2b8e4a0fca368e64b203dea84c782be_b.png)
 
@@ -200,4 +200,3 @@ https://web.stanford.edu/class/cs224n/slides/cs224n-2019-lecture08-nmt.pdfweb.st
 
 
 
-  

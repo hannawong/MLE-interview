@@ -32,12 +32,12 @@ BN层的计算在training和testing阶段是不一样的。
 
 **在testing阶段：**
 
-和training阶段不同，在testing阶段，可能输入就只有一个实例，看不到Mini-Batch其它实例，那么这时候怎么对输入做BN呢？为了解决这一问题，我们计算($\mu_{pop}$,$\sigma_{pop}$)，其中：
+和training阶段不同，在testing阶段，可能输入就只有一个实例，看不到Mini-Batch其它实例，那么这时候怎么对输入做BN呢？为了解决这一问题，我们计算( ![\mu_{pop}](https://www.zhihu.com/equation?tex=%5Cmu_%7Bpop%7D)  , ![\sigma_{pop}](https://www.zhihu.com/equation?tex=%5Csigma_%7Bpop%7D)  )，其中：
 
-- $\mu_{pop} $ : estimated mean of the studied population ;
-- $σ_{pop}$ : estimated standard-deviation of the studied population.
+-  ![\mu_{pop}](https://www.zhihu.com/equation?tex=%5Cmu_%7Bpop%7D)   : estimated mean of the studied population ;
+-  ![\sigma_{pop}](https://www.zhihu.com/equation?tex=%5Csigma_%7Bpop%7D)   : estimated standard-deviation of the studied population.
 
-($\mu_{pop}$ ,$σ_{pop}$)是在训练时计算滑动平均得到的。这两个值代替了在(1)(2)中算出的均值和方差，可以直接带入(3)式。如果阅读了BatchNorm的源码就会发现，这个全局统计量--均值和方差都是通过滑动平均的方法来实现的：
+( ![\mu_{pop}](https://www.zhihu.com/equation?tex=%5Cmu_%7Bpop%7D)   , ![\sigma_{pop}](https://www.zhihu.com/equation?tex=%5Csigma_%7Bpop%7D)  ) 是在训练时计算滑动平均得到的。这两个值代替了在(1)(2)中算出的均值和方差，可以直接带入(3)式。如果阅读了BatchNorm的源码就会发现，这个全局统计量--均值和方差都是通过滑动平均的方法来实现的：
 
 ```python
 running_mean = momentum * running_mean + (1 - momentum) * x_mean
@@ -74,13 +74,13 @@ Tensorflow / Keras: [tf.nn.batch_normalization](https://www.tensorflow.org/api_d
 
 **Stability Issue**
 
-在testing阶段，我们使用$\mu_{pop},\sigma_{pop}$做为evaluation set的估计值。但是，**假如训练集和测试集分布不同**会怎样呢？比如下图中，训练集是形如左图的sneakers，但是测试集中是形如右图的皮鞋。所以，在测试集中如果还用$\mu_{pop},\sigma_{pop}$, 测试集经过batchnorm之后并不是 ![\mu = 0, \sigma^2 = 1](https://www.zhihu.com/equation?tex=%5Cmu%20%3D%200%2C%20%5Csigma%5E2%20%3D%201)的分布。
+在testing阶段，我们使用 ![\sigma_{pop}](https://www.zhihu.com/equation?tex=%5Csigma_%7Bpop%7D)  ， ![\mu_{pop}](https://www.zhihu.com/equation?tex=%5Cmu_%7Bpop%7D)  做为evaluation set的估计值。但是，**假如训练集和测试集分布不同**会怎样呢？比如下图中，训练集是形如左图的sneakers，但是测试集中是形如右图的皮鞋。所以，在测试集中如果还用 ![\mu_{pop}](https://www.zhihu.com/equation?tex=%5Cmu_%7Bpop%7D)  ， ![\sigma_{pop}](https://www.zhihu.com/equation?tex=%5Csigma_%7Bpop%7D)   ，测试集经过batchnorm之后并不是 ![\mu = 0, \sigma^2 = 1](https://www.zhihu.com/equation?tex=%5Cmu%20%3D%200%2C%20%5Csigma%5E2%20%3D%201)的分布。
 
 ![img](https://pic2.zhimg.com/v2-784eac3b291c76b344aca447e9add315_b.png)
 
 > Remark: 训练集和测试集的分布偏差叫做"**covariate shift**".
->
->
+
+
 
 #### 0x02.  放在非线性激活函数之前还是之后？
 
@@ -158,4 +158,3 @@ https://towardsdatascience.com/batch-normalization-in-3-levels-of-understanding-
 
 
 
-  

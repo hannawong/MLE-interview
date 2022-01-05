@@ -42,7 +42,7 @@ RoBERTa模型是对BERT模型的**精调**，它细致分析了BERT模型的超�
 
 ### 0x02. ALBERT
 
-ALBERT是Google于2020年发表的论文[ALBERT: A LITE BERT FOR SELF-SUPERVISED LEARNING OF LANGUAGE REPRESENTATIONS](https://arxiv.org/pdf/1909.11942.pdf) 中提出的。**ALBERT在保持性能的基础上，大大减少了模型的参数，**使得实用变得更加方便，是经典的BERT变体之一。
+ALBERT是Google于2020年发表的论文[ALBERT: A LITE BERT FOR SELF-SUPERVISED LEARNING OF LANGUAGE REPRESENTATIONS](https://arxiv.org/pdf/1909.11942.pdf) 中提出的。 **ALBERT在保持性能的基础上，大大减少了模型的参数，** 使得实用变得更加方便，是经典的BERT变体之一。
 
 ALBERT做了如下改进：**跨层参数共享；句子顺序预测（Sentence Order Prediction）;对embedding做分解**
 
@@ -60,7 +60,7 @@ BERT-large模型有24层，而它的基础版本有12层。随着层数的增加
 
 ![img](https://pic2.zhimg.com/v2-2a78fb88afc8a80e337b5bda2193c5a5_b.png)
 
-2**.句子顺序预测 (SOP)**
+2 **句子顺序预测 (SOP)** 
 
 上文提到，RoBERTa的论文已经阐明了NSP的无效性，并且发现它对下游任务的影响是不可靠的。在取消NSP任务之后，多个任务的性能都得到了提高。为什么NSP无效呢？ALBERT论文中的解释是这样的：
 
@@ -85,7 +85,7 @@ SOP提高了下游任务(SQUAD 1.1, 2.0, MNLI, SST-2, RACE)的性能。
 
 在这里我们可以看到，在SOP任务上，一个只经过NSP训练的模型给出的分数只比随机猜略好一点(52.0)，这也恰恰证明了上文的猜想：NSP只学习了topic prediction, 完全没有学习到coherence prediction。但是经过SOP训练的模型可以非常有效地解决NSP任务。这就证明SOP能带来更好的学习表现。
 
-3、嵌入参数分解(对Embedding部分进行矩阵分解)
+3、**嵌入参数分解(对Embedding部分进行矩阵分解)**
 
 ALBERT中使用和BERT大小相近的30K词汇表。假如我们的embedding size和hidden size一样，都是768，那么如果我们想增加了hidden size，就也需要相应的增加embedding size，这会导致embedding table变得很大。
 

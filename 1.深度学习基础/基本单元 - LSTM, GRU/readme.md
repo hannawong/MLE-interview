@@ -18,7 +18,7 @@
 
 ![img](https://pic4.zhimg.com/80/v2-ca989fb91c422c566ce30b0496d0fc97_1440w.jpg)
 
-梯度消失的罪魁祸首是sigmoid函数，在sigmoid函数靠近0和1的位置，其导数很小。很多小的值相乘，导致最终的梯度很小。(自己推导：$\sigma'(x) = \sigma(x)(1-\sigma(x))$)
+梯度消失的罪魁祸首是sigmoid函数，在sigmoid函数靠近0和1的位置，其导数很小。很多小的值相乘，导致最终的梯度很小。(自己推导： ![\sigma'(x) = \sigma(x)(1-\sigma(x))](https://www.zhihu.com/equation?tex=%5Csigma%27(x)%20%3D%20%5Csigma(x)(1-%5Csigma(x)))  )
 
 ![img](https://pic2.zhimg.com/80/v2-cc42dc6326273abbf14837d83ad805c9_1440w.jpg)                                
 
@@ -74,7 +74,7 @@
 
 
 
-(2) 权重正则化。如果发生梯度爆炸，那么权值的范数就会变的非常大。通过限制正则化项的大小，也可以在一定程度上限制梯度爆炸的发生。
+(2) **权重正则化** 。如果发生梯度爆炸，那么权值的范数就会变的非常大。通过限制正则化项的大小，也可以在一定程度上限制梯度爆炸的发生。
 
 
 
@@ -228,9 +228,8 @@ LSTM能够让RNN一直保留原来的信息(preserve information over many times
 **Q/A：Relu 能否作为RNN的激活函数？**
 
 RNN 的梯度消失，梯度爆炸问题在于： 
-$$
-\prod_{j=k+1}^t \frac{\delta S_j}{\delta S_{j-1}} = \prod_{j=k+1}^t tanh' W_h
-$$
+
+ ![\prod_{j=k+1}^t \frac{\delta S_j}{\delta S_{j-1}} = \prod_{j=k+1}^t tanh' W_h](https://www.zhihu.com/equation?tex=%5Cprod_%7Bj%3Dk%2B1%7D%5Et%20%5Cfrac%7B%5Cdelta%20S_j%7D%7B%5Cdelta%20S_%7Bj-1%7D%7D%20%3D%20%5Cprod_%7Bj%3Dk%2B1%7D%5Et%20tanh%27%20W_h)  
 
 ### 
 

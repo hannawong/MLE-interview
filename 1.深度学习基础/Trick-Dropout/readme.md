@@ -2,7 +2,7 @@
 
 ![img](https://miro.medium.com/max/2842/1*TfTdymI0ot6ZOdwVUK1V2w.png)
 
-Dropout是一种典型的**【防止过拟合】**的方法。
+Dropout是一种典型的**【防止过拟合】** 的方法。
 
 过拟合的原因是算法的学习能力过强；而训练样本过少不能对整个空间进行分布估计。
 

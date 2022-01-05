@@ -124,7 +124,7 @@ def transformer_model(input_tensor,  ##[batch_size,seq_length,hidden_size]
 
 现在，给出GELU函数的形式：
 
-​                                                  $$GELU(x) = \Phi(x) * I(x) + (1 - \Phi(x)) * 0x = x\Phi(x)$$
+​                                                                       ![GELU(x) = x\Phi(x)](https://www.zhihu.com/equation?tex=GELU(x)%20%3D%20x%5CPhi(x))  
 
 其中 ![\Phi(x)](https://www.zhihu.com/equation?tex=%5CPhi(x))\Phi(x) 是上文提到的标准正态分布的累积分布函数。因为这个函数没有解析解，所以要用近似函数来表示。
 
@@ -345,4 +345,3 @@ FFN的gelu激活函数和self-attention，注意self-attention是非线性的（
 
 
 
-  

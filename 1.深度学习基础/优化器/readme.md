@@ -38,9 +38,9 @@
 梯度下降法是最基本的一类优化器，目前主要分为三种梯度下降法：标准梯度下降法(GD, Gradient Descent)，随机梯度下降法(SGD, Stochastic Gradient Descent)及批量梯度下降法(BGD, Batch Gradient Descent)。
 
 ##### 1. 标准梯度下降法(GD)
-假设要学习训练的模型参数为$\theta$，loss为$J(\theta)$，则loss关于模型参数的偏导数，即梯度为$g_t = \frac{\partial J(\theta)}{\partial \theta}|_{\theta = \theta_{t-1}}$，学习率为$η$，则使用梯度下降法更新参数为：$\Delta \theta = -\eta g_t$
+假设要学习训练的模型参数为 ![\theta](https://www.zhihu.com/equation?tex=%5Ctheta)  ，loss为 ![J(\theta)](https://www.zhihu.com/equation?tex=J(%5Ctheta))  。则loss关于模型参数的偏导数，即梯度为 ![g_t = \frac{\partial J(\theta)}{\partial \theta}|_{\theta = \theta_{t-1}}](https://www.zhihu.com/equation?tex=g_t%20%3D%20%5Cfrac%7B%5Cpartial%20J(%5Ctheta)%7D%7B%5Cpartial%20%5Ctheta%7D%7C_%7B%5Ctheta%20%3D%20%5Ctheta_%7Bt-1%7D%7D)  ，学习率为η，则使用梯度下降法更新参数为： ![\Delta \theta = -\eta g_t](https://www.zhihu.com/equation?tex=%5CDelta%20%5Ctheta%20%3D%20-%5Ceta%20g_t)  
 
-若参数是多元($\theta_1,\theta_2...\theta_n$)的，则梯度为：
+若参数是多元( ![\theta_1,\theta_2...\theta_n](https://www.zhihu.com/equation?tex=%5Ctheta_1%2C%5Ctheta_2...%5Ctheta_n) )的，则梯度为：
 
 ![img](https://img-blog.csdnimg.cn/20210217221519422.png)
 
@@ -53,7 +53,7 @@
 
 
 
-上图中，红色部分代表损失函数 $J(\theta )$ 比较大的地方，蓝色部分是损失函数小的地方。我们需要让$J(\theta )$的值尽量的低，也就是达到深蓝色的部分。$w_1$，$w_2$表示W向量的两个维度。
+上图中，红色部分代表损失函数 ![J(\theta )](https://www.zhihu.com/equation?tex=J(%5Ctheta%20))   比较大的地方，蓝色部分是损失函数小的地方。我们需要让 ![J(\theta )](https://www.zhihu.com/equation?tex=J(%5Ctheta%20))  值尽量的低，也就是达到深蓝色的部分。 ![w_1,w_2](https://www.zhihu.com/equation?tex=w_1%2Cw_2)  表示W向量的两个维度。
 
 然而，标准梯度下降法每走一步都要在**整个训练集上**计算调整下一步的方向，下山的速度慢。在应用于大型数据集中，每次迭代都要遍历所有的样本，会使得训练过程及其缓慢。所以，下面介绍随机梯度下降法和小批量梯度下降法。
 
@@ -93,7 +93,7 @@ A：梯度下降法并不是下降最快的方向，它只是目标函数在当�
 
 #### 1. momentum
 
-Momentum的“梯度”不仅包含了这一步实际算出来的梯度，还包括了上一次的梯度“惯性”。其实，动量项$m_t$可以看作$E[g_t] $的移动平均。
+Momentum的“梯度”不仅包含了这一步实际算出来的梯度，还包括了上一次的梯度“惯性”。其实，动量项 ![m_t](https://www.zhihu.com/equation?tex=m_t)  可以看作 ![E[g_t] ](https://www.zhihu.com/equation?tex=E%5Bg_t%5D%20)  的移动平均。
 
 ![img](https://img-blog.csdnimg.cn/2021012711360045.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
 
@@ -121,7 +121,7 @@ nesterov项在梯度更新时做一个校正，避免前进太快，同时提高
 
 
 
-所以，加上nesterov项后，梯度在大的跳跃后，进行计算对当前梯度进行校正。如下图：
+所以，加上nesterov项后，梯度在大的跳跃后，进行计算**对当前梯度进行校正** 。如下图：
 
 ![img](https://img-blog.csdnimg.cn/20210127113707743.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
 
@@ -142,12 +142,12 @@ Adagrad其实是对学习率进行了一个约束。即：
 
 
 
-- 前期$\sum g_r^2$较小的时候，learning rate较大，能够放大梯度
-- 后期$\sum g_r^2$较大的时候，learning rate较小，能够约束梯度
+- 前期 ![\sum g_r^2](https://www.zhihu.com/equation?tex=%5Csum%20g_r%5E2)  较小的时候，learning rate较大，能够放大梯度
+- 后期 ![\sum g_r^2](https://www.zhihu.com/equation?tex=%5Csum%20g_r%5E2)  较大的时候，learning rate较小，能够约束梯度
 
 缺点：
 
-- 由公式可以看出，仍依赖于人工设置一个全局学习率$\eta$
+- 由公式可以看出，仍依赖于人工设置一个全局学习率 ![\eta](https://www.zhihu.com/equation?tex=%5Ceta)  
 - 一开始分母太小，所以learning rate太大，对梯度的调节太大
 - 而中后期，分母上梯度平方的累加将会越来越大，使学习率趋近于0，使得训练提前结束
 
@@ -155,7 +155,7 @@ Adagrad其实是对学习率进行了一个约束。即：
 
 ##### **3.2 RMSProp算法**
 
-- RMSProp算法修改了AdaGrad的梯度**积累**为指数加权的移动**平均，**避免了学习率越来越低的的问题。
+- RMSProp算法修改了AdaGrad的梯度**积累**为指数加权的移动**平均，** 避免了学习率越来越低的的问题。
 - RMSProp算法在经验上已经被证明是一种有效且实用的深度神经网络优化算法。目前它是深度学习从业者经常采用的优化方法之一。   
 
 ![img](https://img-blog.csdnimg.cn/20210127113756534.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
@@ -170,9 +170,9 @@ Adam(Adaptive Moment Estimation)本质上是**带momentum的RMSprop**，它利�
 
 为什么说Adam是"带momentum的RMSprop"呢? 我们把参数更新的公式拆解成这样就容易看清了：
 
-​                                                                    $$\Delta \theta_t = -\frac{\eta}{\sqrt{\hat{n_t}+\epsilon}} \cdot \hat{m_t}$$
+​                                                                 ![\Delta \theta_t = -\frac{\eta}{\sqrt{\hat{n_t}+\epsilon}} \cdot \hat{m_t}](https://www.zhihu.com/equation?tex=%5CDelta%20%5Ctheta_t%20%3D%20-%5Cfrac%7B%5Ceta%7D%7B%5Csqrt%7B%5Chat%7Bn_t%7D%2B%5Cepsilon%7D%7D%20%5Ccdot%20%5Chat%7Bm_t%7D)  
 
-其中，左边这一项就是自适应调整学习率的项，分母中的$\hat{n_t}$ 就对应RMSprop中的$E[g_t^2]$. 右边是所谓"动量项"，就是$E[g_t]$的移动平均。 
+其中，左边这一项就是自适应调整学习率的项，分母中的 ![\hat{n_t}](https://www.zhihu.com/equation?tex=%5Chat%7Bn_t%7D)  就对应RMSprop中的 ![E[g_t^2]](https://www.zhihu.com/equation?tex=E%5Bg_t%5E2%5D)  . 右边是所谓"动量项"，就是 ![E[g_t]](https://www.zhihu.com/equation?tex=E%5Bg_t%5D)  的移动平均。 
 
 Adam通常被认为对超参数的选择相当鲁棒，尽管学习率有时需要从建议的默认修改。
 

@@ -8,7 +8,7 @@ RNN是处理**序列数据**的算法，RNN使用内部存储器(internal memory
 
 在介绍RNN之前，我们先介绍最初引入RNN的问题---**Language Modeling**。
 
-**定义：**Language Modeling就是预测下一个出现的词的概率的任务。(Language Modeling is the task of predicting what word comes next.)
+**定义：** Language Modeling就是预测下一个出现的词的概率的任务。(Language Modeling is the task of predicting what word comes next.)
 
 ![img](https://pic3.zhimg.com/80/v2-0aac9354c677b27fd7602711041464aa_1440w.jpg)
 

@@ -38,9 +38,9 @@ self.u = torch.nn.Parameter(torch.nn.init.normal_(tensor,mean = 0.0,std = 1.0),r
 
 文章假设的是线性激活函数，经过推导得到
 
-​                                                                                      $W  \sim U [ -\frac{\sqrt{6}}{\sqrt{n_i+ n_{i + 1}}}, \frac{\sqrt{6}}{\sqrt{n_i + n_{i + 1}}}]$              ,
+​                                                          ![W  \sim U [ -\frac{\sqrt{6}}{\sqrt{n_i+ n_{i + 1}}}, \frac{\sqrt{6}}{\sqrt{n_i + n_{i + 1}}}]](https://www.zhihu.com/equation?tex=W%20%20%5Csim%20U%20%5B%20-%5Cfrac%7B%5Csqrt%7B6%7D%7D%7B%5Csqrt%7Bn_i%2B%20n_%7Bi%20%2B%201%7D%7D%7D%2C%20%5Cfrac%7B%5Csqrt%7B6%7D%7D%7B%5Csqrt%7Bn_i%20%2B%20n_%7Bi%20%2B%201%7D%7D%7D%5D)  
 
-其中，$n_i$是第i层神经元个数，$n_{i+1}$是第i+1层神经元个数。
+其中， ![n_i](https://www.zhihu.com/equation?tex=n_i)  是第i层神经元个数， ![n_{i+1}](https://www.zhihu.com/equation?tex=n_%7Bi%2B1%7D)  是第i+1层神经元个数。
 
 推导：https://github.com/songyingxin/NLPer-Interview/blob/master/5-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80/%E8%B0%83%E5%8F%82%20-%20%E6%9D%83%E9%87%8D%E5%88%9D%E5%A7%8B%E5%8C%96.md
 
@@ -53,9 +53,8 @@ self.w_params = torch.nn.Parameter(torch.nn.init.xavier_normal_(w),requires_grad
 #### 6. Kaiming 初始化
 
 kaiming初始化的出现是因为xavier存在一个不成立的假设，那就是假设激活函数都是线性的，而在深度学习中常用的ReLu等都是非线性的激活函数。而kaiming初始化本质上是**高斯分布**初始化，其均值为0，方差为2/n。
-$$
-W\sim N(0,\sqrt{\frac{2}{n}})
-$$
+
+​                                                                              ![W\sim N(0,\sqrt{\frac{2}{n}})](https://www.zhihu.com/equation?tex=W%5Csim%20N(0%2C%5Csqrt%7B%5Cfrac%7B2%7D%7Bn%7D%7D))  
 
 n  为所在层的输入维度。
 

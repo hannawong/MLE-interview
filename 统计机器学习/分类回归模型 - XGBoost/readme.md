@@ -34,12 +34,11 @@
 ​    我们知道模型的预测精度由模型的**偏差和方差**共同决定，损失函数的前半部分代表了模型的偏差；想要方差小则需要在目标函数中添加正则项，用于防止过拟合。所以目标函数的后半部分是抑制**模型复杂度的正则项** ![\Omega(f_k)](https://www.zhihu.com/equation?tex=%5COmega(f_k))，这也是XGBoost和GBDT的差异所在。
 
 ​    树的复杂度计算公式如下：
-$$
-\Omega(f) = \gamma T+\frac{1}{2} \lambda\sum_{j=1}^Tw_j^2
-$$
- 
 
-​    其中， $T$ 为树的叶子节点个数，![w_j](https://www.zhihu.com/equation?tex=w_j)为第 $j$ 个节点的权重。叶子节点越少模型越简单，此外叶子节点也不应该含有过高的权重$w_j$.
+​                                                                   ![\Omega(f) = \gamma T+\frac{1}{2} \lambda\sum_{j=1}^Tw_j^2](https://www.zhihu.com/equation?tex=%5COmega(f)%20%3D%20%5Cgamma%20T%2B%5Cfrac%7B1%7D%7B2%7D%20%5Clambda%5Csum_%7Bj%3D1%7D%5ETw_j%5E2)  
+
+
+​    其中， T 为树的叶子节点个数，![w_j](https://www.zhihu.com/equation?tex=w_j)为第 j 个节点的权重。叶子节点越少模型越简单，此外叶子节点也不应该含有过高的权重.
 
 **2.2 Gradient Tree Boosting**
 
@@ -65,7 +64,7 @@ $$
 
 ![img](https://pic3.zhimg.com/v2-35b23ffb80cadac1b18483b737632382_b.jpeg)
 
-​    其中 $g_i$ 是损失函数 $l(y_i,\hat{y_i}^{(t-1)})$ 对 $\hat{y_i}^{(t-1)}$ 的一阶导。读过我前面写的GBDT文章的同学应该发现了， $g_i$ 就是在梯度提升树中第t棵树要拟合的那个值（如果是平方误差损失的回归问题，就是残差。）
+​    其中 $g_i$ 是损失函数  ![l(y_i,\hat{y_i}^{(t-1)})](https://www.zhihu.com/equation?tex=l(y_i%2C%5Chat%7By_i%7D%5E%7B(t-1)%7D))  对   ![\hat{y_i}^{(t-1)}](https://www.zhihu.com/equation?tex=%5Chat%7By_i%7D%5E%7B(t-1)%7D)  的一阶导。读过我前面写的GBDT文章的同学应该发现了，  ![g_i](https://www.zhihu.com/equation?tex=g_i)   就是在梯度提升树中第t棵树要拟合的那个值（如果是平方误差损失的回归问题，就是残差。）
 
 ​    但是，XGBoost 还引入了二阶导 $h_i$ 。XGBoost 引入二阶导一方面是为了增加精度，另一方面也是为了能够自定义损失函数，二阶泰勒展开可以近似大量损失函数。顺便提一下，xgboost工具支持自定义代价函数，只要函数可一阶和二阶求导。
 
@@ -73,7 +72,7 @@ $$
 
 ![img](https://pic4.zhimg.com/v2-102a5435bd0fcc53ee3ccc76b726f19f_b.jpeg)
 
-​    其中，$T$ 为这棵树的**叶节点**个数，$G_j$ 为叶子节点 $j$ 所含**所有样本的一阶导数** $g_i $之和；$H_j$ 为节点 $j$ 所含所有样本的二阶导数 $h_i$ 之和。
+​    其中，T为这棵树的**叶节点**个数，G_j 为叶子节点 j 所含**所有样本的一阶导数** g_i 之和；H_j 为节点 j 所含所有样本的二阶导数 h_i 之和。
 
 
 
@@ -89,7 +88,7 @@ XGBoost使用了和CART回归树一样的想法，利用贪婪算法，将所有
 
    贪心算法可以得到最优解，但当数据量太大时则无法读入内存进行计算，近似算法则大大降低了计算量，给出了近似最优解。
 
-   对于每个特征，只考察分位点可以减少计算复杂度。近似算法简单来说，就是对每个特征 $k$ 都确定 $l$ 个候选切分点 ![S_k = \{S_{k1}, S_{k2},...S_{kl}\}](https://www.zhihu.com/equation?tex=S_k%20%3D%20%5C%7BS_%7Bk1%7D%2C%20S_%7Bk2%7D%2C...S_%7Bkl%7D%5C%7D) ，然后根据这些候选切分点把相应的样本放入对应的桶中，对每个桶的$g_i,h_i$ 进行累加。最后在候选切分点集合上贪心查找。例如：
+   对于每个特征，只考察分位点可以减少计算复杂度。近似算法简单来说，就是对每个特征 k​ 都确定 l 个候选切分点 ![S_k = \{S_{k1}, S_{k2},...S_{kl}\}](https://www.zhihu.com/equation?tex=S_k%20%3D%20%5C%7BS_%7Bk1%7D%2C%20S_%7Bk2%7D%2C...S_%7Bkl%7D%5C%7D) ，然后根据这些候选切分点把相应的样本放入对应的桶中，对每个桶的g_i,h_i 进行累加。最后在候选切分点集合上贪心查找。例如：
 
 ![img](https://pic1.zhimg.com/v2-c04f7b4e428db4e1a8f57d1bc01e6cec_b.png)
 
@@ -142,4 +141,3 @@ XGBoost使用了和CART回归树一样的想法，利用贪婪算法，将所有
 https://towardsdatascience.com/https-medium-com-vishalmorde-xgboost-algorithm-long-she-may-rein-edd9f99be63dtowardsdatascience.com
 
 
-  

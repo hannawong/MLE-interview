@@ -12,7 +12,7 @@
 
 - - Relatively **few assumptions** are made a priori about the functional form.
 
-- - 非参数化的训练过程非常简单（可以说没有训练过程），就是把所有的训练样例存储起来。之后我们需要一个相似度函数 $f$，在测试过程中，计算测试样例和训练样例的相似度即可。
+- - 非参数化的训练过程非常简单（可以说没有训练过程），就是把所有的训练样例存储起来。之后我们需要一个相似度函数 f，在测试过程中，计算测试样例和训练样例的相似度即可。
 
 ## 0x02. 1-近邻 (1-NN)
 **【定义1】Voronoi tessellation (Dirichlet tessellation)**

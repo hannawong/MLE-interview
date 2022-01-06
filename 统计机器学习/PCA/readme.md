@@ -18,7 +18,9 @@
 - 样本方差：![S^{2}=\frac{1}{n-1}\sum_{i=1}^{n}{\left( x_{i}-\bar{x} \right)^2}](https://www.zhihu.com/equation?tex=S%5E%7B2%7D%3D%5Cfrac%7B1%7D%7Bn-1%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%7B%5Cleft(%20x_%7Bi%7D-%5Cbar%7Bx%7D%20%5Cright)%5E2%7D)度量分散程度。
 - 协方差：表示两个分布的线性相关性
 
-​                                                   $$\begin{align*} Cov\left( X,Y \right)&=E\left[ \left( X-E\left( X \right) \right)\left( Y-E\left( Y \right) \right) \right] \\ &=\frac{1}{n-1}\sum_{i=1}^{n}{(x_{i}-\bar{x})(y_{i}-\bar{y})} \end{align*}$$
+ Cov(X,Y) = E[(X-EX)(Y-EY)] 
+
+ ![ =\frac{1}{n-1}\sum_{i=1}^{n}{(x_{i}-\bar{x})(y_{i}-\bar{y})} ](https://www.zhihu.com/equation?tex=%20%3D%5Cfrac%7B1%7D%7Bn-1%7D%5Csum_%7Bi%3D1%7D%5E%7Bn%7D%7B(x_%7Bi%7D-%5Cbar%7Bx%7D)(y_%7Bi%7D-%5Cbar%7By%7D)%7D%20)  
 
 #### 2. PCA概念
 
@@ -161,4 +163,3 @@ PCA的工作就是从原始的空间中顺序地找一组相互正交的坐标�
 Microstrong：主成分分析（PCA）原理详解zhuanlan.zhihu.com![图标](https://pic1.zhimg.com/equation_ipico.jpg)
 
 
-  

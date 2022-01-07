@@ -38,3 +38,65 @@
 
 再后来想到，这不就是个三维dp嘛，直接用dp数组不就完事儿了。但是可惜还是超时，估计是因为三维数组的空间时间复杂度还是太大，毕竟是200\*200\*200维的。不知道有没有二维数组的方法。最后过了30%。
 
+
+
+```python
+# If you need to import additional packages or classes, please import here.
+class Solution():
+    dp = None
+    def func(self,A_capacity,B_capacity,goods,M): ##goods:[weight,A_profit,B_profit]
+        self.dp = [[[0]*(B_capacity+1) for _ in range(A_capacity+1)] for k in range(M+1)]
+        for i in range(1,M+1):
+            for j in range(A_capacity+1):
+                for k in range(B_capacity+1):
+                    if j - goods[i-1][0] >= 0:
+                        self.dp[i][j][k] = max(self.dp[i][j][k],self.dp[i-1][j-goods[i-1][0]][k]+goods[i-1][1])
+                    if k - goods[i - 1][0] >= 0:
+                        self.dp[i][j][k] = max(self.dp[i][j][k],self.dp[i-1][j][k-goods[i-1][0]]+goods[i-1][2])
+                    self.dp[i][j][k] = max(self.dp[i][j][k],self.dp[i - 1][j][k])
+        print(self.dp[M][A_capacity][B_capacity])
+
+
+
+if __name__ == "__main__":
+    s = Solution()
+    #s.func(5,6,[[4,3,2],[3,1,4],[2,2,4],[2,3,3]],4)
+    line1 = input().split()
+    A_capacity = int(line1[0])
+    B_capacity = int(line1[1])
+    M = int(line1[-1])
+    goods = []
+    for i in range(M):
+        line = input().split()
+        llline = []
+        for j in range(len(line)):
+            llline.append(int(line[j]))
+        goods.append(llline)
+    s.func(A_capacity,B_capacity,goods,M)
+```
+
+
+
+【复盘】：
+
+后来想到的优化点：可以进行状态压缩，变为滚动数组。这样空间复杂度变为O(n^2), 但是时间复杂度还是O(n^3).
+
+```python
+class Solution():
+    dp = None
+    def func(self,A_capacity,B_capacity,goods,M): ##goods:[weight,A_profit,B_profit]
+        self.dp = [[[0]*(B_capacity+1) for _ in range(A_capacity+1)] for k in range(2)]
+        for i in range(1,M+1):
+            for j in range(A_capacity+1):
+                for k in range(B_capacity+1):
+                    if j - goods[i-1][0] >= 0:
+                        self.dp[1][j][k] = max(self.dp[1][j][k],self.dp[0][j-goods[i-1][0]][k]+goods[i-1][1])
+                    if k - goods[i - 1][0] >= 0:
+                        self.dp[1][j][k] = max(self.dp[1][j][k],self.dp[0][j][k-goods[i-1][0]]+goods[i-1][2])
+                    self.dp[1][j][k] = max(self.dp[1][j][k],self.dp[0][j][k])
+            for j in range(A_capacity+1):
+                for k in range(B_capacity+1):
+                    self.dp[0][j][k] = self.dp[1][j][k]
+        print(self.dp[0][A_capacity][B_capacity])
+```
+

@@ -2,11 +2,11 @@
 
 **(1) Accuracy, Precision, Recall, F1-score**
 
-​                                                   $Accuracy = \frac{TP+TN}{TP+TN+FP+FN} $
+​                                                    ![Accuracy = \frac{TP+TN}{TP+TN+FP+FN} ](https://www.zhihu.com/equation?tex=Accuracy%20%3D%20%5Cfrac%7BTP%2BTN%7D%7BTP%2BTN%2BFP%2BFN%7D%20)  
 
-​                                                         $Precision = \frac{TP}{TP+FP}$   //模型给出的阳性，有多少是真阳？
+​                                                       ![Precision = \frac{TP}{TP+FP}](https://www.zhihu.com/equation?tex=Precision%20%3D%20%5Cfrac%7BTP%7D%7BTP%2BFP%7D)        //模型给出的阳性，有多少是真阳？
 
-​                                                       $Recall = \frac{TP}{TP+FN}$  //阳性有多少被找了出来？
+​                                                       ![Recall = \frac{TP}{TP+FN}](https://www.zhihu.com/equation?tex=Recall%20%3D%20%5Cfrac%7BTP%7D%7BTP%2BFN%7D)       //阳性有多少被找了出来？
 
 ​                                                    ![F1 = \frac{2}{\frac{1}{Precision}+\frac{1}{Recall}}](https://www.zhihu.com/equation?tex=F1%20%3D%20%5Cfrac%7B2%7D%7B%5Cfrac%7B1%7D%7BPrecision%7D%2B%5Cfrac%7B1%7D%7BRecall%7D%7D) //二者的调和平均数
 
@@ -63,7 +63,7 @@ def AUC(label,pre):
 
 Macro 算法在计算 Precision 与 Recall 时是先分别计算每个类别的Precision 与 Recall， 然后再进行平均。
 
-​                                                     $$Macro_{F1-score}=\frac{1}{N}\sum_{i=0}^N F1-score_i$$
+​                                                   ![Macro_{F1-score}=\frac{1}{N}\sum_{i=0}^N F1-score_i](https://www.zhihu.com/equation?tex=Macro_%7BF1-score%7D%3D%5Cfrac%7B1%7D%7BN%7D%5Csum_%7Bi%3D0%7D%5EN%20F1-score_i)  
 
 其中，N为类别数。
 
@@ -74,13 +74,8 @@ Macro F1 本质上是所有类别的统计指标的算术平均值来求得的�
 **2) Micro F1** ：微平均
 
 Micro 算法在计算 Precision 与 Recall 时会将所有类直接放到一起来计算。
-$$
-\text{Precision}_{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FP} \\
-\text{Recall}{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FN} \\
 
-\text{Micro F1} = \frac{2 \cdot \text{Precision}_{micro} \cdot \text{Recall}
-_{micro}}{\text{Precision}_{micro} + \text{Recall}_{micro}}
-$$
+ ![\text{Precision}_{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FP} \\ \text{Recall}{micro} = \frac{\sum_{i=1}^L TP}{\sum_{i=1}^L TP + \sum_{i=1}^L FN} \\  \text{Micro F1} = \frac{2 \cdot \text{Precision}_{micro} \cdot \text{Recall} _{micro}}{\text{Precision}_{micro} + \text{Recall}_{micro}}](https://www.zhihu.com/equation?tex=%5Ctext%7BPrecision%7D_%7Bmicro%7D%20%3D%20%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5EL%20TP%7D%7B%5Csum_%7Bi%3D1%7D%5EL%20TP%20%2B%20%5Csum_%7Bi%3D1%7D%5EL%20FP%7D%20%5C%5C%0A%5Ctext%7BRecall%7D%7Bmicro%7D%20%3D%20%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5EL%20TP%7D%7B%5Csum_%7Bi%3D1%7D%5EL%20TP%20%2B%20%5Csum_%7Bi%3D1%7D%5EL%20FN%7D%20%5C%5C%0A%0A%5Ctext%7BMicro%20F1%7D%20%3D%20%5Cfrac%7B2%20%5Ccdot%20%5Ctext%7BPrecision%7D_%7Bmicro%7D%20%5Ccdot%20%5Ctext%7BRecall%7D%0A_%7Bmicro%7D%7D%7B%5Ctext%7BPrecision%7D_%7Bmicro%7D%20%2B%20%5Ctext%7BRecall%7D_%7Bmicro%7D%7D)  
 
 
 **Macro vs Micro** 

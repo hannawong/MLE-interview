@@ -62,13 +62,13 @@ x轴：log(用户最终选的酒店价格) - log(搜索结果的中位数价格)
 
 x轴：price，y轴：tanh(w*P+b),是单调递增
 
-![w,b](https://www.zhihu.com/equation?tex=w%2Cb) 两个参数可以提供解释性。最总学到的 ![w=0.33,b=-0.9](https://www.zhihu.com/equation?tex=w%3D0.33%2Cb%3D-0.9)w=0.33,b=-0.9.
+![w,b](https://www.zhihu.com/equation?tex=w%2Cb) 两个参数可以提供解释性。最总学到的 ![w=0.33,b=-0.9](https://www.zhihu.com/equation?tex=w%3D0.33%2Cb%3D-0.9).
 
-但是采用上续方式的线上A/B test的表现并不如意。搜索结果的平均价格下降了5.7%。但是下单率下降了1.5%。这可能是因为price特征和其他特征有比较强的特征交互，将price特征isolate出来会导致模型的**欠拟合**。在训练集和测试集上NDCG都下降了，这印证了模型是发生了欠拟合。
+但是采用上续方式的线上A/B test的表现并不如意。搜索结果的平均价格下降了5.7%。但是下单率下降了1.5%。这可能是因为price特征和其他特征有比较强的**特征交互** ，将price特征isolate出来会导致模型的**欠拟合**。在训练集和测试集上NDCG都下降了，这印证了模型是发生了欠拟合。
 
 ### 2.3 Generalized Monotonicity
 
-为了保留cheaper is better，同时让价格特征和其它特征进行交互，文章就开始研究一些对输入特征保持单调的架构(DNN architectures that were monotonic with respect to some of its inputs)。Lattice networks提供了一种很好的解决方案，但是如果将整个结果转换成 Lattice 的话是比较麻烦的。所以文章设计了一个这样的解决方案，将price特征抽取出来，单独和price无关的特征交互。
+为了保留cheaper is better，同时让价格特征和其它特征进行**交互** ，文章就开始研究一些对输入特征保持单调的架构(DNN architectures that were monotonic with respect to some of its inputs)。Lattice networks提供了一种很好的解决方案，但是如果将整个结果转换成 Lattice 的话是比较麻烦的。所以文章设计了一个这样的解决方案，将price特征抽取出来，单独和price无关的特征交互。
 
 ![img](https://pic1.zhimg.com/v2-6072eeba706fb60cf06b5f140fbc5608_b.jpeg)
 
@@ -83,7 +83,7 @@ x轴：price，y轴：tanh(w*P+b),是单调递增
 
 ### 2.4 Soft Monotonicity
 
-既然过于强制的价格下降会导致模型失准，那么能不能有一个没那么强制的方案呢？答案是有的。其实对于搜索排序而言，一般会考虑**pairwise的损失**。也就是说训练样本包含同一个query下的**<一个正例(booked)，一个负例(not booked)>**
+既然过于强制的价格下降会导致模型失准，那么能不能有一个没那么强制的方案呢？答案是有的。其实对于搜索排序而言，一般会考虑**pairwise的损失**。也就是说训练样本包含同一个query下的**<一个正例(booked)，一个负例(not booked)>** 
 
 ![img](https://pic4.zhimg.com/v2-54a16981423abf4941d42c5215b46e83_b.png)
 
@@ -121,13 +121,15 @@ x轴：搜索结果的价格中位数 - 预订的价格
 
 **中间的塔是Query&User的特征；左右两侧的塔是<被预订，未预订>的特征。这三个塔分别学习100维的向量，之后计算euclidean distance。**
 
-损失函数：基于pair-wise计算，基于Query&User和正样本、负样本的欧式距离，计算差值(Unbooked list euclidean distance - Booked list euclidean distance)，然后和全1向量计算cross entropy loss。这是因为我们希望Booked listing塔的输出更接近Query&User塔；让Unbooked Listing塔的输出更远离Query&User塔。
+
+
+损失函数：基于pair-wise计算，基于Query&User和正样本、负样本的欧式距离，计算差值(Unbooked list euclidean distance - Booked list euclidean distance)，然后和全1向量计算cross entropy loss。这是因为我们希望Booked listing塔的输出更接近Query&User塔；让Unbooked Listing塔的输出更远离Query&User塔。(这也正是对比学习的思想)
 
 模型的简要代码：
 
 ![img](https://pic1.zhimg.com/v2-d76b008af38616bbcfeafdb3ecadb08c_b.jpeg)
 
-### 3. 冷启动问题
+### 3.【 冷启动】问题
 
 冷启动问题是任何推荐系统必须面对的问题，不论是user冷启动还是item冷启动。Airbnb的这篇文章解决的是item冷启动问题。
 
@@ -178,4 +180,3 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 
 
-  

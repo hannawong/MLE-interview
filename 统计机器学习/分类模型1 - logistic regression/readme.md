@@ -30,15 +30,15 @@
 
 为了更方便求解，我们对等式两边同取对数，写成对数似然函数：
 
-​                                                          $$\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))$$
+​                                                        ![\sum_{i=1}^N y_ilogp(x_i) + (1-y_i)log(1-p(x_i))](https://www.zhihu.com/equation?tex=%5Csum_%7Bi%3D1%7D%5EN%20y_ilogp(x_i)%20%2B%20(1-y_i)log(1-p(x_i)))  
 
 从另一个角度来讲，对于一个样本来说，它的交叉熵损失函数为：
 
-​                                                         $$-[(1-y)log(1-\sigma(\theta^Tx))+ylog(\sigma(\theta^Tx))]$$
+​                                                ![1641523024244](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1641523024244.png)
 
 所有样本的交叉熵损失函数为：
 
-​                                             $$\frac{1}{N}\sum_{i=1}^N-[(1-y_i)log(1-\sigma(\theta^Tx_i))+y_ilog(\sigma(\theta^Tx_i))]$$
+​                                          ![1641523120348](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1641523120348.png)
 
 这就是对数似然函数取相反数嘛！所以，在逻辑回归模型中，**最大化对数似然函数和最小化损失函数实际上是等价的。**
 
@@ -99,4 +99,3 @@ Q3：**逻辑回归在训练的过程当中，如果有很多的特征高度相�
 
 
 
-  

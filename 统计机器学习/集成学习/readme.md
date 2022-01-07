@@ -90,13 +90,13 @@ Boosting方法的基本思想是：
 
 - 一开始给每个样例点都分配同样的权重 ![1/N ](https://www.zhihu.com/equation?tex=1%2FN%20)  
 
-- for $t = 1,2,...T$ Do:
+- for t = 1,2,...T​ Do:
 
   - 生成分类器 ![C_t](https://www.zhihu.com/equation?tex=C_t)
   - 计算在此分类器下的错误率 ![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t)所有被误分类的样例权重之和
-  - $\alpha_t = \frac{1}{2}ln\frac{1-\epsilon_t}{\epsilon_t}$ (若 ![\epsilon_t > 50\%](https://www.zhihu.com/equation?tex=%5Cepsilon_t%20%3E%2050%5C%25) ,则 ![\alpha_t < 0](https://www.zhihu.com/equation?tex=%5Calpha_t%20%3C%200) ;否则 ![\alpha_t > 0](https://www.zhihu.com/equation?tex=%5Calpha_t%20%3E%200) )
+  -  ![\alpha_t = \frac{1}{2}ln\frac{1-\epsilon_t}{\epsilon_t}](https://www.zhihu.com/equation?tex=%5Calpha_t%20%3D%20%5Cfrac%7B1%7D%7B2%7Dln%5Cfrac%7B1-%5Cepsilon_t%7D%7B%5Cepsilon_t%7D)   (若 ![\epsilon_t > 50\%](https://www.zhihu.com/equation?tex=%5Cepsilon_t%20%3E%2050%5C%25) ,则 ![\alpha_t < 0](https://www.zhihu.com/equation?tex=%5Calpha_t%20%3C%200) ;否则 ![\alpha_t > 0](https://www.zhihu.com/equation?tex=%5Calpha_t%20%3E%200) )
   - 更新样例的权重：
-    - 对于正确分类的样例， ![W_{new} = W_{old}*e^{-\alpha_t}](https://www.zhihu.com/equation?tex=W_%7Bnew%7D%20%3D%20W_%7Bold%7D*e%5E%7B-%5Calpha_t%7D) (若 $\epsilon_t>50\%$,则正确样本的权重上升；反之减少)
+    - 对于正确分类的样例， ![W_{new} = W_{old}*e^{-\alpha_t}](https://www.zhihu.com/equation?tex=W_%7Bnew%7D%20%3D%20W_%7Bold%7D*e%5E%7B-%5Calpha_t%7D) (若 ![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t)>50%,则正确样本的权重上升；反之减少)
     - 对分类错误的样例， ![W_{new} = W_{old}*e^{\alpha_t}](https://www.zhihu.com/equation?tex=W_%7Bnew%7D%20%3D%20W_%7Bold%7D*e%5E%7B%5Calpha_t%7D)(若 ![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t) <50%, 则错误样本权重上升)
 
   - 把所有样例的权重归一化
@@ -108,15 +108,15 @@ Boosting方法的基本思想是：
 #### 2. AdaBoost.M1
 
 - 一开始给每个样例点都分配同样的权重 ![1/N ](https://www.zhihu.com/equation?tex=1%2FN%20)
-- for $t = 1,2,...T$ Do:
+- for t = 1,2,...T​ Do:
   - 生成分类器 ![C_t](https://www.zhihu.com/equation?tex=C_t)
   - 计算在此分类器下的错误率 ![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t)=所有被误分类的样例权重之和. ![{\color{blue}{若\epsilon_t>50\%，则终止！}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7B%E8%8B%A5%5Cepsilon_t%3E50%5C%25%EF%BC%8C%E5%88%99%E7%BB%88%E6%AD%A2%EF%BC%81%7D%7D)
-  - ${\color{blue}{\beta_t = \frac{\epsilon_t}{1-\epsilon_t}}}$ (若 ![\epsilon_t > 50\%](https://www.zhihu.com/equation?tex=%5Cepsilon_t%20%3E%2050%5C%25) ,则 ![\beta_t>1](https://www.zhihu.com/equation?tex=%5Cbeta_t%3E1);否则 ![\beta_t <1](https://www.zhihu.com/equation?tex=%5Cbeta_t%20%3C1))
+  -  ![{\color{blue}{\beta_t = \frac{\epsilon_t}{1-\epsilon_t}}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7B%5Cbeta_t%20%3D%20%5Cfrac%7B%5Cepsilon_t%7D%7B1-%5Cepsilon_t%7D%7D%7D)  (若 ![\epsilon_t > 50\%](https://www.zhihu.com/equation?tex=%5Cepsilon_t%20%3E%2050%5C%25) ,则 ![\beta_t>1](https://www.zhihu.com/equation?tex=%5Cbeta_t%3E1);否则 ![\beta_t <1](https://www.zhihu.com/equation?tex=%5Cbeta_t%20%3C1))
   - 更新样例的权重：
     - 对于正确分类的样例， ![{\color{blue}{W_{new} = W_{old}*\beta_t}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7BW_%7Bnew%7D%20%3D%20W_%7Bold%7D*%5Cbeta_t%7D%7D) (若![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t)> 50%,则正确样本的权重上升；反之减少。总之，增加少数派的权重)
     - 对分类错误的样例， ![{\color{blue}{W_{new} = W_{old}}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7BW_%7Bnew%7D%20%3D%20W_%7Bold%7D%7D%7D)(若 ![\epsilon_t](https://www.zhihu.com/equation?tex=%5Cepsilon_t)< 50%,则错误样本权重上升)
 - - 把所有样例的权重归一化
-- 把所有分类器 ![C_t](https://www.zhihu.com/equation?tex=C_t)C_t 的输出结果按照 ![{\color{blue}{log(1/\beta_t)}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7Blog(1%2F%5Cbeta_t)%7D%7D){\color{blue}{log(1/\beta_t)}} 进行加权平均
+- 把所有分类器 ![C_t](https://www.zhihu.com/equation?tex=C_t)C_t 的输出结果按照 ![{\color{blue}{log(1/\beta_t)}}](https://www.zhihu.com/equation?tex=%7B%5Ccolor%7Bblue%7D%7Blog(1%2F%5Cbeta_t)%7D%7D)进行加权平均
 
 
 
@@ -238,4 +238,3 @@ https://towardsdatascience.com/simple-guide-for-ensemble-learning-methods-d87cc6
 
 
 
-  

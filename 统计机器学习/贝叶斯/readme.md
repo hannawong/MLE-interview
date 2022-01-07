@@ -1,4 +1,4 @@
-# 贝叶斯推断
+#  贝叶斯推断
 
 
 
@@ -12,13 +12,21 @@
 
 D是{“咳嗽”,“味觉消失”,“发烧”}，h是“得了流感”。
 
-$P(h)$: 得了流感的先验概率
-$P(D)$: 出现症状{“咳嗽”,“味觉消失”,“发烧”}的**先验概率**
-$P(h|D)$: 得了流感的**后验概率** ，即在出现症状这个事件发生之后，对“得了流感”事件概率的重新评估。
-$P(D|h)$: **似然度** likelihood，实际经常取log，因为概率相乘会非常小。
+P(h): 得了流感的先验概率
+
+P(D): 出现症状{“咳嗽”,“味觉消失”,“发烧”}的**先验概率**
+
+P(h|D): 得了流感的**后验概率** ，即在出现症状这个事件发生之后，对“得了流感”事件概率的重新评估。
+
+P(D|h): **似然度** likelihood，实际经常取log，因为概率相乘会非常小。
+
+
 
 > **先验概率**：是指现有数据根据以往的经验和分析得到的概率
+>
 > **后验概率**：事情已经发生，要求这件事情发生的原因是由某个因素引起的可能性的大小
+
+
 
 #### 2.1 极大后验假设(Maximum A posteriori)
 
@@ -32,31 +40,30 @@ $P(D|h)$: **似然度** likelihood，实际经常取log，因为概率相乘会�
 
 
 ### 2.3 极大似然假设(Maximum Likelihood)
-​                                                               $h_{ML} = argmax_{h \in H} P(D|h)$
+​                                                                ![h_{ML} = argmax_{h \in H} P(D|h)](https://www.zhihu.com/equation?tex=h_%7BML%7D%20%3D%20argmax_%7Bh%20%5Cin%20H%7D%20P(D%7Ch))  
 
-其中，$h$为标签，$D$为样本特征。
-可见，在极大似然假设中，也忽略了先验概率$P(h)$. 当$P(h)$未知或者等概率的时候可以这样做。
+其中，h为标签，D为样本特征。
+可见，在极大似然假设是忽略了先验概率P(h). 当P(h)未知或者等概率的时候可以这样做。
 
 
 
 ##### 2.3.1 maximum likelihood 和 Least square error 等价
-设有n个样本 $\{x_1, x_2,... x_n\}$, 它们的真实标签值$\{d_1,d_2,..d_n\}$. 使用函数$h(x)$来拟合，它是一个无噪音的目标函数。假设噪音$e_i$是独立的随机变量，符合正态分布$N(0,\sigma^2)$, 那么有：$$d_i=h(x_i)+e_i $$
+设有n个样本 ![\{x_1, x_2,... x_n\}](https://www.zhihu.com/equation?tex=%5C%7Bx_1%2C%20x_2%2C...%20x_n%5C%7D)  , 它们的真实标签值 ![\{d_1,d_2,..d_n\}](https://www.zhihu.com/equation?tex=%5C%7Bd_1%2Cd_2%2C..d_n%5C%7D)  . 使用函数 ![h(x)](https://www.zhihu.com/equation?tex=h(x))  来拟合，它是一个无噪音的目标函数。假设噪音 ![e_i](https://www.zhihu.com/equation?tex=e_i)  是独立的随机变量，符合正态分布 ![N(0,\sigma^2)](https://www.zhihu.com/equation?tex=N(0%2C%5Csigma%5E2))  , 那么有：  ![d_i=h(x_i)+e_i ](https://www.zhihu.com/equation?tex=d_i%3Dh(x_i)%2Be_i%20)  
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210216195221951.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
 
-$d_i$也服从正态分布$N(f(x_i),\sigma^2)$.那么，第 $i$ 个样本的标签为$d_i$的概率为：
+ ![d_i](https://www.zhihu.com/equation?tex=d_i)  也服从正态分布  ![N(h(x_i),\sigma^2)](https://www.zhihu.com/equation?tex=N(h(x_i)%2C%5Csigma%5E2))  .那么，第 i 个样本的标签为 ![d_i](https://www.zhihu.com/equation?tex=d_i)  的概率为： 
+![img](https://pic3.zhimg.com/80/v2-d9c12f9f641c2d2de76b5ab7d6543044_1440w.png)
 
-$P(d_i∣x_i)=\frac{1}{2πσ^2}e^{−\frac{(di−h(xi))2}{2\sigma^2}}$.
+所有样本标签为 ![\{d_1,d_2,..d_n\}](https://www.zhihu.com/equation?tex=%5C%7Bd_1%2Cd_2%2C..d_n%5C%7D)  的概率为：
 
-所有样本标签为$\{d_1,d_2,..d_n\}$的概率为：
-
-$P(d_i∣x_i)=\prod_{i}\frac{1}{2πσ^2}e^{−\frac{(di−h(xi))2}{2\sigma^2}}$.
+![1641514386533](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1641514386533.png)
 
 两边取对数：
 
-$$\sum_i [log(2πσ^2)−\frac{(di−h(xi))2}{2\sigma^2}]$$
+![1641514427991](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1641514427991.png)
 
-最大似然法就是要取一个合适的函数h(x)来最大化这个概率，即：![1638999671217](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1638999671217.png)
+最大似然法就是要取一个合适的函数 h(x) 来最大化这个概率，即：![1638999671217](C:\Users\zh-wa\AppData\Roaming\Typora\typora-user-images\1638999671217.png)
 
 
 
@@ -66,11 +73,11 @@ $$\sum_i [log(2πσ^2)−\frac{(di−h(xi))2}{2\sigma^2}]$$
 
 ### 3. 朴素贝叶斯分类器
 
- $h_{ML} = argmax_{h \in H} P(D|h)$
+ ![h_{ML} = argmax_{h \in H} P(D|h)](https://www.zhihu.com/equation?tex=h_%7BML%7D%20%3D%20argmax_%7Bh%20%5Cin%20H%7D%20P(D%7Ch))  
 
 朴素贝叶斯引入的假设是独立性假设, 假设自变量之间是独立的：
 
-$P(D∣h_i)=P(d_1,d_2,...d_n∣h_i)=\prod_j P(d_j∣h_i)$
+​                                         ![P(D∣h_i)=P(d_1,d_2,...d_n∣h_i)=\prod_j P(d_j∣h_i)](https://www.zhihu.com/equation?tex=P(D%E2%88%A3h_i)%3DP(d_1%2Cd_2%2C...d_n%E2%88%A3h_i)%3D%5Cprod_j%20P(d_j%E2%88%A3h_i))  
 
 朴素贝叶斯分类器：
 
@@ -92,9 +99,9 @@ $P(D∣h_i)=P(d_1,d_2,...d_n∣h_i)=\prod_j P(d_j∣h_i)$
 
 **后验概率：** 数学表达式为p(A|B), 即A在B发生的条件下发生的概率。比如，在出现"嗓子疼"这个症状的条件下，得流感的概率为50%。这就是后验概率，后验概率是**有果求因**（知道结果推出原因）
 
-**误判损失:** $L(j|i)$，表示把一个标记为$i$类的样本误分类为$j$类所造成的损失。
+**误判损失:** L(j|i)，表示把一个标记为​ i 类的样本误分类为 j 类所造成的损失。
 
-**条件风险:** $∑L(i|j)P(j|x)$。其实就是所有误判损失的加权和，而这个权就是样本判为j类的概率.
+**条件风险:** ∑L(i|j)P(j|x)。其实就是所有误判损失的加权和，而这个权就是样本判为 j 类的概率.
 
 **贝叶斯判别准则：** 贝叶斯判别准则是找到一个使**条件风险达到最小**的判别方法。即，将样本判为哪一类，所得到的条件风险（或者说平均判别损失）最小，那就将样本归为那个造成平均判别损失最小的类。
 
@@ -122,13 +129,14 @@ $P(D∣h_i)=P(d_1,d_2,...d_n∣h_i)=\prod_j P(d_j∣h_i)$
 
 Google的拼写检查基于贝叶斯方法。请说说的你的理解，具体Google是怎么利用贝叶斯方法，实现"拼写检查"的功能。
 
-答："拼写检查"要做的事情就是：在输入一个错误词语w的情况下，试图推断出正确词语c。换言之：已知w，然后在若干个备选方案中，找出可能性最大的那个c，也就是求$P(c|w)$的最大值。
-而根据贝叶斯定理，有：                                                                                                                                                                
-$P(c|w) = \frac{P(w|c)P(c)}{P(w)}     $ 
+答："拼写检查"要做的事情就是：在输入一个错误词语w的情况下，试图推断出正确词语c。换言之：已知w，然后在若干个备选方案中，找出可能性最大的那个c，也就是求P(c|w)的最大值。
+而根据贝叶斯定理，有：         
 
-由于对于所有备选的$c$来说，对应的都是同一个$w$，所以它们的$P(w)$是相同的，因此我们只要最大化$P(w|c)P(c)$即可。其中：
+​                                                                      ![P(c|w) = \frac{P(w|c)P(c)}{P(w)} ](https://www.zhihu.com/equation?tex=P(c%7Cw)%20%3D%20%5Cfrac%7BP(w%7Cc)P(c)%7D%7BP(w)%7D%20)                                                                                                                                                        
 
-$P(c)​$表示某个正确的词的出现"概率"，它可以用"频率"代替。如果我们有一个足够大的文本库，那么这个文本库中每个单词的出现频率，就相当于它的发生概率。某个词的出现频率越高, P(c)就越大。比如在你输入一个错误的词“computet”时，系统更倾向于去猜测你可能想输入的词是“computer”，而不是“computeo”，因为“computer”更常见。
+由于对于所有备选的 c​ 来说，对应的都是同一个​ w​ ，所以它们的​ P(w)​ 是相同的，因此我们只要最大化P(w|c)P(c)即可。其中：
+
+P(c)​ 表示某个正确的词的出现"概率"，它可以用"频率"代替。如果我们有一个足够大的文本库，那么这个文本库中每个单词的出现频率，就相当于它的发生概率。某个词的出现频率越高, P(c)就越大。比如在你输入一个错误的词“computet”时，系统更倾向于去猜测你可能想输入的词是“computer”，而不是“computeo”，因为“computer”更常见。
 P(w∣c)表示在试图拼写c的情况下，出现拼写错误w的概率。为了简化问题，假定两个单词在字形上越接近，就有越可能拼错，P(w|c)就越大。举例来说，相差一个字母的拼法，就比相差两个字母的拼法，发生概率更高。值得一提的是，一般把这种问题称为“**编辑距离**”。
 
 

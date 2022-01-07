@@ -40,7 +40,7 @@
 
 解这个问题的原始方法：
 
-- 首先固定住$w,b$, 只改变 ![\alpha](https://www.zhihu.com/equation?tex=%5Calpha) , 去最大化 ![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha)). 容易看出，
+- 首先固定住w,b, 只改变 ![\alpha](https://www.zhihu.com/equation?tex=%5Calpha) , 去最大化 ![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha)). 容易看出，
 - - 当某个约束条件不满足时，会有某个 ![y_i(w^Tx_i+b) -1<0](https://www.zhihu.com/equation?tex=y_i(w%5ETx_i%2Bb)%20-1%3C0) , 此时只需要让 ![\alpha_i](https://www.zhihu.com/equation?tex=%5Calpha_i)无限大，就可以最大化![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha)), 其最大值为+inf, 下一步无法最小化了。
   - 当所有约束条件都满足时，所有![y_i(w^Tx_i+b)](https://www.zhihu.com/equation?tex=y_i(w%5ETx_i%2Bb))都>0, 此时只需要让 ![\alpha_i](https://www.zhihu.com/equation?tex=%5Calpha_i)=0, 就可以最大化![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha))，其最大值为 ![\frac{1}{2}||w||^2](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%7C%7Cw%7C%7C%5E2) , 就是我们下一步要最小化的东西。
 - 下一步改变w,b, 去最小化 ![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha))。假如上一步的约束条件都满足，现在就是要最小化![\frac{1}{2}||w||^2](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%7C%7Cw%7C%7C%5E2).
@@ -99,7 +99,7 @@ SVM的处理方法是只考虑support vectors，也就是和分类最相关的�
 
 ![img](https://pic4.zhimg.com/v2-3a8c6662760cd46b7b02cc07c0fa043f_b.png)
 
-损失函数最大化几何间隔，同时最小化松弛变量之和。现在，我们允许一些训练集落在两个分类平面之间 ![(0<\xi_i<1)](https://www.zhihu.com/equation?tex=(0%3C%5Cxi_i%3C1))(0<\xi_i<1), 甚至允许一些训练样本被错误分类（ ![\xi_i>1](https://www.zhihu.com/equation?tex=%5Cxi_i%3E1)\xi_i>1 ）.
+损失函数最大化几何间隔，同时最小化松弛变量之和。现在，我们允许一些训练集落在两个分类平面之间 ![(0<\xi_i<1)](https://www.zhihu.com/equation?tex=(0%3C%5Cxi_i%3C1)), 甚至允许一些训练样本被错误分类（ ![\xi_i>1](https://www.zhihu.com/equation?tex=%5Cxi_i%3E1)）.
 
 ![img](https://pic4.zhimg.com/v2-fbcafa53d615d8cb5eafe8d5050aa5c7_b.png)
 
@@ -119,7 +119,7 @@ SVM的处理方法是只考虑support vectors，也就是和分类最相关的�
 
 ![img](https://pic1.zhimg.com/v2-c49f260d2e34a7cb7fff206dd8c20568_b.png)
 
-这里，支持向量( ![\alpha_i>0](https://www.zhihu.com/equation?tex=%5Calpha_i%3E0)\alpha_i>0 的那些)包括落在边界上的，和落在两个分类边界之间的，以及分类错误的。
+这里，支持向量( ![\alpha_i>0](https://www.zhihu.com/equation?tex=%5Calpha_i%3E0) 的那些)包括落在边界上的，和落在两个分类边界之间的，以及分类错误的。
 
 用对偶方法计算得到的预测值：
 

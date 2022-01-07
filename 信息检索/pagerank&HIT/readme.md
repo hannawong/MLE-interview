@@ -20,9 +20,11 @@ Google创始人拉里·佩奇和谢尔盖·布林于1997年构建早期的搜索
 #### 3.1 朴素pagerank
 
 PageRank的计算充分利用了两个假设：数量假设和质量假设。步骤如下：
- **1）在初始阶段：**网页通过链接关系构建起Web图，每个页面设置相同的PageRank值，通过若干轮的计算，会得到每个页面所获得的最终PageRank值。随着每一轮的计算进行，网页当前的PageRank值会不断得到更新。
+ **1）在初始阶段：** 网页通过链接关系构建起Web图，每个页面设置相同的PageRank值，通过若干轮的计算，会得到每个页面所获得的最终PageRank值。随着每一轮的计算进行，网页当前的PageRank值会不断得到更新。
 
- **2）在一轮中更新页面PageRank得分的计算方法：**在一轮更新页面PageRank得分的计算中，每个页面将其当前的PageRank值**平均分配到本页面包含的出链**上，这样每个链接即获得了相应的权值。而每个页面将所有指向本页面的入链所传入的权值求和，即可得到新的PageRank得分。当每个页面都获得了更新后的PageRank值，就完成了一轮PageRank计算。
+
+
+ **2）在一轮中更新页面PageRank得分的计算方法：** 在一轮更新页面PageRank得分的计算中，每个页面将其当前的PageRank值**平均分配到本页面包含的出链**上，这样每个链接即获得了相应的权值。而每个页面将所有指向本页面的入链所传入的权值求和，即可得到新的PageRank得分。当每个页面都获得了更新后的PageRank值，就完成了一轮PageRank计算。
 
 #### 3.2 改进的pagerank
 
@@ -46,7 +48,7 @@ PageRank的计算充分利用了两个假设：数量假设和质量假设。步
 
 # 二、HITS算法
 ## 1. 算法来源
-HITS算法的全称是Hyperlink-Induced Topic Search。在HITS算法中，每个页面被赋予两个属性**：hub属性和authority属性**。同时，网页被分为两种：hub页面和authority页面。hub，中心的意思，所以hub页面指那些包含了很多指向authority页面的链接的网页，比如一些**门户网站**；authority页面则指那些包含有实质性内容的网页。HITS算法的目的是：当用户查询时，返回给用户高质量的authority页面。
+HITS算法的全称是Hyperlink-Induced Topic Search。在HITS算法中，每个页面被赋予两个属性：**hub属性和authority属性** 。同时，网页被分为两种：hub页面和authority页面。hub，中心的意思，所以hub页面指那些包含了很多指向authority页面的链接的网页，比如一些**门户网站**；authority页面则指那些包含有实质性内容的网页。HITS算法的目的是：当用户查询时，返回给用户高质量的authority页面。
 
 ## 2. 算法原理
 
@@ -87,13 +89,13 @@ HITS算法基于下面两个假设：
 
 网页p在此轮迭代中的Authority权值即为所有指向网页p页面的Hub权值之和：
 
-​                                                                                        $∀p,a(p)=\sum h(i)$
+​                                                                                        ![∀p,a(p)=\sum h(i)](https://www.zhihu.com/equation?tex=%E2%88%80p%2Ca(p)%3D%5Csum%20h(i))  
 
 网页p的Hub分值即为所指向的页面的Authority权值之和：
 
-​                                                                                 $ ∀p,h(p)=∑_{i=1}^na(i)$
+​                                                                                ![∀p,h(p)=∑_{i=1}^na(i)](https://www.zhihu.com/equation?tex=%E2%88%80p%2Ch(p)%3D%E2%88%91_%7Bi%3D1%7D%5Ena(i))  
 
 
-每一轮迭代结束，都需要进行标准化，使 $∑_{i=1}^nh(i)^2=∑_{i=1}^na(i)^2=1$.
+每一轮迭代结束，都需要进行标准化，使  ![∑_{i=1}^nh(i)^2=∑_{i=1}^na(i)^2=1](https://www.zhihu.com/equation?tex=%E2%88%91_%7Bi%3D1%7D%5Enh(i)%5E2%3D%E2%88%91_%7Bi%3D1%7D%5Ena(i)%5E2%3D1)  .
 
 什么时候迭代结束呢？我们可以设置一个迭代次数上限k来控制，或者设定一个阈值，当变化小于阈值的时候迭代结束。然后只要返回给用户authority值靠前的十几个网页就行了。

@@ -19,15 +19,15 @@
 
 ### 3 归一化的类型
 
-**1）线性归一化**
-​                                                                              $x' = \frac{x - \text{min}(x)}{\text{max}(x)-\text{min}(x)}$
+**1）min-max归一化**
+​                                                                  ![x' = \frac{x - \text{min}(x)}{\text{max}(x)-\text{min}(x)}](https://www.zhihu.com/equation?tex=x%27%20%3D%20%5Cfrac%7Bx%20-%20%5Ctext%7Bmin%7D(x)%7D%7B%5Ctext%7Bmax%7D(x)-%5Ctext%7Bmin%7D(x)%7D)  
 
  这种归一化方法比较适用在数值比较集中的情况。这种方法有个缺陷，如果max和min不稳定，很容易使得归一化结果不稳定，使得后续使用效果也不稳定。实际使用中可以用经验常量值来替代max和min。
 
 **2）标准差标准化**
 
 经过处理的数据符合标准正态分布，即均值为0，标准差为1，其转化函数为：
-​                                                                          $x^* = \frac{x-\mu}{\sigma}$
+​                                                                             ![x^* = \frac{x-\mu}{\sigma}](https://www.zhihu.com/equation?tex=x%5E*%20%3D%20%5Cfrac%7Bx-%5Cmu%7D%7B%5Csigma%7D)  
 其中μ为所有样本数据的均值，σ为所有样本数据的标准差。
 
 **3）非线性归一化**

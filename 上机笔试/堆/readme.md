@@ -230,7 +230,7 @@ public:
 vector<int> heap_sort(vector<int> vec){
     //建堆
     heap H;
-    for(int i = 0;i<vec.size();i++) { //建堆，O(nlogn)
+    for(int i = 0;i<vec.size();i++) { //建堆，O(n)
         H.insert(vec[i]);
     }
     vector<int> ans;

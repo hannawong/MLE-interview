@@ -39,7 +39,7 @@ P(D|h): **似然度** likelihood，实际经常取log，因为概率相乘会非
 
 
 
-### 2.3 极大似然假设(Maximum Likelihood)
+#### 2.2 极大似然假设(Maximum Likelihood)
 ​                                                                ![h_{ML} = argmax_{h \in H} P(D|h)](https://www.zhihu.com/equation?tex=h_%7BML%7D%20%3D%20argmax_%7Bh%20%5Cin%20H%7D%20P(D%7Ch))  
 
 其中，h为标签，D为样本特征。
@@ -47,7 +47,7 @@ P(D|h): **似然度** likelihood，实际经常取log，因为概率相乘会非
 
 
 
-##### 2.3.1 maximum likelihood 和 Least square error 等价
+##### 2.2.1 maximum likelihood 和 Least square error 等价
 设有n个样本 ![\{x_1, x_2,... x_n\}](https://www.zhihu.com/equation?tex=%5C%7Bx_1%2C%20x_2%2C...%20x_n%5C%7D)  , 它们的真实标签值 ![\{d_1,d_2,..d_n\}](https://www.zhihu.com/equation?tex=%5C%7Bd_1%2Cd_2%2C..d_n%5C%7D)  . 使用函数 ![h(x)](https://www.zhihu.com/equation?tex=h(x))  来拟合，它是一个无噪音的目标函数。假设噪音 ![e_i](https://www.zhihu.com/equation?tex=e_i)  是独立的随机变量，符合正态分布 ![N(0,\sigma^2)](https://www.zhihu.com/equation?tex=N(0%2C%5Csigma%5E2))  , 那么有：  ![d_i=h(x_i)+e_i ](https://www.zhihu.com/equation?tex=d_i%3Dh(x_i)%2Be_i%20)  
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/20210216195221951.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
@@ -68,6 +68,14 @@ P(D|h): **似然度** likelihood，实际经常取log，因为概率相乘会非
 
 
 所以，极大似然和最小均方误差等价的充要条件是：误差满足正态分布。
+
+
+
+**【面试题：极大似然估计和极大后验假设的区别？】**
+
+首先，必须要提一下频率学派和贝叶斯学派。**频率学派**认为世界是确定的，模型参数是个定值，希望通过类似解方程组的方式从数据中求得该未知数。这就是频率学派使用的参数估计方法-**极大似然估计**，意思就是，现在我有一大堆的观测值，那么这个模型的参数最有可能是多少呢？
+
+贝叶斯学派认为世界是不确定的。他们对世界先有一个预先的估计，因此对于同一个事件，不同的人掌握的**先验**不同的话，那么他们所认为的事件状态也会不同。他们认为模型参数源自某种先验分布，希望从数据中推知该分布（2.1中的`P(h)`）。这就是贝叶斯派视角下用来估计参数的常用方法-**最大后验概率估计（MAP）**，这种方法在先验假设比较靠谱的情况下效果显著，随着数据量的增加，先验假设对于模型参数的主导作用会逐渐削弱，相反真实的数据样例会大大占据有利地位。极端情况下，比如把先验假设去掉，或者**假设先验满足均匀分布的话，那它和极大似然估计就如出一辙了**。
 
 
 

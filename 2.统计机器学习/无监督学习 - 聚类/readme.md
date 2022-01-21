@@ -32,6 +32,35 @@ K-Means在本质上是一种EM算法(Expectation Maximization), 有关EM算法�
 
 K-Medians是与K-Means相关的另一种聚类算法，不同之处在于它使用簇的中值向量来重新计算质心点。和K-means不同，K-中值算法的聚类中心点一定是一个真实存在的点。该方法**对异常值不敏感**（因为使用中值），但在较大数据集上运行时速度会慢很多，因为每次计算中值向量，我们都要重新排序。
 
+**【面试题：怎么确定好的初值？】**
+
+- 第一种方法：随机选择，选择距离尽可能远的K个点
+  - 随机选一个点作为一个类簇的初始中心点
+  - 然后选取距离这个点**最远**的点作为第二个点
+  - 之后选与前两个点距离和最远的点作为第三个点，以此类推。
+- 第二种方法：用层次聚类预处理
+  - 使用层次聚类的方法，得到若干个"Canopy".可以认为每个Canopy都是一个Cluster。但是与KMeans等硬划分算法不同，每个点有可能属于多个Canopy。我们可以选择每个Canopy的中心点作为KMeans的初始K个类簇中心点。
+
+**【面试题：怎么确定好的K值？】**
+
+常见的一种方法是[elbow method](https://www.zhihu.com/search?q=elbow+method&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra=%7B%22sourceType%22%3A%22answer%22%2C%22sourceId%22%3A667861076%7D)。x轴为K值，y轴为WSS（within cluster sum of squares）也就是**各个点到聚类簇中心的距离的平方的和**。
+
+先假设K=1，然后我们找到这一范围的中心点，用⭐️表示，蓝色的线表示黑点到⭐️的距离，WSS就是所有的蓝色的线的平方加起来：
+
+![img](https://pica.zhimg.com/80/v2-cb029eaec2a3c77b34f28ee7e5f2aad2_1440w.jpg?source=1940ef5c)
+
+很明显这样的WSS是很大的，于是我们可以进一步再看K=2的时候：
+
+![img](https://pic3.zhimg.com/80/v2-fdd906ff2f595aa80de74601ee05d8ea_1440w.jpg?source=1940ef5c)
+
+以此类推，算出K = 1,2,3...
+
+![img](https://pic3.zhimg.com/80/v2-916dd08810a3e3ca23ecab29378cbfdc_1440w.jpg?source=1940ef5c)
+
+看到那个拐弯处最厉害的地方，就像我们的肘关节一样，那个点对应的值，就是比较适合的K值。这是因为在这个”肘子值“后面WSS指标下降的就不再那么明显了。
+
+
+
 ### 0x02. 层次聚类 -- hierarchical method
 
 层次聚类实际上可以被分为两类：自上而下和自下而上。其中自下而上算法（Bottom-up algorithms）首先会将每个数据点视为单个聚类，然后连续合并（或聚合）成对的聚类，直到所有聚类合并成包含所有数据点的单个聚类。它也因此会被称为hierarchical agglomerative clustering。该算法的聚类可以被表示为一幅树状图，树根是最后收纳所有数据点的单个聚类，而树叶则是只包含一个样本的聚类。
@@ -132,4 +161,24 @@ DBSCAN的缺点有：
 - **调参**相对于传统的K-Means之类的聚类算法稍复杂，主要需要对距离阈值ϵ，邻域样本数阈值MinPts联合调参，不同的参数组合对最后的聚类效果有很大影响。
 
 
-  
+
+### 4. 混合高斯模型 GMM
+
+
+高斯混合模型（GMM）是多个高斯分布函数的线性组合，**理论上可以拟合出任意类型的分布**，通常用于解决同一集合下的数据包含多个不同的分布的情况。对于GMM，我们假设数据点满足**不同参数下的高斯分布**。我们用$\mu$和$\sigma$来描述聚类的形状。以二维分布为例，标准差的存在允许聚类的形状可以是任何种类的**椭圆形**。因此这个算法的思想是：如果数据点符合某个高斯分布，那它就会被归类为那个聚类。
+
+为了找到每个聚类的高斯参数，我们要用到EM算法。下图是高斯混合模型的聚类过程。
+
+初始化
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210219152855893.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
+
+迭代数次之后：
+
+![在这里插入图片描述](https://img-blog.csdnimg.cn/20210219153208381.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
+
+E步：随机初始化每个聚类的高斯分布参数。根据每个聚类的高斯分布，**计算数据点属于特定聚类的概率**。如果数据点越接近高斯质心，那它属于该聚类的概率就越高。
+M步：为每个聚类的高斯分布计算一组新的参数，使聚类内数据点的概率最大化。我们用数据点位置的加权和来计算这些新参数，其中权重就是数据点属于聚类的概率。
+迭代步骤2和步骤3，直至收敛。
+
+GMM有两个关键优势。首先它比K-Means更灵活，由于标准差的引入，**最后聚类的形状不再局限于圆形，它还可以是大小形状不一的椭圆形**（K-means由于计算的是欧式距离，所以更适合圆形形状聚类；而GMM由于有高斯分布假设，所以更适合椭圆形聚类）。其次，权重的引入为同一点属于多个聚类（软聚类）找到了解决方案。我们就可以计算一个点属于X聚类的百分比是多少，属于Y聚类的百分比是多少。

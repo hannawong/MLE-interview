@@ -153,3 +153,16 @@ fork() 创建一个继承的子进程，复制父进程的所有变量和内存�
 - 内核线程：由内核通过系统调用来完成线程的创建、终止、管理。
 
 ![427ecbdf2adbed7eb25a6a5fe5901fe](C:\Users\zh-wa\AppData\Local\Temp\WeChat Files\427ecbdf2adbed7eb25a6a5fe5901fe.jpg)
+
+
+
+
+
+
+
+【面试题：同步/异步；阻塞/非阻塞的区别是什么？】
+
+
+
+
+

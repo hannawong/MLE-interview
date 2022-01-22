@@ -150,7 +150,7 @@ b2Body *body = world->createBody(&bodyDef);
 
 2.Box2D需要频繁申请并释放小块内存，为高效处理，Box2D自己实现了小块内存分配器b2BlockAllocator并手动管理内存。通过工厂方法，可以**避免用户误用系统的内存分配机制**。（工厂统一分配）
 
-3.另外，使用b2BodyDef可以避免在函数调用中标明所有属性，也可以方便地构造多个属性相同或类似的b2Body对象
+
 
 
 

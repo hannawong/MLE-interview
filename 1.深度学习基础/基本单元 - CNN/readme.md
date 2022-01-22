@@ -174,6 +174,99 @@ highway: 类似LSTM的思想(more LSTM-ish), 增加了T门和C门，但其实它
 
 
 
+### 5. pytorch中的卷积
+
+#### 5.1 nn.conv1d
+
+一般来说，一维卷积`nn.Conv1d`用于文本数据，只对embedding维进行卷积。通常，输入大小为`batch_size * embedding_dim * max_length`。
+
+torch中的接口为：
+
+```python
+torch.nn.Conv1d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)
+```
+
+##### 代码示例
+
+输入：batchsize为32，句子的最大长度为35，词向量维度为256
+目标：句子分类，共2类
+
+```python
+conv1 = nn.Conv1d(in_channels=256, out_channels=100, kernel_size=2)
+input = torch.randn(32, 35, 256)
+input = input.permute(0, 2, 1)
+output = conv1(input)
+```
+
+假设`window_size = [3, 4, 5, 6]`，即共有四个卷积核，基于上述代码，具体计算过程如下：
+
+1. 原始输入大小为`(32, 35, 256)`，经过`permute(0, 2, 1)`操作后，输入的大小变为`(32, 256, 35)`.(这是因为torch中的conv1d只能把倒数第二个维度当成通道)
+2. 使用1个卷积核进行卷积，可得到1个大小为`32 x 100 x 1`的输出，共4个卷积核，故共有4个大小为`32 x 100 x 1`的输出；
+3. 将上一步得到的4个结果在`dim = 1`上进行拼接，输出大小为`32 x 400 x 1`；
+4.  `view`操作后，输出大小变为`32 x 400`；
+5. 全连接，最终输出大小为`32 x 2`，即分别预测为2类的概率大小。
+
+
+
+#### 5.2 nn.conv2d
+
+```python
+torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True)
+```
+
+##### 代码示例
+
+假设现有大小为`32 x 32`的图片样本，输入样本的`channels`为1，该图片可能属于10个类中的某一类。CNN框架定义如下：
+
+```ruby
+class CNN(nn.Module):
+    def __init__(self):
+        nn.Model.__init__(self)
+ 
+        self.conv1 = nn.Conv2d(1, 6, 5)  # 输入通道数为1，输出通道数为6
+        self.conv2 = nn.Conv2d(6, 16, 5)  # 输入通道数为6，输出通道数为16
+        self.fc1 = nn.Linear(5 * 5 * 16, 120)
+        self.fc2 = nn.Linear(120, 84)
+        self.fc3 = nn.Linear(84, 10)
+
+    def forward(self, x):
+        # 输入x -> conv1 -> relu -> 2x2窗口的最大池化
+        x = self.conv1(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+        # 输入x -> conv2 -> relu -> 2x2窗口的最大池化
+        x = self.conv2(x)
+        x = F.relu(x)
+        x = F.max_pool2d(x, 2)
+        # view函数将张量x变形成一维向量形式，总特征数不变，为全连接层做准备
+        x = x.view(x.size()[0], -1)
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+ 原始输入样本的大小：`32 x 32 x 1`
+```
+
+1.  **第一次卷积**：使用6个大小为`5 x 5`的卷积核，故卷积核的规模为`(5 x 5) x 6`；卷积操作的`stride`参数默认值为`1 x 1`，32 - 5 + 1 = 28，并且使用ReLU对第一次卷积后的结果进行非线性处理，输出大小为`28 x 28 x 6`；
+2.  **第一次卷积后池化**：`kernel_size`为`2 x 2`，输出大小变为`14 x 14 x 6`；
+3.  **第二次卷积**：使用16个卷积核，故卷积核的规模为`(5 x 5 x 6) x 16`；使用ReLU对第二次卷积后的结果进行非线性处理，14 - 5 + 1 = 10，故输出大小为`10 x 10 x 16`；
+4.  **第二次卷积后池化**：`kernel_size`同样为`2 x 2`，输出大小变为`5 x 5 x 16`；
+5.  **第一次全连接**：将上一步得到的结果铺平成一维向量形式，5 x 5 x 16 = 400，即输入大小为`400 x 1`，W大小为`120 x 400`，输出大小为`120 x 1`；
+6.  **第二次全连接**，W大小为`84 x 120`，输入大小为`120 x 1`，输出大小为`84 x 1`；
+7.  **第三次全连接**：W大小为`10 x 84`，输入大小为`84 x 1`，输出大小为`10 x 1`，即分别预测为10类的概率值。
+
+卷积核参数大小的计算：
+
+![img](https://pic1.zhimg.com/80/v2-ae3a47dfb4deab6d23a028f35429da13_1440w.png)
+
+
+
+#### 5.3 nn.conv3d
+
+三维卷积层, 输入的尺度是(N, C_in,D,H,W)，输出尺度（N,C_out,D_out,H_out,W_out）. 注意，输入的是五维的数据，也就是在二维长宽的基础上又加了“高度”。其他做法和conv2d类似。
+
+
+
 -----
 
 

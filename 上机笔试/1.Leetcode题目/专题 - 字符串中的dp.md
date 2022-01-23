@@ -55,3 +55,50 @@ class Solution:
         return dp[len1][len2]
 ```
 
+
+
+注意：注意题中子序列的定义是否可以是连续的，如果必须是连续的:
+
+##### 718. 最长重复子数组
+
+```python
+class Solution:
+    def findLength(self, nums1, nums2):
+        len1 = len(nums1)
+        len2 = len(nums2)
+        ans = 0
+        dp = [[0]*(len2+1) for _ in range(len1+1)]
+        for i in range(1,len1+1):
+            for j in range(1,len2+1):
+                if nums1[i-1] == nums2[j-1]:
+                    dp[i][j] = dp[i-1][j-1]+1
+                    ans = max(ans,dp[i][j])
+                else:
+                    dp[i][j] = 0
+        return ans
+```
+
+![image.png](https://pic.leetcode-cn.com/9b80364c7936ad0fdca0e9405025b2a207a10322e16872a6cb68eb163dee25ee-image.png)
+
+使用滚动数组压缩：
+
+```python
+class Solution:
+    def findLength(self, nums1, nums2):
+        len1 = len(nums1)
+        len2 = len(nums2)
+        ans = 0
+        dp = [[0]*(len2+1) for _ in range(2)]  ##只用两行即可
+
+        for i in range(1,len1+1): ##时间复杂度还是不变
+            for j in range(1,len2+1):
+                if nums1[i-1] == nums2[j-1]:
+                    dp[1][j] = dp[0][j-1]+1
+                    ans = max(ans,dp[1][j])
+                else:
+                    dp[1][j] = 0
+            for j in range(1,len2+1):  ##滚动
+                dp[0][j] = dp[1][j]
+        return ans
+```
+

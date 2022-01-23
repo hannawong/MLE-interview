@@ -174,7 +174,7 @@ highway: 类似LSTM的思想(more LSTM-ish), 增加了T门和C门，但其实它
 
 
 
-### 5. pytorch中的卷积
+### 0x05. pytorch中的卷积
 
 #### 5.1 nn.conv1d
 
@@ -266,6 +266,22 @@ class CNN(nn.Module):
 三维卷积层, 输入的尺度是(N, C_in,D,H,W)，输出尺度（N,C_out,D_out,H_out,W_out）. 注意，输入的是五维的数据，也就是在二维长宽的基础上又加了“高度”。其他做法和conv2d类似。
 
 
+
+### 0x06. 其他卷积核
+
+#### 6.1 空洞卷积
+
+空洞卷积（dilated convolution）是利用添加空洞**扩大感受野**，让原本3x3的卷积核，在相同参数量和计算量下拥有5x5（dilated rate =2）或者更大的感受野，从而**无需下采样**（max-pooling）。
+
+传统的3\*3卷积核，在做了max-pooling的情况下：
+
+![img](https://pic2.zhimg.com/50/v2-d552433faa8363df84c53b905443a556_720w.jpg?source=1940ef5c)
+
+空洞卷积：
+
+![img](https://pica.zhimg.com/50/v2-4959201e816888c6648f2e78cccfd253_720w.webp?source=1940ef5c)
+
+感受野和相同参数做max-pooling相当。
 
 -----
 

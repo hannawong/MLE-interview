@@ -63,3 +63,43 @@ class Solution:
         self.ans.pop()
 ```
 
+#### 39. 组合总和
+
+给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+
+candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+
+```
+输入：candidates = [2,3,6,7], target = 7
+输出：[[2,2,3],[7]]
+```
+
+**解法：** 为了保证“不重复”，例如不能有[2,2,3]和[3,2,2], 需要做到“不吃回头草”，不能再加入前面已经遍历过的数字。所以，在每个位置，要么选它，即now+candidate[idx]；要么不选它，即idx+1. 
+
+```python
+class Solution:
+    ans = []
+    ans_list = []
+    def combinationSum(self, candidates, target: int):
+        self.ans = []
+        self.ans_list = []
+        self.DFS(candidates,target,0,0)
+        return self.ans_list
+
+    def DFS(self,candidates,target,idx,now):
+        if now == target:
+            self.ans_list.append(self.ans[:])
+            return
+        if now > target:
+            return
+        if idx >= len(candidates):
+            return
+        #### 选！
+        self.ans.append(candidates[idx])
+        self.DFS(candidates,target,idx,now+candidates[idx])
+        self.ans.pop()
+        ### 不选！
+        self.DFS(candidates,target,idx+1,now)
+
+```
+

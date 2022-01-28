@@ -2,6 +2,8 @@
 
 #### 1.1 调用栈
 
+![img](https://pic1.zhimg.com/80/v2-6a5db014b28e6537583e9f8a8315f64b_1440w.jpeg)
+
 有关栈帧的知识之后补充。
 
 **消除递归**：
@@ -17,9 +19,17 @@
 - 故不难改写为迭代形式。越来越多的编译器可以自动识别并代为改写。
 - 时间复杂度有常系数改进，空间复杂度或有渐进改进。
 
+尾递归的调用栈：
+
+![img](https://pic2.zhimg.com/80/v2-bdb990c8d29f020cd28a6f60e0881e7f_1440w.jpeg)
+
+![img](https://pica.zhimg.com/80/v2-bd1d925f130a9f4e02b8c478cb54f277_1440w.jpeg)
+
 
 
 #### 1.2 栈混洗
+
+![img](https://pic2.zhimg.com/80/v2-59708a0b560d2a60a64255289e4dff1c_1440w.jpeg)
 
 只允许：
 

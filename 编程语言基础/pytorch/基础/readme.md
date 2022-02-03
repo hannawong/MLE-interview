@@ -168,3 +168,34 @@ loss.backward()
 optimizer.step()    # Does the update
 ```
 
+
+
+### 4. 常见操作
+
+##### 4.1 损失函数
+
+`nn.crossEntropyLoss`就是直接去拿logits和ground truth label进行比较，并不用提前做softmax！
+
+```python
+import torch
+import torch.nn as nn
+import math
+
+criterion = nn.CrossEntropyLoss()
+input = torch.Tensor([[-0.7715, -0.6205,-0.2562]]) ##输出的未经归一化的logits
+target = torch.tensor([0])
+loss = criterion(input, target)
+print(loss)  ##1.3447
+```
+
+实际上，`nn.crossEntropyLoss`相当于nn.Softmax+log+nn.NLLLoss
+
+```python
+import numpy as np
+m = nn.Softmax()
+input=m(input)  ##做softmax归一，输出为[0.2606, 0.3031, 0.4363]
+print(-np.log(0.2606)) ##这就是loss，为1.3447
+```
+
+![img](https://pic3.zhimg.com/80/v2-423f83896fca1af3179f203c062fdf55_1440w.png)
+

@@ -64,6 +64,23 @@ CNN 网络参数
 - 跑完一次 epoch 所需的迭代次数减少，要想达到相同的精度，其所花费的时间大大增加了，从而对参数的修正也就显得更加缓慢。
 - Batch_Size 增大到一定程度，其确定的下降方向已经基本不再变化。
 
+**【batchsize和学习率的关系】：**
+
+一般情况下，增加batchsize，学习率也应该相应的增加。这是因为：
+
+- 假设把batchsize增加K倍，那么一个epoch下的更新次数只为原先的1/k了。如果每次更新的lr不变，所以要达到与原先相同的更新次数，则需要增加epoch数量。
+- 对于收敛精度，batch size增大K倍，相当于将梯度的方差减少K倍，使梯度估计更加准确，噪音减少，更容易收敛到附近的local minima，类似于GD的效果。应该充分利用这个方差容量，增加lr。"Large batch size allows you to work with higher learning rates, faster convergence"
+
+
+**Q/A:**
+
+Are you restricted to work with small size mini-batches for large models or GPUs with limited memory?
+•No, you can simulate large batch size by delaying gradient/weight updates to happen every n iterations (instead of n=1) ; supported by frameworks.例如:
+
+![img](https://pica.zhimg.com/80/v2-f4c06c02129cbe0a035a60a24fbce4bb_1440w.png)
+
+
+
 ### 3. dropout
 
 dropout 往往设置先为 0.5， 然后在 [0.0, 0.5] 范围内精调。
@@ -108,7 +125,7 @@ Dropout 往往会在卷积层和全连接层之间是有来防止过拟合。 �
 ![img](https://pic3.zhimg.com/80/v2-2783af5609a75929b5a744e0c66ec133_1440w.png)
 
 
-  
+
 
 
 

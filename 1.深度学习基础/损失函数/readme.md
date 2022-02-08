@@ -70,4 +70,6 @@ $$
 
 
 
-### 
+【softmax+cross entropy反向传播梯度】
+
+![img](https://pic2.zhimg.com/80/v2-6d79e42b765d04dc6153e8cbf31962c7_1440w.png)

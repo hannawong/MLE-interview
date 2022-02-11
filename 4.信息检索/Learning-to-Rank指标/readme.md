@@ -28,7 +28,7 @@ FPR(False Positive Rate): ![\frac{FP}{FP+TN}](https://www.zhihu.com/equation?tex
 
 
 
-AUC是工业界评判CTR预估的指标。AUC（Area Under Curve）被定义为ROC曲线下的面积。又由于ROC曲线一般都处于y=x这条直线的上方，所以AUC的取值范围在0.5和1之间。使用AUC值作为评价标准是因为很多时候ROC曲线并不能清晰的说明哪个分类器的效果更好，而作为一个数值，对应AUC更大的分类器效果更好。
+AUC是工业界评判CTR预估的指标。AUC（Area Under Curve）被定义为ROC曲线下的面积（ROC曲线是通过改变判别器的判别threshold得到的）。又由于ROC曲线一般都处于y=x这条直线的上方，所以AUC的取值范围在0.5和1之间。使用AUC值作为评价标准是因为很多时候ROC曲线并不能清晰的说明哪个分类器的效果更好，而作为一个数值，对应AUC更大的分类器效果更好。
 
 **【手撕AUC】**
 

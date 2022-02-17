@@ -45,6 +45,14 @@ KL散度在形式上定义如下：
 
 相对熵的值是非负值，即 ![D(P||Q)>0](https://www.zhihu.com/equation?tex=D(P%7C%7CQ)%3E0)  。
 
+**【JS散度】**
+
+JS 散度度量了两个概率分布的相似度，基于 KL 散度的变体，**解决了 KL 散度非对称的问题**。一般地，JS 散度是对称的，其取值是 0 到 1 之间。
+
+定义如下：
+
+![img](https://cdn.hyper.ai/wp-content/uploads/2019/01/vcw7xahr.png)
+
 
 
 ##### 6. 交叉熵

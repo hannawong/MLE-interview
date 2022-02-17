@@ -55,9 +55,49 @@
 
 实际上，可以通过改变loss的方法来实现。对分类器的小类样本数据增加loss权值，降低大类样本的权值，从而使得分类器将重点集中在小类样本身上。具体做法就是，在训练分类器时，若分类器将小类样本分错时额外增加分类器一个小类样本分错代价，这个额外的代价可以使得分类器更加“关心”小类样本。
 
-![img](https://pic4.zhimg.com/80/v2-762577496f8380237295f080829a75c7_1440w.jpg)可以让majority的权重为1，minority权重为3
+![img](https://pic4.zhimg.com/80/v2-762577496f8380237295f080829a75c7_1440w.jpg)
 
-![img](https://pic1.zhimg.com/80/v2-b5c983bad91d58f64dd57400113758d4_1440w.jpg)树模型
+例如，可以让majority的权重为1，minority权重为3，从而惩罚那些被分错的小样本。
+
+![img](https://pic1.zhimg.com/80/v2-b5c983bad91d58f64dd57400113758d4_1440w.jpg)树模型，在衡量“混乱程度”的时候，把小样本的混乱程度加强。
+
+
+
+**【focal loss】**
+
+focal loss是ICCV2017中提出的一种解决**难易**样本数据不平衡的方法。注意，不是解决正负样本不平衡的方法。
+
+目标检测器通常会产生高达100k的候选目标，只有极少数是正样本，正负样本数量非常不平衡。我们在计算分类的时候常用的损失——交叉熵的公式如下：
+
+![[公式]](https://www.zhihu.com/equation?tex=CE%3D%5Cleft%5C%7B+%5Cbegin%7Baligned%7D+-log%28p%29++%2C%5Cquad+if%5Cquad++y%3D1%5C%5C+-log%281-p%29%2C%5Cquad+if%5Cquad++y%3D0++++%5Cend%7Baligned%7D+%5Cright.) (1)
+
+为了**解决正负样本不平衡**的问题，我们通常会在交叉熵损失的前面加上一个参数 ![[公式]](https://www.zhihu.com/equation?tex=%5Calpha) ，来对小样本做更多的惩罚，就像上文说的那样。即：
+
+![[公式]](https://www.zhihu.com/equation?tex=CE%3D%5Cleft%5C%7B+%5Cbegin%7Baligned%7D+-%5Calpha+log%28p%29++%2C%5Cquad+if%5Cquad++y%3D1%5C%5C+-%281-%5Calpha%29log%281-p%29%2C%5Cquad+if%5Cquad++y%3D0+%5Cend%7Baligned%7D+%5Cright.) (2)
+
+但这并不能解决全部问题。根据正、负、难、易，样本一共可以分为以下四类：
+
+![img](https://pic1.zhimg.com/80/v2-21ca62ae70e63d1e99833e368fcac4cc_1440w.jpg)
+
+**尽管** ![[公式]](https://www.zhihu.com/equation?tex=%5Calpha) **平衡了正负样本，但对难易样本的不平衡没有任何帮助。**而实际上，目标检测中大量的候选目标都是**易分**样本。这些样本的损失很低，但是由于数量极不平衡，易分样本的数量相对来讲太多，最终主导了总的损失。而本文的作者认为，易分样本（即，**置信度高的样本**）对模型的**提升效果非常小**，模型应该主要关注与那些难分样本。
+
+这时候，Focal Loss就上场了！
+
+一个简单的思想：**把高置信度(p)样本的损失再降低一些不就好了吗！**
+
+![[公式]](https://www.zhihu.com/equation?tex=FL%3D%5Cleft%5C%7B+%5Cbegin%7Baligned%7D+-%281-p%29%5E%5Cgamma+log%28p%29++%2C%5Cquad+if%5Cquad++y%3D1%5C%5C+%5C%5C+-p%5E%5Cgamma+log%281-p%29%2C%5Cquad+if%5Cquad++y%3D0+%5Cend%7Baligned%7D+%5Cright.) （3）
+
+举个例， ![[公式]](https://www.zhihu.com/equation?tex=%5Cgamma) 取2时，如果 ![[公式]](https://www.zhihu.com/equation?tex=p%3D0.968) , ![[公式]](https://www.zhihu.com/equation?tex=%281-0.968%29%5E2+%5Capprox+0.001) ，损失衰减了1000倍！
+
+Focal Loss的最终形式结合了上面的公式（2）. 这很好理解，公式(3)解决了难易样本的不平衡，公式(2)解决了正负样本的不平衡，将公式（2）与（3）结合使用，同时解决正负难易2个问题！
+
+最终的Focal Loss形式如下：
+
+![[公式]](https://www.zhihu.com/equation?tex=FL%3D%5Cleft%5C%7B+%5Cbegin%7Baligned%7D+-%5Calpha+%281-p%29%5E%5Cgamma+log%28p%29++%2C%5Cquad+if%5Cquad++y%3D1%5C%5C++-%281-%5Calpha%29+p%5E%5Cgamma+log%281-p%29%2C%5Cquad+if%5Cquad++y%3D0+%5Cend%7Baligned%7D+%5Cright.)
+
+实验表明![[公式]](https://www.zhihu.com/equation?tex=%5Cgamma) 取2, ![[公式]](https://www.zhihu.com/equation?tex=%5Calpha) 取0.25的时候效果最佳。
+
+
 
 ### 2.2 boosting 方法
 
@@ -69,11 +109,10 @@
 
 在搜索、推荐、广告的实际场景下，怎么选择正负样本也是大有讲究。
 
-对于召回阶段，一般初始的训练集是只有正样本的。什么样的样本被选作正样本，这个标准在每个公司都不一样。例如，facebook在其最新的文章 Que2Search: Fast and Accurate Query and Document Understanding for Search at Facebook中提到，他们选择正样本标准十分严格：对于一个query，只有当用户点击了一个product，进去和卖家聊天，卖家还回复了，这才算一个正样本。但是在其另外一篇文章Embedding-based Retrieval in Facebook Search中却提到，其实可以把用户点击的商品都算作正样本。这是因为其实召回可以看作排序阶段的一个近似，我们只需要快速的把和query相关的物品都拿出来。
+对于召回阶段，一般初始的训练集是只有正样本的。什么样的样本被选作正样本，这个标准在每个公司都不一样。例如，facebook在其文章 Que2Search: Fast and Accurate Query and Document Understanding for Search at Facebook中提到，他们选择正样本标准十分严格：对于一个query，只有当用户点击了一个product，进去和卖家聊天，卖家还回复了，这才算一个正样本。但是在其另外一篇文章Embedding-based Retrieval in Facebook Search中却提到，其实可以把用户点击的商品都算作正样本。这是因为其实召回可以看作排序阶段的一个近似，我们只需要快速的把和query相关的物品都拿出来。
 
 那么召回阶段的负样本怎么来呢？在实际的数据流场景中，一般是用in-batch采样，但是这样有一个问题：越热门的商品，越容易出现在batch中，所以越容易成为负样本。这样，就对热门商品施加了不必要的惩罚。为了解决这个问题，Google在Sampling-Bias-Corrected Neural Modeling for Large Corpus Item Recommendations一文中提出streaming frequency estimation方法。其实还有一些负采样方法，比如难负例采样。还可以把in-batch采样与随机负采样相结合。这里的门道很多，之后会专门出专题介绍。
 
 对于排序阶段，一般都是多目标预测，目标有是否点击、是否关注、是否购买、观看时长、评分等等（engagement & satisfaction），负样本就是那些曝光未点击的，由于曝光的商品本来就比较少了（相对召回阶段而言），所以数据不平衡没有那么严重。
 
 
-  

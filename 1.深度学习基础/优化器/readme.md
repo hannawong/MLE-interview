@@ -93,19 +93,19 @@ A：梯度下降法并不是下降最快的方向，它只是目标函数在当�
 
 #### 1. momentum
 
-Momentum的“梯度”不仅包含了这一步实际算出来的梯度，还包括了上一次的梯度“惯性”。其实，动量项 ![m_t](https://www.zhihu.com/equation?tex=m_t)  可以看作 ![E[g_t] ](https://www.zhihu.com/equation?tex=E%5Bg_t%5D%20)  的移动平均。
+Momentum的“梯度”不仅包含了这一步实际算出来的梯度，还包括了上一次的梯度“惯性”。其实，动量项 ![m_t](https://www.zhihu.com/equation?tex=m_t)  可以看作 ![E[g_t] ](https://www.zhihu.com/equation?tex=E%5Bg_t%5D%20)  的移动平均。为什么要这么做呢？这是因为如果只使用梯度下降法，有时**震荡**会很明显，然而我们总是希望参数**平稳**的移动到极小值点。有什么办法能够达到这个“平稳”的目的呢？求平均呗！
 
 ![img](https://img-blog.csdnimg.cn/2021012711360045.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
 
 
 
 - **下降初期**时，使用上一次参数更新，下降方向一致
-- 下降中后期时，在局部最小值来回震荡的时候，![gradient \rightarrow 0](https://private.codecogs.com/gif.latex?gradient%20%5Crightarrow%200)，但是由于具有上一次的动量![m_{t-1}](https://private.codecogs.com/gif.latex?m_%7Bt-1%7D),所以能够跳出陷阱
-- 在梯度![g_t](https://private.codecogs.com/gif.latex?g_t)改变方向（震荡）的时候，由于具有上一次的动量，所以会“往回掰”一点，抑制震荡。
+- 下降中后期时，在局部最小值来回震荡的时候，![gradient \rightarrow 0](https://private.codecogs.com/gif.latex?gradient%20%5Crightarrow%200)，但是由于具有上一次的动量![m_{t-1}](https://private.codecogs.com/gif.latex?m_%7Bt-1%7D),所以能够**跳出陷阱**
+- 在梯度![g_t](https://private.codecogs.com/gif.latex?g_t)改变方向（**震荡**）的时候，由于具有上一次的动量，所以会“往回掰”一点，**抑制震荡**。
 
 总而言之，momentum项能够在原先方向加速SGD，抑制振荡，从而加快收敛。
 
-由于当前梯度的改变会受到**上一次梯度**改变的影响，类似于小球向下滚动的时候带上了惯性。这样可以加快小球向下滚动的速度。
+由于当前梯度的改变会受到**上一次梯度**改变的影响，类似于小球向下滚动的时候带上了惯性。这样可以加快小球向下滚动的速度。如下面的左图中，y方向震荡很明显（一会儿是正的、一会儿是负的）；右图是加上了动量之后的结果，可见抑制了震荡、加速了收敛。
 
 ![preview](https://img-blog.csdnimg.cn/img_convert/7fb767587ea8f71fd478e8f8f7ac01be.png)
 
@@ -113,21 +113,15 @@ Momentum的“梯度”不仅包含了这一步实际算出来的梯度，还包
 
 #### 2. NAG
 
-- 牛顿加速梯度（NAG, Nesterov accelerated gradient）算法，是Momentum动量算法的变种
+但是，上文的这种动量法也有问题！想象一个小球已经达到了我们想要的极小值点，我们当然希望它的速度降下来。但是动量法中，由于还具有上次的动量，所以小球会“overshoot”。因此，就要引入NAG方法，“put on the brakes as the marble reaches near bottom of hill”
 
-nesterov项在梯度更新时做一个校正，避免前进太快，同时提高灵敏度。 
+牛顿加速梯度（NAG, Nesterov accelerated gradient）算法，是Momentum动量算法的变种。nesterov项在梯度更新时做一个校正，避免前进太快。这个校正就是$\eta \mu m_{t-1}$, 这个就是“向前看”，**提前感知下一步更新之后的参数**。"lookahead/foresee in computing updates"
 
-![img](https://img-blog.csdnimg.cn/20210127113652693.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
+![img](https://pic2.zhimg.com/80/v2-f17d0e73dbf6401fa741a9550cf3a6d2_1440w.jpeg)
 
 
 
-所以，加上nesterov项后，梯度在大的跳跃后，进行计算**对当前梯度进行校正** 。如下图：
-
-![img](https://img-blog.csdnimg.cn/20210127113707743.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3dlaXhpbl80MTMzMjAwOQ==,size_16,color_FFFFFF,t_70)
-
-**momentum**首先计算一个梯度(短的蓝色向量)，然后在原先梯度的方向(惯性)进行一个大的跳跃(长的蓝色向量)
-
-**nesterov**项首先在原先梯度的方向进行一个大的跳跃(棕色向量)，计算梯度然后进行**校正**(绿色向量)
+所以，加上nesterov项后，梯度在大的跳跃后，进行计算**对当前梯度进行校正** 。
 
 
 

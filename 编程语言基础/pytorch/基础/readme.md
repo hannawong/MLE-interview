@@ -123,7 +123,7 @@ forward函数（前馈函数）需要自己定义，然后**反向传播函数**
 
 #### 3.2 反向传播
 
-首先，需要计算损失函数loss。这样，当我们调用 loss.backward()，**整个图都会微分**，而且所有的在图中的requires_grad=True 的张量将会让他们的 grad 张量累计梯度。需要先清空现存的梯度，要不然梯度将会和现存的梯度累计到一起。
+首先，需要计算损失函数loss。这样，当我们调用 loss.backward()，**整个图都会微分**，而且所有的在图中的requires_grad=True 的张量将会让他们的 grad 张量**累计**梯度。需要先清空现存的梯度，要不然梯度将会和现存的梯度累计到一起。
 
 ```python
 net.zero_grad()     # zeroes the gradient buffers of all parameters
@@ -164,7 +164,7 @@ optimizer = optim.SGD(net.parameters(), lr=0.01)
 optimizer.zero_grad()   # zero the gradient buffers
 output = net(input)
 loss = criterion(output, target)
-loss.backward()
+loss.backward() ##累计梯度
 optimizer.step()    # Does the update
 ```
 

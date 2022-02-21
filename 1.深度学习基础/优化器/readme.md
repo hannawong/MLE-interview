@@ -135,6 +135,9 @@ torch.optim.SGD(params, lr=<required parameter>, momentum=0, dampening=0, weight
 
 ## 3.自适应学习率优化算法
 自适应学习率优化算法针对于机器学习模型的学习率，传统的优化算法要么将学习率设置为常数要么根据训练次数调节学习率。极大忽视了学习率其他变化的可能性。然而，学习率对模型的性能有着显著的影响，因此需要采取一些策略来想办法更新学习率，从而提高训练速度。
+
+自适应学习率算法可以实现"apply a different learning rate to **each parameter** at each step". 这里的梯度都是针对**每个参数**而言的，而不是整体的学习率。
+
 目前的自适应学习率优化算法主要有：AdaGrad算法，RMSProp算法，Adam算法以及AdaDelta算法。
 
 ##### 3.1 AdaGrad算法

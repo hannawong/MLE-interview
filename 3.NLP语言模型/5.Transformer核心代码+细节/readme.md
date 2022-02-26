@@ -11,9 +11,9 @@ def transformer_model(input_tensor,  ##[batch_size,seq_length,hidden_size]
                       num_hidden_layers=12,
                       num_attention_heads=12,
                       intermediate_size=3072,
-                      intermediate_act_fn=gelu, ##the output of the intermediate/feed-forward layer
-                      hidden_dropout_prob=0.1,
-                      attention_probs_dropout_prob=0.1,
+                      intermediate_act_fn=gelu, ##the output of the intermediate/feed-forward layer激活函数
+                      hidden_dropout_prob=0.1, ##FFN的dropout
+                      attention_probs_dropout_prob=0.1, ##self-attention算QKV的dropout
                       initializer_range=0.02,
                       do_return_all_layers=False):
   
@@ -22,18 +22,17 @@ def transformer_model(input_tensor,  ##[batch_size,seq_length,hidden_size]
             "The hidden size (%d) is not a multiple of the number of attention "
             "heads (%d)" % (hidden_size, num_attention_heads))
 
-    attention_head_size = int(hidden_size / num_attention_heads) ## 拆分attention_head
+    attention_head_size = int(hidden_size / num_attention_heads) ## 拆分attention_head，每个attention head的大小
     input_shape = get_shape_list(input_tensor, expected_rank=3)
     batch_size = input_shape[0] ## 128, batchsize
     seq_length = input_shape[1] ## 20,sequence length
     input_width = input_shape[2] ## 32, hidden size
 
-
     # We keep the representation as a 2D tensor to avoid re-shaping it back and
     # forth from a 3D tensor to a 2D tensor. Re-shapes are normally free on
     # the GPU/CPU but may not be free on the TPU, so we want to minimize them to
     # help the optimizer.
-    prev_output = reshape_to_matrix(input_tensor) ##(128*20,32)
+    prev_output = reshape_to_matrix(input_tensor) ##(128*20,32)，记录上一层输出
 
     all_layer_outputs = []
     for layer_idx in range(num_hidden_layers): ## 多层Transformer
@@ -66,31 +65,31 @@ def transformer_model(input_tensor,  ##[batch_size,seq_length,hidden_size]
                 with tf.variable_scope("output"):
                     attention_output = tf.layers.dense(
                         attention_output,
-                        hidden_size,
+                        hidden_size, ##和输入input的hidden size一样，没有升维
                         kernel_initializer=create_initializer(
                             initializer_range))
                     attention_output = dropout(attention_output,
-                                               hidden_dropout_prob)
-                    attention_output = layer_norm(attention_output +
+                                               hidden_dropout_prob) ##隐藏层dropout
+                    attention_output = layer_norm(attention_output + ## 残差连接+layernorm
                                                   layer_input)
 			# FFN层
             # The activation is only applied to the "intermediate" hidden layer.
             with tf.variable_scope("intermediate"):
                 intermediate_output = tf.layers.dense(
                     attention_output,
-                    intermediate_size,
+                    intermediate_size, ##一般取4*hiddensize
                     activation=intermediate_act_fn, ###"gelu"
                     kernel_initializer=create_initializer(initializer_range))
 
             # Down-project back to `hidden_size` then add the residual.
             with tf.variable_scope("output"):
                 layer_output = tf.layers.dense(
-                    intermediate_output,
-                    hidden_size,
+                    intermediate_output, ##4*hidden size
+                    hidden_size, ##降维到hiddensize
                     kernel_initializer=create_initializer(initializer_range))
                 layer_output = dropout(layer_output, hidden_dropout_prob)
                 layer_output = layer_norm(layer_output + attention_output)
-                prev_output = layer_output
+                prev_output = layer_output ##这一层的输出已经得到了！
                 all_layer_outputs.append(layer_output)
 
     if do_return_all_layers:
@@ -100,7 +99,7 @@ def transformer_model(input_tensor,  ##[batch_size,seq_length,hidden_size]
             final_outputs.append(final_output)
         return final_outputs
     else:
-        final_output = reshape_from_matrix(prev_output, input_shape) ##(128,20,32)
+        final_output = reshape_from_matrix(prev_output, input_shape) ##reshape得到三维输出(128,20,32)
         return final_output
 ```
 
@@ -344,4 +343,42 @@ FFN的gelu激活函数和self-attention，注意self-attention是非线性的（
 
 
 
+----
 
+**Transformer复杂度分析**
+
+1. self-attention复杂度
+
+记：序列长度为n，一个位置的embedding大小为d。例如，(32,512,768)的序列，n = 512, d = 768.
+
+首先，得到的Q,K,V都是大小为n\*d的。
+
+- 相似度计算 ![[公式]](https://www.zhihu.com/equation?tex=QK%5ET) ： ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 与 ![[公式]](https://www.zhihu.com/equation?tex=d%5Ctimes+n) 运算，得到 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+n) 矩阵，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%5E2d%29)
+- softmax计算：对每行做softmax，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%29) ，则n行的复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%5E2%29)
+- 乘上V加权： ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+n) 与 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 运算，得到 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 矩阵，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%5E2d%29)
+
+2. 多头self-attention复杂度
+
+- Attention操作复杂度：首先经过“切头”，把输出变成(batchsize, n, d/h)长度， ![[公式]](https://www.zhihu.com/equation?tex=QK%5ET)就是(n,d/h)和(n,d/h)的运算，由于h为常数，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%5E2d%29)![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7B%7D)
+- 之后的softmax和乘V加权同上。
+- 之后，还需要把这些头拼接起来，经过一层线性映射之后输出。concat操作拼起来形成 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 的矩阵，然后经过输出线性映射，保证输出也是 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 的，所以是 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d) 与 ![[公式]](https://www.zhihu.com/equation?tex=d%5Ctimes+d) 计算，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28nd%5E2%29)
+
+故最后的复杂度为： ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28n%5E2d%2Bnd%5E2%29)
+
+**RNN 复杂度分析**
+
+![[公式]](https://www.zhihu.com/equation?tex=h_t%3Df%28Ux_t%2BWh_%7Bt-1%7D%29+%5C%5C)
+
+- ![[公式]](https://www.zhihu.com/equation?tex=Ux_t) ： ![[公式]](https://www.zhihu.com/equation?tex=d%5Ctimes+m) 与 ![[公式]](https://www.zhihu.com/equation?tex=m%5Ctimes+1) 运算，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28md%29) ， ![[公式]](https://www.zhihu.com/equation?tex=m) 为输入$x_t$的embedding size，d为hidden state的embedding size
+- ![[公式]](https://www.zhihu.com/equation?tex=Wh_%7Bt-1%7D) ： ![[公式]](https://www.zhihu.com/equation?tex=d%5Ctimes+d) 与 ![[公式]](https://www.zhihu.com/equation?tex=d%5Ctimes+1) 运算，复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28d%5E2%29)
+
+故一次操作的时间复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28d%5E2%29) ， ![[公式]](https://www.zhihu.com/equation?tex=n) 次序列操作后的总时间复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28nd%5E2%29)
+
+
+
+**CNN复杂度分析**
+
+> 使用conv1d，这里保证输入输出都是一样的，即均是 ![[公式]](https://www.zhihu.com/equation?tex=n%5Ctimes+d)
+
+- 大小为 ![[公式]](https://www.zhihu.com/equation?tex=k%5Ctimes+d) 的卷积核一次运算的复杂度为： ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28kd%29) ，一共做了 ![[公式]](https://www.zhihu.com/equation?tex=n) 次，故复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28nkd%29)
+- 为了保证第二个维度在第二个维度都相同，故需要 ![[公式]](https://www.zhihu.com/equation?tex=d) 个卷积核，所以卷积操作总的时间复杂度为 ![[公式]](https://www.zhihu.com/equation?tex=%5Cmathcal%7BO%7D%28nkd%5E2%29)

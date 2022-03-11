@@ -103,3 +103,49 @@ class Solution:
 
 ```
 
+
+
+#### 剑指 Offer 38. 字符串的排列：去重
+
+输入一个字符串，打印出该字符串中字符的所有排列。
+
+你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+
+**示例:**
+
+```
+输入：s = "abc"
+输出：["abc","acb","bac","bca","cab","cba"]
+```
+
+解法：为了保证没有重复元素，我们需要把原有的字符串排序，然后保证一件事情，那就是：**一个元素前面的相同元素如果尚未放入，那么这个元素现在就不能放入！**，即 ` if i >= 1 and not visited[i-1] and s[i-1] == s[i]:continue`. 这句话就是整个代码的核心。同时注意要写i >= 1防止出界。
+
+```python
+class Solution:
+    ans = []
+    ans_list = []
+    def permutation(self, s: str):
+        self.ans = []
+        self.ans_list = []
+        n = len(s)
+        s = sorted(s)
+        visited = [0]*n
+        def DFS(now):
+            if now == n:
+                self.ans_list.append("".join(self.ans))
+                return
+            for i in range(n):
+                if visited[i]:
+                    continue
+                if i >= 1 and not visited[i-1] and s[i-1] == s[i]:
+                    continue
+                self.ans.append(s[i])
+                visited[i] = 1
+                DFS(now+1)
+                visited[i] = 0
+                self.ans.pop()
+        DFS(0)
+        return self.ans_list
+```
+
+- 总结：DFS函数作为一个辅助函数，可以写在主函数体里，这样可以免去很多参数的传入。

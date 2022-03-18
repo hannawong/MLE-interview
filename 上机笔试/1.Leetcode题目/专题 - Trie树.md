@@ -100,3 +100,97 @@ class Solution:
         return ans
 ```
 
+
+
+#### [421. 数组中两个数的最大异或值](https://leetcode-cn.com/problems/maximum-xor-of-two-numbers-in-an-array/)
+
+难度中等428
+
+给你一个整数数组 `nums` ，返回 `nums[i] XOR nums[j]` 的最大运算结果，其中 `0 ≤ i ≤ j < n` 。
+
+**进阶：**你可以在 `O(n)` 的时间解决这个问题吗？
+
+**示例 1：**
+
+```
+输入：nums = [3,10,5,25,2,8]
+输出：28
+解释：最大运算结果是 5 XOR 25 = 28.
+```
+
+解法：首先，把所有的数字都表示成32位二进制数，然后依次插入Trie树中。然后，再遍历数组的每个元素，对于其二进制表示，**尽量向反方向去找**（为了使异或值更大）。如果实在没有反方向，那么就只能向同方向找。由于每个数都必定是32位，所以都不用去标注is_end了。
+
+```python
+class Trie:
+    def __init__(self):
+        self.children = [None] * 2   ##要么转0，要么转1
+        self.is_end = False
+
+    def insert(self, binary): ##插入一个32位二进制数字
+        tmp = self
+        for digit in binary:
+            if not tmp.children[digit]:  ##还没有这个字符，建立一个！
+                tmp.children[digit] = Trie()
+                tmp = tmp.children[digit]
+            else:
+                tmp = tmp.children[digit]
+        tmp.is_end = True
+
+    def find_max_xor(self, number):  ##找到trie树中和number异或值最大的数
+        tmp = self
+        ans = []
+        for digit in number:
+            if tmp.children[1-digit]: ##能走相反，就走相反
+                ans.append(1-digit)
+                tmp = tmp.children[1-digit]
+            else:
+                ans.append(digit)
+                tmp = tmp.children[digit]
+        return ans
+
+class Solution:
+    def to_binary(self,number): ##转为32位二进制数
+        binary = []
+        while number:
+            digit = number % 2
+            number = number // 2
+            binary.append(digit)
+        return [0]*(32-len(binary))+binary[::-1]
+    def binary2num(self,binary):
+        ans = 0
+        for i in range(len(binary)):
+            ans += 2**(31-i)*binary[i]
+        return ans
+
+
+    def findMaximumXOR(self, nums) -> int:
+        mmax = 0
+        trie = Trie()
+        for num in nums:
+            trie.insert(self.to_binary(num))
+        for i in range(len(nums)):
+            mmax = max(mmax,self.binary2num(trie.find_max_xor(self.to_binary(nums[i]))) ^ nums[i])
+        print(mmax)
+        return mmax
+```
+
+【总结】
+
+- 整数转二进制写法：
+
+  - ```python
+    while number:
+    	digit = number % 2
+    	number = number // 2
+    ```
+
+    但是不要忘记这样得到的digit是**倒序**的！！
+
+- 二进制转int：
+
+  - ```python
+    for i in range(len(binary)):
+    	ans += 2**(31-i)*binary[i]
+    ```
+
+    注意这里是`31-i`而不是`32-i`, 需要注意细节

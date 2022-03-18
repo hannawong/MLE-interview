@@ -78,3 +78,15 @@
 ![[公式]](https://www.zhihu.com/equation?tex=x_%7BH%7D%5E%7B%2A%7D%3Dargmax_%7Bx%7D-%5Csum_%7Bi%7DP_%7B%5Ctheta%7D%28y_%7Bi%7D%7Cx%29%5Ccdot+%5Cln+P_%7B%5Ctheta%7D%28y_%7Bi%7D%7Cx%29) ,
 
 相较于 least confident 和 margin sample 而言，entropy 的方法考虑了该模型对某个 ![[公式]](https://www.zhihu.com/equation?tex=x) 的所有类别判定结果。而 least confident 只考虑了最大的概率，margin sample 考虑了最大的和次大的两个概率。
+
+
+
+## 半监督学习：
+
+半监督学习是为了解决有标签数据太少的问题。符号：有标签数据集$D$，大量的无标签数据集U。首先用有标签数据集训练出teacher model，然后用此teacher model去标记无标签数据集，取“最确定”的一些样本当成真实的标签。何谓“最确定”呢？实际上，就是取每个类别中预测score最高的top K个样本。如果K太小，那么扩充的数据集较少，不能起到有效训练模型的目的；如果K太大，那么就会引入一些噪声。
+
+之后，让student model在这个经过标注的无标签训练集上做**预训练**，然后用有标签数据做**微调**。
+
+![img](https://pic3.zhimg.com/80/v2-a5c6a8c1a73a683cd99b22903bc9fb51_1440w.jpeg)
+
+使用semi-supervised的方法要比直接在有标签数据集上做supervised learning要好，因为有了提前的预训练，相当于做了数据集的扩增，能够学到更generalized的信息，起到正则化的作用。

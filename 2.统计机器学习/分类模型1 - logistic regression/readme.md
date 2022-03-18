@@ -46,7 +46,7 @@
 
 ![img](https://pic3.zhimg.com/80/v2-0d6004d8ed9e9f5e286bfa93c4ef1861_1440w.png)
 
-- 梯度下降求解
+- 梯度下降求解(错误：下图中少了一个负号，应该是negative log-likelihood, L(\theta)应该多一个负号，梯度也应该变为相反数)
 
 ![img](https://pic3.zhimg.com/v2-e9b19e804cbb8cdad22041b4523270b2_b.jpeg)
 

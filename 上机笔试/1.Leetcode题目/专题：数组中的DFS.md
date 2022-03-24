@@ -10,23 +10,20 @@ class Solution:
         self.ans = []
         self.ans_list = []
         visited = [0]*len(nums)
-        self.DFS(nums,0,visited)
+        
+        def dfs(idx): ##现在在放第idx位
+            if idx == len(nums):
+                self.ans_list.append(self.ans[:])
+                return 
+            for i in range(len(nums)):
+                if not visited[i]:
+                    visited[i] = 1
+                    self.ans.append(nums[i])
+                    dfs(idx+1)
+                    self.ans.pop()
+                    visited[i] = 0
+        dfs(0)
         return self.ans_list
-
-
-    def DFS(self,nums,idx,visited):
-        if idx == len(nums):
-            self.ans_list.append(self.ans[:])
-            return
-        for i in range(len(nums)):
-            if visited[i]:
-                continue
-                
-            visited[i] = 1
-            self.ans.append(nums[i])
-            self.DFS(nums,idx+1,visited)
-            self.ans.pop() ##回溯
-            visited[i] = 0
 ```
 
 
@@ -149,3 +146,65 @@ class Solution:
 ```
 
 - 总结：DFS函数作为一个辅助函数，可以写在主函数体里，这样可以免去很多参数的传入。
+
+
+
+### 93. 复原IP地址
+
+有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
+
+例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
+给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
+
+```python
+示例 1：
+
+输入：s = "25525511135"
+输出：["255.255.11.135","255.255.111.35"]
+```
+
+```
+class Solution:
+    ans = []
+    ans_list = []
+
+    def restoreIpAddresses(self, s: str):
+        self.ans = []
+        self.ans_list = []
+        def is_valid(string): ##判断是否0~255之间
+            if len(string) == 0:
+                return False
+            if string[0] == ' ':
+                return False
+            if int(string)<0 or int(string) > 255:
+                return False
+            if len(string) >= 2 and string[0] == "0":
+                return False
+            return True
+        def DFS(s,idx,ip_num):
+            if ip_num == 4 and idx == len(s):
+                print(self.ans)
+                self.ans_list.append(".".join(self.ans[:]))
+                return
+            if ip_num > 4:
+                return
+            if idx > len(s):
+                return 
+
+            for i in range(1,4):
+                if is_valid(s[idx:idx+i]):
+                    self.ans.append(s[idx:idx+i])
+                    idx += i
+                    DFS(s,idx,ip_num+1)
+                    idx -= i
+                    self.ans.pop()
+        DFS(s,0,0)
+        return self.ans_list
+        
+
+```
+
+【易错点】
+
+- 当len(nums) >= 2 且第一个数为0时，说明有前导零。注意这里的长度是2，而不是1！
+- 终止条件就是  `ip_num == 4 and idx == len(s)`而不是`idx >= len(s)`

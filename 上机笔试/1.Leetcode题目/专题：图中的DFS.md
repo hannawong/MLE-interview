@@ -32,30 +32,22 @@ class Solution:
         m = len(grid)
         n = len(grid[0])
         visited = [[0]*n for _ in range(m)]
+
+        def dfs(x,y):
+            dx = [1,-1,0,0]
+            dy = [0,0,1,-1]
+            visited[x][y] = 1 ##visited
+            for i in range(4): ##再考虑所有邻居
+                xx = x+dx[i]; yy = y+dy[i]
+                if xx >= 0 and xx < m and yy >= 0 and yy < n and not visited[xx][yy] and grid[xx][yy] == "1":
+                    dfs(xx,yy)
+
         cnt = 0
         for i in range(m):
             for j in range(n):
-                if grid[i][j] == '1' and visited[i][j] == 0:
-                    visited[i][j] == 1
-                    self.DFS(grid,visited,i,j)
+                if grid[i][j] == "1" and not visited[i][j]:
                     cnt += 1
-        return cnt 
-        
-        
-        
-    def DFS(self,grid,visited,x,y):
-        m = len(grid)
-        n = len(grid[0])
-
-        dx = [1,-1,0,0]
-        dy = [0,0,1,-1]
-
-        for i in range(4):
-            xx = x+dx[i]
-            yy = y+dy[i]
-            if xx < 0 or xx >= m or yy < 0 or yy >= n or visited[xx][yy] == 1 or grid[xx][yy] == '0': ##邻居不符合条件
-                continue
-            visited[xx][yy] = 1 ##visit邻居
-            self.DFS(grid,visited,xx,yy)
+                    dfs(i,j)
+        return cnt
 ```
 

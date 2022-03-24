@@ -27,9 +27,10 @@ class Solution:
         return dp[lena][lenb]
 ```
 
-【易错点】有两个：
+【易错点】有三个：
 
-- 当word1[i]!=word2[j]的时候，不要忘记还可能会有`dp[i-1][j-1]+1`, 这对应“替换”操作。
+- 当word1[i]!=word2[j]的时候，不要忘记还可能会有`dp[i-1][j-1]+1`, 这对应“**替换**”操作。
+- 最后应返回`dp[lena][lenb]`而不是`dp[lena-1][lenb-1]`
 - 第0行和第0列都用**相同**的字符“#“来pad。为什么要强调相同的呢，那是因为如果pad的值不同，会导致最后的编辑距离发生变化！因此，一开始dp矩阵的初始化应该是这样的：
 
 ![img](https://pic1.zhimg.com/80/v2-7fcbe552cf029ce5ec3ee47ac4e8dcd9_1440w.png)

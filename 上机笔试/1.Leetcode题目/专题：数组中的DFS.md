@@ -39,25 +39,26 @@ class Solution:
     def generateParenthesis(self, n: int):
         self.ans = []
         self.ans_list = []
-        self.DFS(0,0,n)
+        def DFS(left_num, right_num):
+            if left_num == right_num == n:
+                self.ans_list.append("".join(self.ans))
+                return
+            if left_num < right_num:
+                return 
+            if left_num > n or right_num > n:
+                return 
+            ####放左括号
+            self.ans.append("(")
+            DFS(left_num+1,right_num)
+            self.ans.pop()
+
+            ###放右括号
+            self.ans.append(")")
+            DFS(left_num,right_num+1)
+            self.ans.pop()
+        DFS(0,0)
         return self.ans_list
 
-    def DFS(self,left_num,right_num,n):
-        if right_num > left_num:
-            return
-        if left_num == n and right_num == n:
-            self.ans_list.append(''.join(self.ans))
-            return
-        if right_num > n or left_num > n:
-            return
-        ##### 左括号
-        self.ans.append("(")
-        self.DFS(left_num+1,right_num,n)
-        self.ans.pop()
-        ##### 右括号
-        self.ans.append(")")
-        self.DFS(left_num,right_num+1,n)
-        self.ans.pop()
 ```
 
 #### 39. 组合总和

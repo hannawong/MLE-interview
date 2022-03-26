@@ -1,12 +1,14 @@
 
 
-# GraphSage 
+# GraphSage (Graph Sample and Aggregate)
 
 ### 1. GCN的局限
 
-GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要把**所有节点都参与训练**才能得到node embedding，如果新node来了，没法得到新node的embedding。所以，GCN是transductive的。（Transductive任务是指：训练阶段与测试阶段都基于同样的图结构）
+GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要把**所有节点都参与训练**才能得到node embedding(巨大的拉普拉斯矩阵)，如果新node来了，没法得到新node的embedding。所以，GCN是transductive的。（Transductive任务是指：训练阶段与测试阶段都基于同样的图结构）。而在实际应用中，由于新的item/user是源源不断的，所以我们的算法必须要支持新节点的加入；还有可能一个节点根本没有出现在训练集中，但是在测试集中出现（冷启动问题），所以我们的算法必须支持对未见节点的良好embedding。
 
-而GraphSAGE是inductive的。inductive任务是指：训练阶段与测试阶段需要处理的graph不同。通常是训练阶段只是在子图（subgraph）上进行，测试阶段需要处理未知的顶点。
+而GraphSAGE是inductive的。inductive任务是指：训练阶段与测试阶段需要处理的graph不同。通常是训练阶段只是在子图（subgraph）上进行，测试阶段需要**处理未知的顶点**。
+
+> ...leverage node **feature** information(e.g. text attributes) to efficiently generate node embeddings for previously unseen data. (也可以用此方法解决冷启动问题，即图中放入一个新的节点，如何快速得到它的embedding？可以利用它的属性特征，放入图中合适的位置。我们可以知道，GraphSAGE的每个节点初始化是用内容embedding来做的，所以就隐式的同时对**内容embedding**和**图关系embedding**进行了表征融合。)
 
 **得到新节点的表示的难处：**
 
@@ -14,7 +16,7 @@ GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要�
 
 **因此我们需要换一种思路：**
 
-既然**新增的节点，一定会改变原有节点的表示**，那么我们**干嘛一定要得到每个节点的一个固定的表示呢？**我们何不直接**学习一种节点的表示方法**。这样不管graph怎么改变，都可以很容易地得到新的表示。
+既然**新增的节点，一定会改变原有节点的表示**，那么我们**干嘛一定要得到每个节点的一个固定的表示呢？**我们何不直接**学习一种节点的表示方法**。这样不管graph怎么改变，都可以很容易地得到新的表示。具体的方法就是聚合邻居节点的表示。如何训练合适的聚合邻居节点的函数，就是GraphSAGE的关键。聚合一次邻居节点，我们就得到了“一阶关系”；聚合k次邻居节点，我们就得到了“k阶关系”。在测试的时候，面对新的节点，我们就可以用训练得到的聚合函数去聚合新节点的邻居，得到新节点的表征。
 
 
 
@@ -24,15 +26,15 @@ GCN本身有一个巨大局限，即没法快速表示**新节点**。GCN需要�
 
 #### 2.1 . Embedding generation（前向传播算法）
 
-Embedding generation算法共聚合K次，总共有K个聚合函数(aggregator)，可以认为是K层，来聚合邻居节点的信息。假如用$h^k$来表示第k层每个节点的embedding，那么如何从$h^{k-1}$得到$h^k$呢？
+Embedding generation算法共**聚合**K次，总共有K个聚合函数(aggregator)，可以认为是K层，来聚合邻居节点的信息。假如用$h^k$来表示第k层每个节点的embedding，那么如何从$h^{k-1}$得到$h^k$呢？
 
 - $h^{0}$就是初始的每个节点embedding。
 
-- 对于每个节点v，都把它随机采样的若干**邻居**的**k-1**层的所有向量表示$\{h^{k-1}_u, u \in N(v)\}$、以及节点v**自己**的k-1层表示聚合成一个向量，这样就得到了第$k$层的表示$h^k$。这个聚合方法具体是怎么做的后面再详细介绍。
+- 对于每个节点v，都把它随机采样的若干**邻居**的**k-1**层的所有向量表示$\{h^{k-1}_u, u \in N(v)\}$、以及节点v**自己**的k-1层表示聚合成一个向量，然后把二者拼接起来，经过sigmoid激活函数的全连接层，就得到了第$k$层的表示$h^k$。这个聚合方法具体是怎么做的后面再详细介绍。
 
 文中描述如下：
 
-![1d3847bc19cca879d10b78ced44c0dc](C:\Users\zh-wa\AppData\Local\Temp\WeChat Files\1d3847bc19cca879d10b78ced44c0dc.jpg)
+![img](https://pica.zhimg.com/80/v2-99e65d0ea27a2ba405dc81945189d628_1440w.jpeg)
 
 下图简明的展现了上述过程：
 
@@ -58,9 +60,11 @@ Embedding generation算法共聚合K次，总共有K个聚合函数(aggregator)�
 
   把节点v的所有邻居节点都单独经过一个MLP+sigmoid得到一个向量，最后把所有邻居的向量做一个element-wise的max-pooling。
 
+  > By applying the max-pooling operator to each of the computed features, the model effectively captures different aspects of the neighborhood set.
+
 #### 2.3 GraphSAGE的参数学习
 
-GraphSAGE的参数就是聚合函数的参数。为了学习这些参数，需要设计合适的损失函数。
+GraphSAGE的参数就是**聚合函数AGGREGATE的参数**。为了学习这些参数，需要设计合适的损失函数。
 
 对于**无监督学习**，设计的损失函数应该**让临近的节点的拥有相似的表示**，反之应该表示大不相同。所以损失函数是这样的：
 
@@ -68,7 +72,7 @@ GraphSAGE的参数就是聚合函数的参数。为了学习这些参数，需�
 
 其中，节点v是和节点u在一定长度的random walk上共现的节点，所以它们的点积要尽可能大；后面这项是采了Q个负样本，它们的点积要尽可能小。这个loss和skip-gram中的negative sampling如出一辙。
 
-对于**有监督学习**，可以直接使用cross-entropy loss等常规损失函数。当然，上面的这个loss也可以作为一个辅助loss。
+对于**有监督学习**，可以直接使用cross-entropy loss等常规损失函数。当然，上面的这个loss也可以作为一个**辅助loss**。
 
 
 

@@ -64,8 +64,8 @@
 
 对于每个user/item分别学习两个embedding:
 
-- within-domain embedding. 在自己的领域内根据user-item评分矩阵得到embedding ![[公式]](https://www.zhihu.com/equation?tex=E_A%28%5Ccdot%29)
-- cross-domain embedding. GraphSAGE是一种通过聚合第k-1层节点自己和邻居的embedding来得到第k层节点表示的方法。在这里我们采用使用max-pooling聚合的GraphSAGE方法，具体计算方法如下：
+- within-domain embedding. 在自己的领域内根据user-item评分矩阵得到embedding ![[公式]](https://www.zhihu.com/equation?tex=E_A%28%5Ccdot%29)。由于我们只考虑ID，而不考虑side-information，所以这里就是用矩阵分解/神经网络模拟矩阵分解的方法得到user/item ID embedding。
+- cross-domain embedding. 首先用矩阵分解方法得到的embedding对节点表示做初始化。GraphSAGE是一种通过聚合第k-1层节点自己和邻居的embedding来得到第k层节点表示的方法。在这里我们采用使用max-pooling聚合的GraphSAGE方法，具体计算方法如下：
 
 ![img](https://pic2.zhimg.com/80/v2-98ee227907e9de269ebe7b79e0f6d8d5_1440w.jpg)
 

@@ -72,7 +72,7 @@ candidates 中的 同一个 数字可以 无限制重复被选取 。如果至�
 输出：[[2,2,3],[7]]
 ```
 
-**解法：** 为了保证“不重复”，例如不能有[2,2,3]和[3,2,2], 需要做到“不吃回头草”，不能再加入前面已经遍历过的数字。所以，在每个位置，要么选它，即now+candidate[idx]；要么不选它，即idx+1. 
+**解法：** 为了保证“不重复”，例如不能有[2,2,3]和[3,2,2], 需要做到“**不吃回头草**”，不能再加入前面已经遍历过的数字。所以，在每个位置，**要么选它，即now+candidate[idx]；要么不选它，即idx+1.** 
 
 ```python
 class Solution:
@@ -81,24 +81,23 @@ class Solution:
     def combinationSum(self, candidates, target: int):
         self.ans = []
         self.ans_list = []
-        self.DFS(candidates,target,0,0)
+        def DFS(idx,now):
+            if now == target:
+                self.ans_list.append(self.ans[:])
+                return
+            if idx >= len(candidates):
+                return
+            if now > target:
+                return 
+            ###选
+            self.ans.append(candidates[idx])
+            DFS(idx,now+candidates[idx])
+            self.ans.pop()
+
+            ##不选
+            DFS(idx+1,now)
+        DFS(0,0)
         return self.ans_list
-
-    def DFS(self,candidates,target,idx,now):
-        if now == target:
-            self.ans_list.append(self.ans[:])
-            return
-        if now > target:
-            return
-        if idx >= len(candidates):
-            return
-        #### 选！
-        self.ans.append(candidates[idx])
-        self.DFS(candidates,target,idx,now+candidates[idx])
-        self.ans.pop()
-        ### 不选！
-        self.DFS(candidates,target,idx+1,now)
-
 ```
 
 

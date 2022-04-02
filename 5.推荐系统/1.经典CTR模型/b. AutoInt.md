@@ -1,6 +1,6 @@
 # AutoInt
 
-这篇文章还是解决**高阶显式交叉特征**的，使用了Transformer中的Multi-head self attention+残差连接来显式地捕捉高阶交叉特征。
+这篇文章还是解决**高阶显式交叉特征**的，使用了Transformer中的Multi-head self attention+**残差连接**来显式地捕捉不同阶的高阶交叉特征。
 
 ### 1. 模型思路
 
@@ -28,6 +28,10 @@
 > 交叉特征$g(x_{i_1},...,x_{i_p})$, 其中每个feature都来自不同的field，且$g(·)$做的是non-additive combination（例如乘法、内积、外积都算），那么$g(x_{i_1},...,x_{i_p})$就叫p阶交叉特征。
 
 AutoInt使用multi-head self-attention来捕捉高阶交叉特征。和Transformer中的计算方法一样，每个feature都对应Q,K,V三个向量，然后用该feature对应的Q向量去和其他所有feature的K向量相乘，得到权重系数对所有feature的V向量进行加权求和。为了保留之前层计算而得的交叉特征，使用残差连接。
+
+时间复杂度为$O(Mdd'+M^2d')$. 
+
+![img](https://pica.zhimg.com/80/v2-9583895d4938efcea01f9bf322371592_1440w.jpeg)
 
 例如，假设只有四个特征x1,x2,x3,x4, 那么在第一个self-attention层，每个feature都和其他的特征做了交互，得到二阶交叉特征，如g(x1,x2),g(x1,x3),g(x2,x3).（这是因为每层的每个feature对应的Q向量去乘以其他所有feature的K向量时，就引入了**乘法**，构成了交叉特征。）在第二层，由于还有第一层的**残差**连接，所以可以捕捉三阶、四阶的交叉特征，例如g(x1,x2,x3),g(x1,x2,x3,x4)。
 

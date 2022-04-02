@@ -2,11 +2,11 @@
 
 xDeepFM的卖点还是在于显式构造高阶交叉特征，只是和DCN不一样，xDeepFM的特征交叉是**vector-wise**而不是bit-wise的。也就是说，xDeepFM**区分了不同field的embedding**，实现的是"真正的"、像FM一样的特征交叉，而不是像DCN那样"虚假的"特征交叉。
 
-
+文章上来先diss了一下DCN，指出DCN的本质只是每层给$x_0$乘上不同的系数而已，表达能力有限。而且，DCN的特征交叉是bit-wise的。
 
 ## 0x01. 模型结构
 
-之前讲过，DCN的交叉是**bit-wise**的交叉，其本质只是x0乘上一个系数。为了解决这个问题，xDeepFM中提出了compressed interaction network(**CIN**)模块，来替代DCN中的cross network。
+为了解决DCN的问题，xDeepFM中提出了compressed interaction network(**CIN**)模块，来替代DCN中的cross network。
 
 #### 1. 整体模型结构
 
@@ -16,15 +16,17 @@ xDeepFM的卖点还是在于显式构造高阶交叉特征，只是和DCN不一�
 
 该模型主要分为三个部分：
 
-- linear: 捕捉**线性**特征
+- linear: 捕捉**线性**特征，对应Logistic Regression
 - DNN: **隐式地、bit-wise**地学习高阶交叉特征
-- CIN: **显式地、vector-wise**地学习高阶交叉特征
+- ⭐CIN: **显式地、vector-wise**地学习高阶交叉特征
 
 
 
 #### 2. CIN模块
 
 其中，CIN模块是xDeepFM模型的核心。CIN模块的目的是完成**显式的、vector-wise的**特征交叉，同时把复杂度控制在**多项式时间**(不能随着阶数上升而指数增长)。
+
+
 
 #### 2.1 交互、压缩
 

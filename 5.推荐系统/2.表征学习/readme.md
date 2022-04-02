@@ -8,13 +8,13 @@
 
 1）Embedding模块是FI模块的**上游**模块，直接影响FI模块的效果； 2）CTR模型中的大多数参数集中在Embedding模块(巨大的embedding table！)，对于模型效果有十分重要的影响。
 
-但是，Embedding模块却很少有工作进行深入研究，特别是对于连续特征的embedding方面。现有的处理方式由于其硬离散化(hard discretization)的方式，通常suffer from low model capacity。而本文提出的AutoDis框架具有high model capacity, end-to-end training, 以及unique representation. 
+但是，Embedding模块却很少有工作进行深入研究，特别是对于连续特征的embedding方面。现有的处理方式由于其硬离散化(hard discretization)的方式，通常suffer from low model capacity。而本文提出的AutoDis框架具有high model capacity, end-to-end training（而直接分桶的方式显然是不能端到端训练的，通常怎么分桶也是人”拍脑袋“决定的）, 以及unique representation（而直接分桶的方式很多不同的值会被分到同一个桶中，共享embedding 表达）. 
 
 - No Embedding：是指不对连续特征进行embedding操作，而直接使用原始的数值。如Google Play的Wide & Deep直接使用原始值作为输入;而在Youtube DNN 中，则是对原始值进行变换（如平方，开根号）后输入：
 
 ![img](https://pic1.zhimg.com/v2-f377e77b4c542178d32abd93d9861c28_b.png)
 
-​        这类对连续特征不进行embedding的方法，由于模型容量有限，通常难以有效捕获连续特征中信息。
+​        这类对连续特征不进行embedding的方法，由于模型**容量有限**（参数太少），通常难以有效捕获连续特征中信息。
 
 - Field Embedding：是指同一个field无论取何值，都共享同一个embedding，随后将特征值与其对应的embedding相乘作为模型输入：
 
@@ -24,11 +24,11 @@
 
 ​        由于同一field的特征共享同一个embedding，并基于不同的取值对embedding进行缩放，这类方法的表达能力也是有限的。
 
-- Discretization: 即将连续特征进行离散化，是工业界最常用的方法。这类方法通常是两阶段的，即首先将连续特征转换为对应的离散值，再通过look-up的方式转换为对应的embedding。
+- Discretization: 即将连续特征进行离散化，是工业界最常用的方法。这类方法通常是两阶段的，即首先将连续特征转换为对应的离散值，再通过look-up的方式转换为对应的embedding。embedding table为：$E_j \in R^{H_j \times d}$, 其中$H_j$为离散化分桶的桶数，d为embedding size。
 
-​       【为什么要将连续特征离散化呢？】将连续特征进行离散化给模型引入了**非线性**(可以做特征交叉)，能够提升模型表达能力，而对于离散化的方式，常用的有以下几种：
+​       【为什么要将连续特征离散化呢？】将连续特征进行离散化给模型引入了**非线性**(可以做特征交叉)，能够提升模型表达能力。同时，对于一个field，我们有$H_j \times d$个embedding参数，提升了模型的capacity。而对于离散化的方式，常用的有以下几种：
 
-1） 等宽/等深分箱。对于等宽分箱，首先基于特征的最大值和最小值、以及要划分的桶的个数 ![H_j](https://www.zhihu.com/equation?tex=H_j)，来计算每个样本取值要放到哪个箱子里。对于等深分箱，则是基于数据中特征的**频次**进行分桶，每个桶内特征取值的个数是大致相同的。
+1） 等宽/等深分箱。对于等宽分箱，首先基于特征的最大值和最小值、以及要划分的桶的个数 ![H_j](https://www.zhihu.com/equation?tex=H_j)，来计算每个样本取值要放到哪个箱子里。对于等深分箱，则是基于数据中特征的**频次**进行分桶，每个桶内特征取值的个数是大致相同的。（注：等宽/等深分箱也是工业界最常使用的方法，但是其问题在于，我们必须知道数据的分布才能够进行分箱。对于等宽分箱还好，只需要知道数据的max/min，但是对于等深分箱，则需要统计数据的详细分布。然而，在线上数据是一个stream，是无法离线统计好全部数据分布的。）
 
 2）LD (Logarithm Discretization)：对数离散化，其计算公式如下：
 
@@ -40,7 +40,7 @@
 
 #### 1.2 AutoDis介绍
 
-AutoDis的全称为Automatic end-to-end embedding learning framework for numerical features based on soft discretization. 用于连续特征的端到端离散化和embedding学习。
+AutoDis的全称为Automatic end-to-end embedding learning framework for numerical features based on soft discretization. 用于连续特征的**端到端**离散化和embedding学习。
 
 ![img](https://pic4.zhimg.com/v2-d55666c6319dacfb6e541250b996a767_b.png)
 
@@ -48,21 +48,21 @@ AutoDis的全称为Automatic end-to-end embedding learning framework for numeric
 
 ##### 1.3.1 Meta-Embeddings
 
-为了提升model capacity，一种朴素的处理连续特征的方式是给每一个特征取值赋予一个独立的embedding。显然，这种方法参数量巨大（因为你可以有无穷个连续特征取值！），无法在实践中进行使用。另一方面，Field Embedding对同一域内的特征赋予相同的embedding，尽管降低了参数数量，但model capacity也受到了一定的限制。
+为了提升model capacity，一种朴素的处理连续特征的方式是给每一个特征取值赋予一个独立的embedding。显然，这种方法参数量巨大（因为你可以有无穷个连续特征取值！），无法在实践中进行使用。另一方面，Field Embedding对同一field内的特征赋予都相同的embedding，降低了参数数量，但model capacity也受到了一定的限制。
 
 为了平衡参数数量和模型容量，AutoDis设计了Meta-embedding模块: **对于第 $j$ 个连续特征，对应 ![H_j](https://www.zhihu.com/equation?tex=H_j)个Meta-Embedding**（可以看作是分 ![H_j](https://www.zhihu.com/equation?tex=H_j)个**桶**，每一个桶对应一个embedding）。第$j$个特征的Meta-Embedding表示为：  
 
 ​                                                               ![ME_j \in \mathbb{R}^{H_j \times d}](https://www.zhihu.com/equation?tex=ME_j%20%5Cin%20%5Cmathbb%7BR%7D%5E%7BH_j%20%5Ctimes%20d%7D)  ( ![H_j](https://www.zhihu.com/equation?tex=H_j)个桶，每个桶是d维的)
 
-对于连续特征的一个具体取值，则是通过一定方式将这 ![H_j](https://www.zhihu.com/equation?tex=H_j)个embedding进行聚合。相较于Field Embedding这种每个field只对应一个embedding的方法，AutoDis中每一个field对应 ![H_j](https://www.zhihu.com/equation?tex=H_j)个embedding，提升了模型容量；同时，参数数量也可以通过 ![H_j](https://www.zhihu.com/equation?tex=H_j)进行很好的控制。
+对于连续特征的一个具体取值，则是通过一定方式将这 ![H_j](https://www.zhihu.com/equation?tex=H_j)个embedding进行**聚合**。相较于Field Embedding这种每个field只对应一个embedding的方法，AutoDis中每一个field对应 ![H_j](https://www.zhihu.com/equation?tex=H_j)个embedding，提升了模型容量；同时，参数数量也可以通过 ![H_j](https://www.zhihu.com/equation?tex=H_j)进行很好的控制。//。
 
 ##### 1.3.2 Automatic Discretization
 
-Automatic Discretization模块可以对连续特征进行自动的离散化，实现了离散化过程的端到端训练。具体来说，对于第 ![j](https://www.zhihu.com/equation?tex=j) 个连续特征的具体取值 ![x_j](https://www.zhihu.com/equation?tex=x_j) ，首先通过两层神经网络进行转换，得到 ![H_j](https://www.zhihu.com/equation?tex=H_j) 长度的向量。下图的例子假设有41个特征，每个特征分配 ![H_j = 10](https://www.zhihu.com/equation?tex=H_j%20%3D%2010) 个桶
+Automatic Discretization模块可以对连续特征进行自动的离散化，实现了离散化过程的端到端训练。具体来说，对于第 ![j](https://www.zhihu.com/equation?tex=j) 个连续特征的具体取值 ![x_j](https://www.zhihu.com/equation?tex=x_j) ，首先通过**两层神经网络**进行转换，得到 ![H_j](https://www.zhihu.com/equation?tex=H_j) 长度的向量（第一层是1维->10维，第二层是10维->10维）。下图的例子假设有41个特征，每个特征分配 ![H_j = 10](https://www.zhihu.com/equation?tex=H_j%20%3D%2010) 个桶：
 
 ![img](https://pic2.zhimg.com/v2-6fec12b115e734557d7495e4e935b8c9_b.jpeg)
 
-最后得到的 ![\tilde{x_j}](https://www.zhihu.com/equation?tex=%5Ctilde%7Bx_j%7D)需要经过某种softmax变成概率分布:
+最后得到的 ![\tilde{x_j}](https://www.zhihu.com/equation?tex=%5Ctilde%7Bx_j%7D)需要经过带温度系数的softmax变成概率分布:
 
 ![img](https://pic3.zhimg.com/v2-8b413d778131652a5d9db0a092508762_b.png)
 
@@ -88,7 +88,14 @@ Automatic Discretization模块可以对连续特征进行自动的离散化，�
 
 （右图：等深分箱，不同的取值都是分开的点，没有相似度的联系；左图：Autodis，相似的取值聚在一起，说明端到端的方法把握了数值的相似性）
 
+为了使训练更稳定，我们需要先把特征做min-max归一化处理，即把min映射到0，把max映射到1. 所以，这样说来Autodis需要记录的数据分布就只是大致的min、max，比起等深分箱要记录的数据分布则少了很多。
 
+**实验效果:**
+
+- 准确率：等深分箱AUC为0.8138，Autodis的AUC为0.8152
+- 内存消耗：等深分箱分H个桶，Autodis也分H个桶，只不过Autodis的一个样本可以”属于“不同的桶，所以参数量并没有怎么增加，只增加了”注意力分配“那一点点可以忽略不计的参数量。
+
+综上，Autodis的优势主要在于一个样本可以”属于“不同的桶，实现了端到端的分桶优化，所以可以看到AUC有了微小的提升。然而，这样微小的提升本可以忽略不计，Autodis不可忽略的优势则在于，它只需要提前记录好min和max，而等深分箱则需要线下记录好整个数据的分布，来决定我们该如何分桶。倘若线上的数据分布发生了变化，那么我们线下确定的分桶方式就要失效了。
 
 ## 2. 谷歌 | 不需要embedding table的类别特征embedding方法
 
@@ -96,15 +103,17 @@ Automatic Discretization模块可以对连续特征进行自动的离散化，�
 
 #### 2.1 背景
 
+在这篇文章中，我们主要研究很大的**vocabulary**中一个词语（特征）的embedding训练方法。我们知道，一个好的embedding对于模型来说是非常重要的。我们使用矩阵分解的方法分解user-item矩阵，得到比较好的初始化user/item ID embedding，可以用于CTR预估中ID类embedding的初始化；我们通过训练FM得到比较好的特征embedding，来把握content信息；在NLP中，我们通过训练word2vec得到词语的embedding。
+
 对于类别型特征（用户ID/物品ID）标准的方式是用一个(巨大的) embedding table为每个类别特征分配一个embedding。然而这种方式有很大问题：
 
 - 参数量巨大（Huge vocabulary size）：推荐系统通常包含几百万的用户ID/视频ID，如果每个特征都指定一个embedding会占据大量空间。
-- 特征是动态的（Dynamic nature of input）：推荐系统中经常会出现**全新的**用户ID/视频ID，固定的embedding table不能解决**OOV**(out-of-vocabulary)问题.
+- 特征是动态的（Dynamic nature of input）：推荐系统中经常会出现**全新的**用户ID/视频ID，固定的embedding table不能解决**OOV**(out-of-vocabulary)问题（冷启动问题，遇到这种问题的话就只能通过图网络，把新的User/item根据content similarity和已有的user/item联系起来，然后通过图中embedding的聚合得到一个比较好的初始化embedding）
 - 特征分布高度倾斜（Highly-skewed data distribution）：推荐数据中**低频**特征的训练实例数量较少，因此该特征的embedding在训练阶段就很少更新，对训练的质量有显著影响。
 
 **已有的类别特征embedding方法**：
 
-- **One-hot Full Embedding**：这种方式就是最常见的方法，做one-hot encoding，然后通过一个可学习的线性变换矩阵（说白了就是embedding table，可以看作一层神经网络，但没有bias项）得到对应的embedding表示： ![\textbf{e} = W^T\textbf{b}](https://www.zhihu.com/equation?tex=%5Ctextbf%7Be%7D%20%3D%20W%5ET%5Ctextbf%7Bb%7D)。缺点：embedding table随特征数量线性增长（即内存问题）；无法处理新出现的特征（OOV）。
+- **One-hot Full Embedding**：这种方式就是最常见的方法，做one-hot encoding，然后通过一个可学习的线性变换矩阵（说白了就是embedding table，可以看作一层神经网络，但没有bias项）得到对应的embedding表示： ![\textbf{e} = W^T\textbf{b}](https://www.zhihu.com/equation?tex=%5Ctextbf%7Be%7D%20%3D%20W%5ET%5Ctextbf%7Bb%7D)。缺点：embedding table随特征数量线性增长，很多时候embedding table占据了网络的大部分参数量，而实际的网络参数量相比而言很小（即内存问题）；无法处理新出现的特征（OOV），新特征来的时候就只能通过hashing的办法，哈希到公共溢出区的桶中，这样就不免会有哈希冲突的问题。
 - **One-hot Hash Embedding**：为了解决One-hot Full Embedding中的内存消耗巨大的问题，可以使用**哈希**函数对类别特征进行映射分桶，将原始的 ![n](https://www.zhihu.com/equation?tex=n)维的 one-hot 特征编码映射为m维的 one-hot 特征编码(即m个桶)。这样，embedding table只用存储m项，大大降低了参数量。缺点：只要是哈希，就会有冲突！哈希冲突导致多个ID共用一个embedding, 这会伤害模型性能。
 
 为了解决哈希冲突的问题，可以做如下改进：
@@ -156,17 +165,28 @@ Decoding阶段需要把Encoding阶段得到的 ![k](https://www.zhihu.com/equati
 
 #### 2.3 加入辅助信息以增强【泛化性】(解决OOV问题)
 
-- 记忆性(memorization): 例如one-hot编码的每个id embedding都是独立的，因此只有记忆性没有泛化性
-- 泛化性(generalization): 本文提出的DHE方法，embedding network中的参数变化会影响所有特征的embedding结果。
+side information（内容信息）经常被用于推荐模型中，但是很少被用于生成类别型特征的embedding部分（其实在user-item图网络中，也利用了内容信息，这也算是side information在类别型特征embedding中的应用）。
 
-对于物品ID/用户ID的特征embedding，可以考虑拼接上它们属性（年龄、品牌等）的表示，然后输入到DHE解码阶段来生成最终的特征嵌入。这样能够增强泛化能力。
+- 记忆性(memorization): 例如one-hot编码的每个id embedding都是独立的，因此只有记忆性没有泛化性。ID 7和ID 8完全没有关系，不能够generalize。
+- 泛化性(generalization): 本文提出的DHE方法，embedding network中的参数变化会影响所有特征的embedding结果，所以能够提供泛化能力。
+
+另外，为了进一步增强泛化能力，对于物品ID/用户ID的特征embedding，可以考虑拼接上它们属性（年龄、品牌等）的表示，然后输入到DHE解码阶段来生成最终的特征嵌入。这样，哈希出来的unique identifier提供的是记忆能力、side information能够增强泛化能力。
 
 
 
 结果：
 
-- DHE取得了和one-hot相近的性能，但参数了极大的减小了。
+- 准确率：DHE取得了和one-hot full embedding相近的性能
+- 速度：DHE的速度比one-hot full embedding要慢，full embedding对1M查询（batchsize = 100）的速度为3.4s，而DHE的速度为27.2s。这是因为DHE需要计算哈希函数、之后还要通过神经网络计算稠密表征。但是，欣慰的是，DHE通过GPU可以进行很大比例的加速。而full embedding这个”查embedding table“操作并不能够被GPU加速。所以，利用足够好的GPU，我们就可以减小DHE速度和full embedding的差异。
 
+![img](https://pic2.zhimg.com/80/v2-f5299638305c323b404931f0041d744e_1440w.png)
 
+- 内存：DHE的内存消耗仅是full embedding的1/4.这是因为原先要存储非常多的ID embedding，而现在只需要存储MLP的参数即可。
+
+实际应用：
+
+在精排阶段，对于那些种类特别多的ID 类特征，例如商品三级品类ID，我们可以用DHE的方法做embedding，只训练对应的MLP参数，不用存储巨大的embedding table，来降低内存消耗；对于那些种类不那么多的特征，例如城市、学历、年龄，我们直接用one-hot full embedding即可。其实，DHE可以看成是full embedding的一种近似模拟，如果内存不是瓶颈的话，还是用full embedding对AUC是最好的。
+
+在召回阶段，也可以用DHE来得到user/item ID表征。传统的方法就是计算user-item的矩阵分解，或者利用MLP来做模拟的矩阵分解（Neural Collaborative Filtering），但不管怎样，我们最后都需要存储巨大的ID embedding table。而用DHE来生成user/item embedding时，可以先使用DHE生成user/item的embedding之后，再求二者点积，并以真实的点击/不点击标签作为label来训练，以此来更新MLP网络参数。这样，就减少了很多参数量，也能够得到比较好的user/item embedding。为了增强泛化能力，我们还可以在unique identifier后拼接side information，得到融合了side information的user/item embedding。
 
   

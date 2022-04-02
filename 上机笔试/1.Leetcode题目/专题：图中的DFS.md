@@ -51,3 +51,56 @@ class Solution:
         return cnt
 ```
 
+
+
+
+
+#### 79. 搜索单词
+
+Given an m x n grid of characters board and a string word, return true if word exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+
+![img](https://assets.leetcode.com/uploads/2020/11/04/word2.jpg)
+
+```python
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+Output: true
+```
+
+解法：DFS尝试不同的方向
+
+```python
+class Solution:
+    def exist(self, board, word: str) -> bool:
+        m = len(board)
+        n = len(board[0])
+        dx = [1,-1,0,0]
+        dy = [0,0,1,-1]
+
+        def DFS(board,word,x,y,idx,visited):
+            if board[x][y]!= word[idx]:
+                return False
+            if idx == len(word)-1 and board[x][y] == word[idx]: ##终止条件
+                return True
+            ans = False
+            for i in range(4):
+                xx = x+dx[i]
+                yy = y+dy[i]
+                if xx < 0 or xx >= m or yy < 0 or yy >= n or visited[xx][yy]:
+                    continue
+                visited[xx][yy] = 1
+                ans = ans or DFS(board,word,xx,yy,idx+1,visited)
+                visited[xx][yy] = 0
+            return ans
+        ans = False
+        for i in range(m):
+            for j in range(n):
+                visited = [[0]*n for _ in range(m)]
+                visited[i][j] = 1
+                ans = ans or (DFS(board,word,i,j,0,visited))
+        return ans
+```
+
+- 易错点1：`visited[x][y]`是需要回溯的，对于那种需要向四方”尝试“DFS的问题，都需要回溯
+- 易错点2：每个位置都需要重置visited矩阵，防止上一次的递归结果对这次产生干扰。

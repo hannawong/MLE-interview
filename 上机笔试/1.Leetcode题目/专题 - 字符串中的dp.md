@@ -103,3 +103,45 @@ class Solution:
         return ans
 ```
 
+
+
+#### 139. 单词拆分
+
+给你一个字符串 s 和一个字符串列表 wordDict 作为字典。请你判断是否可以利用字典中出现的单词拼接出 s 。
+
+注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。
+
+ 1 <= s.length <= 300
+
+```
+示例 1：
+
+输入: s = "leetcode", wordDict = ["leet", "code"]
+输出: true
+解释: 返回 true 因为 "leetcode" 可以由 "leet" 和 "code" 拼接成。
+```
+
+题解：
+
+第一个想到的是DFS。但是为什么不能用呢？因为这里s的最大长度可以达到300，用递归的话明显超时。所以，就想到了用dp。dp[i]表示前i位能否由wordDict表示。
+
+那么，dp数组怎么做初始化呢？就是遍历wordDict数组，把前面出现过的词语都标记为True.
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        n = len(s)
+        dp = [False]*n
+        ###初始化
+        for i in range(len(wordDict)):
+            word = wordDict[i]
+            if s[:len(word)] == word:
+                dp[len(word)-1] = True
+                
+        for i in range(len(s)):
+            for word in wordDict:
+                if i-len(word)+1>=0 and s[i-len(word)+1:i+1] == word: ##递推条件
+                    dp[i] = dp[i] or dp[i-len(word)]
+        return dp[-1]
+```
+

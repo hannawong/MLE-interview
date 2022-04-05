@@ -12,7 +12,7 @@
 
 - 在双塔上引入了用document预测query的多任务学习，强迫模型理解query意图；
 - 采用两阶段训练范式，第一阶段用in-batch负样本，第二阶段用难负例进行课程学习；
-- 使用了包括多模态在内的多种特征，并且用注意力机制融合这些特征。
+- 使用了包括多模态、多语言在内的多种特征，并且用注意力机制融合这些特征。
 
 ## 2. 模型结构
 
@@ -26,7 +26,7 @@
 
 - 3-gram稀疏特征，然后用哈希映射到一个embedding table中的某一行，整个query的embedding就是所有其所有3-gram的sum-pooling。这个思想和最早的双塔模型DSSM是类似的。
 - 用户的国家ID embedding
-- query的文本直接输入一个两层的XLM encoder (4个attention head, hidden size = 128，这样做是为了达到准确率和效率的平衡)，然后用[CLS]的向量表征经过一个MLP（为了降维）得到整个句子的embedding。
+- query的文本直接输入一个两层的XLM encoder (4个attention head, hidden size = 128，这样做是为了达到准确率和效率的平衡)，然后用[CLS]的向量表征经过一个MLP（为了降维）得到整个句子的embedding。XLM相当于做了跨语言对齐的BERT，能够把不同语言的相同意思映射到相似的向量空间。
 
 朴素的方法就是把所有field的embedding都拼接到一起，然后过若干层MLP得到query塔最终的embedding。但是，这个模型用了一个简单的attention机制来赋予不同通道以不同的注意力权重：
 
@@ -46,9 +46,9 @@
 
 ### 2.4 多任务学习
 
-除了预测该商品是否相关，文章还使用了另外一个**辅助任务**，即用document来预测query的类别（见图右上角）。将document的embedding经过MLP+softmax之后变成了一个多分类任务，这个任务的label就是此document对应的query类别。具体地，使用了频率最高的45k个query，因此这就是个45k多分类任务；一个document可以对应多个label，所以这是一个多分类问题，使用多个交叉熵损失求平均。
+除了预测该商品是否相关，文章还使用了另外一个**辅助任务**，即用document来预测query的类别（见图右上角）。我们找到和这个document相关的query作为label。
 
-这样做的目的是强迫模型去根据document来推测**用户意图**。
+将document的embedding经过MLP+softmax之后变成了一个多分类任务，这个任务的label就是此document对应的query。具体地，使用了频率最高的45k个query，因此这就是个45k多分类任务；一个document可以对应多个label，所以这是一个多分类问题，使用多个交叉熵损失求平均。所以，这样对于每个<query,document>对，我们的主loss是sampled softmax loss，这个loss需要负采样+带温度系数的softmax来完成；辅助loss就是正document预测query的关键词label。这样做的目的是强迫模型去根据document来推测**用户意图**。
 
 ### 2.5 训练过程
 
@@ -70,7 +70,7 @@ s值越大，越能拉开正样本和负样本的差距，收敛越快。“拉�
 
 **2.5.2 课程训练**
 
-上文所用的in-batch negative是普通的随机样本，模型区分两个好不相干的document自然比较容易；那么为了让模型能够更加精细的区分，还需要一些**难负例**训练作为第二阶段的训练。这就像学生学习的时候，需要由简单到困难来学习课程一样。
+上文所用的in-batch negative是普通的随机样本，模型区分两个毫不相干的document自然比较容易；那么为了让模型能够更加精细的区分，还需要一些**难负例**训练作为第二阶段的训练。这就像学生学习的时候，需要由简单到困难来学习课程一样。
 
 一般的方法是用另外一个模型来挖掘困难负样本，然后喂给我们的模型来学习。但是这样需要单独维护另外一个模型，不够简洁。文章的做法是还是使用in-batch的方法来获得难负例。具体的做法是：
 

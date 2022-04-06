@@ -45,15 +45,23 @@
 
 另一方面，相对于所有任务公用一个gate的方法One-gate MoE model(OMOE)，这里MMoE中每个任务使用不同的gating networks，从而学习到不同的组合experts的权重，因此模型考虑到了捕捉到任务的相关性和区别。因此在模型的效果上优于上文提到的硬参数共享的方法。实际上，如果任务相关度很低，则OMoE的效果相对于MMoE明显下降，说明MMoE中的multi-gate的结构对于任务差异带来的冲突有一定的缓解作用。
 
-MMoE在Youtube推荐场景下的实践
+#### MMoE在Youtube推荐场景下的实践
 
 论文：Recommending What Video to Watch Next: A Multitask Ranking System，这篇主要是在商业推荐上用了MMoE,以及提出了shallow tower解决position bias的方法。
 
-文中的优化目标大体分为两类，一类是engagement目标，包括点击、观看时长、完播率等，表示用户的参与度；第二类是satisfaction目标，例如评分或差评，表示用户的满意度。这其中既有分类任务(e.g. clicked)也有回归任务(e.g. 观看时长、评分)。从文中实验来看，总共包括7个任务，这些任务或者是**递进/依赖**的关系，例如只有观看之后才会打分；或者是冲突的关系，如点了之后发现不喜欢（虽然engagement高但是satisfaction低）。MMoE比较适合这种多个任务之间联系不紧密、甚至冲突的场景。
+本文的场景是根据seed video预测用户下一个观看的video，属于i2i问题。文中的优化目标大体分为两类，一类是engagement目标，包括点击、观看时长、完播率等，表示用户的参与度；第二类是satisfaction目标，例如评分或差评，表示用户的满意度。这其中既有分类任务(e.g. clicked)也有回归任务(e.g. 观看时长、评分)。从文中实验来看，总共包括7个任务，这些任务或者是**递进/依赖**的关系，例如只有观看之后才会打分；或者是冲突的关系，如点了之后发现不喜欢（虽然engagement高但是satisfaction低）。MMoE比较适合这种多个任务之间联系不紧密、甚至冲突的场景。
 
-完整的模型结构如下图所示。模型对每一个目标都做预估，分类问题就用cross entropy loss学习，回归问题可就是square loss。最后用**融合公式**来平衡用户交互和满意度指标（将目标预估结果做加权平均），用这个score大小来对召回的结果进行排序。这个权重需要人工手动来调整。
+为了更efficient，降低参数量，先使用一个shared bottom，把input layer的维度降下来，然后再接不同的expert：
+
+![img](https://pic2.zhimg.com/80/v2-1c20cf82cbcb0afc6e1c10d03ec988bd_1440w.png)
+
+完整的模型结构如下图所示。模型对每一个目标都做预估，分类问题就用cross entropy loss学习，回归问题可就是square loss。最后用**融合公式**来平衡用户交互和满意度指标（将不同任务的计算得分做加权平均），用这个score大小来对召回的结果进行排序。这个权重需要人工手动来调整。所以，我们做多目标优化的意义就是，不仅要关注CTR等engagement metric，还要去关注用户的满意程度，才能够让用户用的开心、保持推荐系统的健康生态。
 
 ![img](https://pic3.zhimg.com/v2-5d3b129af147908228b87f7a21f2295e_b.png)
+
+这篇文章中的测试结果对比也很引人深思。在对比结果的时候，是对比**相同FLOPs**条件下的测试结果。这是为了在参数计算量一样的前提下比较模型的效果，看不同的模型对线上的engagement和satisfaction指标的影响。
+
+![img](https://pic2.zhimg.com/80/v2-506d70a55e070ee7c3253ffd23a5f21d_1440w.png)
 
 (3) SNR（Sub-Network-Routing）
 

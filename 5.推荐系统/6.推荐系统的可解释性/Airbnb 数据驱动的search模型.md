@@ -1,3 +1,5 @@
+# Improving Deep Learning For Airbnb Search
+
 Airbnb将深度学习应用于搜索排序。但是，在你使用了深度学习模型之后，接下来应该做什么？文章提出了三个方面提高模型的性能(ABC)。
 
 - A: architecture, 文章提出了一种新的神经网络排名架构，关注于提升现有的两层DNN
@@ -13,7 +15,7 @@ Airbnb将深度学习应用于搜索排序。但是，在你使用了深度学�
 
 ![img](https://pic2.zhimg.com/v2-cef10e1d79f0168edfc623b232e65ff1_b.png)
 
-Airbnb界面
+​                                                                                  Airbnb界面
 
 作者提到，他们完全可以把最新、最复杂的模型一个一个实现一遍，然后就完事了😁。
 
@@ -68,11 +70,11 @@ x轴：price，y轴：tanh(w*P+b),是单调递增
 
 ### 2.3 Generalized Monotonicity
 
-为了保留cheaper is better，同时让价格特征和其它特征进行**交互** ，文章就开始研究一些对输入特征保持单调的架构(DNN architectures that were monotonic with respect to some of its inputs)。Lattice networks提供了一种很好的解决方案，但是如果将整个结果转换成 Lattice 的话是比较麻烦的。所以文章设计了一个这样的解决方案，将price特征抽取出来，单独和price无关的特征交互。
+为了保留cheaper is better，同时让价格特征和其它特征进行**交互** ，文章就开始研究一些对输入特征保持单调的架构(DNN architectures that were monotonic with respect to some of its inputs)。所以文章设计了一个这样的解决方案，将price特征抽取出来，单独和price无关的特征交互。
 
 ![img](https://pic1.zhimg.com/v2-6072eeba706fb60cf06b5f140fbc5608_b.jpeg)
 
-实线：权重平方；虚线：正常权重
+​                                                                     实线：权重平方；虚线：正常权重
 
 - 左侧输入的 ![-P = -log((1+price)/(1+median))](https://www.zhihu.com/equation?tex=-P%20%3D%20-log((1%2Bprice)%2F(1%2Bmedian)))是随着price而单调递减的
 - 对于隐层采用权重的平方的形式： ![w^2*(-P)+b](https://www.zhihu.com/equation?tex=w%5E2*(-P)%2Bb)，能够保证单调性。这样，第一隐层的输入就是随价格递减的。
@@ -83,23 +85,25 @@ x轴：price，y轴：tanh(w*P+b),是单调递增
 
 ### 2.4 Soft Monotonicity
 
-既然过于强制的价格下降会导致模型失准，那么能不能有一个没那么强制的方案呢？答案是有的。其实对于搜索排序而言，一般会考虑**pairwise的损失**。也就是说训练样本包含同一个query下的**<一个正例(booked)，一个负例(not booked)>** 
+既然过于强制的价格下降会导致模型失准，那么能不能有一个**没那么强制**的方案呢？答案是有的。
+
+我们知道，在搜索的时候经常会用**pairwise的损失**，即训练样本包含同一个query下的**<一个正例(booked)，一个负例(not booked)>**，我们希望给正例比负例更高的分数。 
 
 ![img](https://pic4.zhimg.com/v2-54a16981423abf4941d42c5215b46e83_b.png)
 
-logit_diffs越接近全1向量越好，交叉熵函数就是拿二者做的比较
+👆这个损失函数的意思：我们希望logit_diffs（给正例的打分logits-给负例的打分logits）越接近全1向量越好，交叉熵函数就是拿二者做的比较。
 
 为了增加价格的影响，论文引入了第二标签，就是在训练样本中标注哪个item是便宜的、哪个是贵的。这样, loss就会变成两个损失的和，其中alpha 作为超参数调节相关性和价格之间的权重。
 
 ![img](https://pic3.zhimg.com/v2-35784a494cb35bae9151d77d04e6caca_b.png)
 
-我们希望lower_price_logits-higher_price_logits越接近1越好
+这样做的意义是，我们希望lower_price_logits-higher_price_logits越接近1越好，即给lower-price的item打分比high-price的item打分要更好才好，这样虽然没有直接让打分随price单调递减，但是也给了一个很强的暗示。
 
 在线上的A/B test中，发现价格减少了3.3%，但是下单率也减少了0.67%。
 
 ### 2.5 Putting Some ICE
 
-上文中提到了一个自相矛盾的问题: 价格下降了但是用户却不喜欢了。为了增强搜索的可解释性，文章使用了individual conditional expectation的想法，一次只关注一个query的搜索结果：
+上文中提到了一个自相矛盾的问题: 价格下降了但是用户却不喜欢了。为了增强搜索的可解释性，文章使用了individual conditional expectation的想法**，一次只关注一个query的搜索结果**，比较不同的price对模型打分的影响（保持其他feature不变，这个需要依赖一个假设，即price和其他feature不相关）：
 
 ![img](https://pic2.zhimg.com/v2-eb243b950ae8f1562bc3116267097b79_b.png)
 
@@ -113,9 +117,9 @@ x轴：price; y轴：得分，每个颜色就是一个query的结果
 
 ![img](https://pic1.zhimg.com/v2-3418907e44a4d439f9f92921a2bf58a8_b.png)
 
-x轴：搜索结果的价格中位数 - 预订的价格
+​                                                        x轴：搜索结果的价格中位数 - 预订的价格
 
-这样就延申出了下一代的模型--三塔模型：
+这样就延申出了下一代的模型--三塔模型（其实这个不就是召回的常规做法吗！！）
 
 ![img](https://pic1.zhimg.com/v2-44952d0c3f7af65838eaf008a14c4e8c_b.png)
 
@@ -128,6 +132,8 @@ x轴：搜索结果的价格中位数 - 预订的价格
 模型的简要代码：
 
 ![img](https://pic1.zhimg.com/v2-d76b008af38616bbcfeafdb3ecadb08c_b.jpeg)
+
+Airbnb这篇文章在排序的时候使用的居然是召回中用的无交互双塔模型，这个在理论上还是很难想通的，毕竟排序的时候我们希望query和item有交互。但是，这个毕竟是在实际应用场景实验多次的结果，而且双塔分离的确可以降低复杂度 -- 对于一个query，我们只需要计算一次query塔的输出结果就可以了，然后去求和query塔点积最大的item即可。
 
 ### 3.【 冷启动】问题
 
@@ -142,11 +148,11 @@ airbnb关注到冷启动的问题是因为他们发现**新上的item和以前�
 - **exploit：利用已知的比较确定的用户的兴趣，然后推荐与之相关的内容**
 - **explore: 除了推荐已知的用户感兴趣的内容，还需要不断探索用户其他兴趣**
 
-排序的策略可以通过exploit以往的订单去优化短期下单, 对于长期而言则需要去explore那些新的item。这种权衡其实就是让新item有更多的曝光机会, 从而通过很少的代价收集到用户对新订单的反馈。airbnb通过对新订单进行加权让它有更多的曝光机会，最终是有提升了+8.5%的曝光。
+排序的策略可以通过exploit以往的订单去优化短期下单, 对于长期而言则需要去explore那些新的item。这种权衡其实就是让新item有更多的曝光机会, 从而通过很少的代价收集到用户**对新item的反馈**。airbnb就是通过对新的item进行加权让它有更多的曝光机会（+8.5%）。
 
 但是这种方法带来了一些问题：
 
-- 搜索结果相关性的降低，短期内会降低用户体验。（新item的曝光会导致排序结果相关性的变化）
+- 搜索结果相关性的降低，短期内会降低用户体验。（新item的曝光率太高会导致排序结果相关性的变化）
 - 长远来看虽然提升了订单率，但是这种方案缺乏一种明确的目标定义。这样会导致有的人觉得结果好，有的人觉得结果差，不会令人满意。
 
 ### 3.2 Estimating Future User Engagement
@@ -161,7 +167,7 @@ baseline方法是用一些default值去填充缺失的用户交互信息；**而
 
 ![img](https://pic3.zhimg.com/v2-20eb484dc810dc22676ef63cba13b526_b.png)
 
-给定一个用户 ![u ](https://www.zhihu.com/equation?tex=u%20)  ，以及一个query ![q](https://www.zhihu.com/equation?tex=q) 和一个item ![l](https://www.zhihu.com/equation?tex=l)，以及list中的每个位置 ![k ](https://www.zhihu.com/equation?tex=k%20)k  。用户预订的概率是：
+给定一个用户 ![u ](https://www.zhihu.com/equation?tex=u%20)  ，以及一个query ![q](https://www.zhihu.com/equation?tex=q) 和一个item ![l](https://www.zhihu.com/equation?tex=l)，以及list中的每个位置 ![k ](https://www.zhihu.com/equation?tex=k%20)  。用户预订的概率是：
 
 ![img](https://pic4.zhimg.com/v2-840c3bfe6cd71e0860ad675de77e5197_b.png)
 
@@ -171,7 +177,7 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 为了减少相关性计算对position feature 的依赖，文章采用了训练阶段对position feature 进行dropout，这样就能够减少模型对位置特征的依赖。
 
-通过实验文章选择了0.15的dropout比例，对线上的结果有0.7%的下单率的提升。经过多次迭代之后，订单收入涨了1.8%。
+通过实验文章选择了0.15的dropout比例，对线上的结果有0.7%的**下单率**的提升。经过多次迭代之后，订单收入涨了1.8%。
 
 ### 总结
 

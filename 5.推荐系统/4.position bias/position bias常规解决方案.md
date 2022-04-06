@@ -36,7 +36,7 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 这种方法出自Youtube多目标排序论文 Recommending What Video to Watch Next: A Multitask Ranking System。
 
-如果不去除position bias，那么用户对一个item的ctr是由user engagement(用户偏好)和position bias共同造成的。如果能够将user engagement和position bias独立开来，将有助于提升模型的推荐质量。本文提出的做法**类似wide&deep，即添加一个浅层网络(shallow tower)**，输入position feature, device info（原因是在不同的设备上会观察到不同的位置偏差), 以及其他能够带来位置偏差的特征，输出为position bias分量。这就将user engagement和position bias 独立开来了。
+如果不去除position bias，那么用户对一个item的ctr是由user engagement(用户偏好)和position bias共同造成的。如果能够将user engagement和position bias独立开来，将有助于提升模型的推荐质量。本文提出的做法**类似wide&deep，即添加一个浅层网络(shallow tower)**，建模position bias的shallow tower就对应WDL里面的wide端。shallow tower输入position feature, device info（原因是在不同的设备上会观察到不同的位置偏差), 以及其他能够带来位置偏差的特征，输出为position bias分量（标量）。这就将user engagement和position bias 独立开来了。
 
 ![img](https://pic2.zhimg.com/v2-dad22d108eedc7f276e450aaa69315e9_b.jpg)
 

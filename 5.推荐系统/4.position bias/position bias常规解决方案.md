@@ -14,9 +14,9 @@ Position-Bias是指 item 在展示页面的排序位置，及其相对广告的�
 
 ### 2. 解决方法
 
-### 2.1 position作为特征
+### 2.1 position作为特征(as feature)
 
-该方法出自(?)Airbnb的一篇经典的搜索文章 Improving Deep Learning for Airbnb Search.
+该方法出自Airbnb的一篇经典的搜索文章 Improving Deep Learning for Airbnb Search.
 
 给定一个用户 ![u ](https://www.zhihu.com/equation?tex=u%20) ，以及一个query ![q](https://www.zhihu.com/equation?tex=q) 和一个list ![l](https://www.zhihu.com/equation?tex=l)，以及list中的每个位置 ![k ](https://www.zhihu.com/equation?tex=k%20) 。用户预订的概率是：
 
@@ -30,9 +30,9 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 通过实验文章选择了0.15的dropout比例，对线上的结果有0.7%的下单率的提升。经过多次迭代之后，订单收入涨了1.8%。需要注意的是位置特征不能与其他特征做交叉。
 
-### 2.2 position作为模块
+### 2.2 position作为模块(as module)
 
-(a) shallow tower
+**(a) shallow tower**
 
 这种方法出自Youtube多目标排序论文 Recommending What Video to Watch Next: A Multitask Ranking System。
 
@@ -44,7 +44,11 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 **(b) PAL**
 
-出自华为Recsys 2019. PAL: a position-bias aware learning framework for CTR prediction in live recommender systems
+出自华为Recsys 2019. PAL: a position-bias aware learning framework for CTR prediction in live recommender systems.
+
+这篇文章的intuition就是，如果把position作为feature，那么有个问题就是在线上inference的时候，我们必须给这个position赋个值吧，但是赋值不同是会导致模型效果不同的。为了选择一个好的值，我们需要做线上/线下实验来找到之。但是，线上实验的成本很高（通常需要几个星期来做，而且会引一部分流量过来），所以我们只能做线下实验来找到这个最好的position值。但是，即便我们找到了”最好“的position值，如果数据分布一发生变化，或者用在另一个场景下，这个值就不再是最好的了。
+
+所以，PAL采用的是position-as-module的方法，即使用一个子网络专门建模position bias分量，然后和”真实“CTR分量求**乘积**。最后线上inference的时候直接把position bias网络去掉就行了。
 
 作者分析到，用户点击广告的概率由两部分组成：
 
@@ -53,9 +57,9 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 ![img](https://pic3.zhimg.com/v2-0541369016dfd401d065f40b14376986_b.png)
 
-那么可以进一步假设：
+那么可以进一步**假设**：
 
-- 用户是否看到广告只跟广告的位置有关系
+- 用户是否看到广告**只**跟广告的位置有关系
 - 用户看到广告后，是否点击广告与广告的位置无关
 
 ![img](https://pic3.zhimg.com/v2-47c51994465dc129038e30e777b9426a_b.png)
@@ -64,23 +68,36 @@ Airbnb在训练时加入位置信息，但是在预估的时候将特征置为0�
 
 ![img](https://pic4.zhimg.com/v2-62c88d550500f26ec9311a1e946e29db_b.jpg)
 
-其中：ProbSeen部分是预估广告被用户看到的概率，pCTR部分是用户看到广告后，点击广告的概率，然后loss是两者的结合：
+其中：ProbSeen部分是预估广告被用户看到的概率（只和position有关），pCTR部分是用户看到广告后，点击广告的概率（和position无关），然后实际的CTR是两者的乘积，与label求loss：
 
 ![img](https://pic4.zhimg.com/v2-ade9542a2132874177a630de6ac3295f_b.png)
 
 线上servering的时候，直接预估pCTR即可(ProbSeen都看作是1). PAL和shallow tower的区别在于PAL是连乘概率，而shallow tower是类似wide&deep的相加。
 
-注记：
+**AB test结果：**
 
-其实，PAL的设计和ESMM有异曲同工的地方，都是将事件拆解为两个概率事件的连乘，但是PAL的假设过强，事件的关联性没有ESMM的点击->购买这样的强关联，这是因为：
+- 对照组：2%的流量引过来，使用baseline（即position as feature）
+- 实验组：2%的流量引过来，使用PAL
+
+做一个星期的实验，考察指标为真实CTR(下载数量/impression数量)。发现PAL相比于position-as-feature方法在线上有了很大提升，虽然PAL在线下的表现(CTR预估中的AUC)还不如position-as-feature.
+
+但是文中并没有把PAL和不用PAL的效果进行比较。根据我的实际经验，去除position bias之后，线上CTR的指标是会降低的，因为去掉position bias相当于去掉了热点效应。但是CVR和一些satisfiction指标会有上升。
+
+**注记：**
+
+其实，PAL的设计和ESMM有异曲同工的地方，都是将事件拆解为两个概率事件的连乘，但是PAL的假设过强，事件的关联性没有ESMM的click->conversion这样的强关联，这是因为：
 
 第一个假设: **广告是否被用户看到只跟广告位置有关**，这个假设在广告场景是不合适的。因为他跟**广告**、以及**用户**的属性都有关系（广告大图、小图，用户个人的行为，还有context等）。
 
 第二个假设: **用户看到广告后, 是否点击与广告位置无关。**这个实际上可能是有关的。比如在一个页面，用户同时看到了 位置1的广告和位置3的广告，但用户点击位置1的广告的概率更大。这其实还是position bias本身要解决的问题。
 
+
+
 ### 3. 实际应用结果
 
-我们在不同场景下对这三种方法都有尝试。在我做的用户搜索场景，把position bias去掉之后，离线指标(auc)不可避免地会下降。在线上要取得短期指标上的收益也比较困难，因为在bias存在的情况下，一些流行的item会占据大部分流量、消费指标也很好；去掉bias之后，长尾商品得到更多的曝光，但是业务指标(如ctr)可能会下降。但是这样做对长期推荐系统的健康生态会有很大帮助。
+我们在不同场景下对这三种方法都有尝试。在我做的用户搜索场景，把position bias去掉之后，离线指标(auc)不可避免地会下降。在线上要取得短期指标上的收益也比较困难，因为在bias存在的情况下，一些流行的item会占据大部分流量、消费指标也很好；去掉bias之后，**长尾商品得到更多的曝光**，但是业务指标(如ctr)可能会下降。但是这样做对长期推荐系统的健康生态会有很大帮助。
+
+
 
 ### 4. 其他bias简介
 

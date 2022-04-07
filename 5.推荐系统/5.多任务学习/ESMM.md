@@ -37,7 +37,7 @@ pCVR(click后conversion的概率)和CTR、CTCVR有什么关系呢？下面这个
 
 仔细观察上图，留意以下几点：
 
-1）**共享Embedding**。CVR和辅助任务CTR使用相同的特征embedding，这是为了解决数据少的问题。实际上，多任务学习的一个目的就是为了解决某些任务**数据稀疏**的问题，这也是一种迁移学习的思想，即CTR预估和CVR预估在representation层是相似的，可以把CTR中学习到的东西迁移到CVR中去。
+1）**共享Embedding**。CVR和辅助任务CTR使用相同的特征embedding，这是为了解决数据少的问题。实际上，多任务学习的一个目的就是为了解决某些任务**数据稀疏**的问题，这也是一种迁移学习的思想，即CTR预估和CVR预估在representation层是相似的，利用好CTR中更丰富的数据集，把CTR中学习到的东西迁移到CVR中去。
 
 2）**隐式学习pCVR** 啥意思呢？这里pCVR（粉色节点）仅是网络中的一个**variable，没有显示的监督信号。**pCVR的更新完全是由pCTCVR这个辅助loss来做的。
 
@@ -56,13 +56,13 @@ pCVR(click后conversion的概率)和CTR、CTCVR有什么关系呢？下面这个
 1. 对比方法：
    - BASE——图1左部所示的CVR结构，训练集为click item；
    - AMAN——从unclicked样本中**随机抽样作为负例**加入点击集合(这种方法之前说过，其实是不对的，因为unclicked并不代表click之后转化率不高)；
-   - OVERSAMPLING——对点击集中的正例（转化样本）过采样；
+   - OVERSAMPLING——对click中的正例（conversion样本）过采样；
    - DIVISION——分别训练CTR和CVCTR，相除得到pCVR；
    - ESMM-NS——ESMM结构中CVR与CTR部分不share embedding。
 2. 上述方法/策略都使用NN结构，relu激活函数，嵌入维度为18，MLP结构为360\*200\*80\*2，adam优化器 with ![[公式]](https://www.zhihu.com/equation?tex=%5Cbeta_1%3D0.9%2C+%5Cbeta_2%3D0.999%2C+%5Cepsilon%3D10%5E%7B-8%7D) 。
 3. 按时间分割，1/2数据训练，其余测试
 
-**衡量指标** 在点击样本上，计算CVR任务的AUC；同时，单独训练一个和BASE一样结构的CTR模型，除了ESMM类模型，其他对比方法均以pCTR*pCVR计算pCTCVR，在全部样本上计算CTCVR任务的AUC。
+**衡量指标**：计算CVR和CTCVR的预估准确率。对于CVR,就是在click样本上，预测click的条件下conversion的概率；对于CTCVR，是在全空间上，计算click+conversion的概率，即pCTR*pCVR。
 
 **实验结果**
 
@@ -76,8 +76,8 @@ pCVR(click后conversion的概率)和CTR、CTCVR有什么关系呢？下面这个
 
 ## 四、Discussion
 
-\1. ESMM 根据用户行为序列，显示引入CTR和CTCVR作为辅助任务，“迂回” 学习CVR，从而在完整样本空间下进行模型的训练和预测，解决了CVR预估中的2个难题。
+1. ESMM 根据用户行为的"链条" -- "impression->click->conversion"，显示引入CTR和CTCVR作为辅助任务，“迂回” 学习CVR，从而在完整样本空间下进行模型的训练和预测，解决了CVR预估中的2个难题。
 
-\2. 可以把 ESMM 看成一个**新颖的 MTL 框架**，其中子任务的网络结构是可替换的，当中有很大的想象空间。至于这个框架的意义，这里引用论文作者之一[@朱小强的描述](https://zhuanlan.zhihu.com/p/54822778)：
+2. 可以把 ESMM 看成一个**新颖的 MTL 框架**，其中子任务的网络结构是可替换的，当中有很大的想象空间。至于这个框架的意义，这里引用论文作者之一[@朱小强的描述](https://zhuanlan.zhihu.com/p/54822778)：
 
 > 据我所知这个工作在这个领域是最早的一批，但不唯一。今天很多团队都吸收了MTL的思路来进行建模优化，不过大部分都集中在传统的MTL体系，如研究怎么对参数进行共享、多个Loss之间怎么加权或者自动学习、哪些Task可以用来联合学习等等。ESMM模型的特别之处在于我们额外**关注了任务的Label域信息，**通过展现>点击>购买所构成的行为链，巧妙地构建了multi-target概率连乘通路**。**传统MTL中多个task大都是隐式地共享信息、任务本身独立建模，ESMM细腻地捕捉了契合领域问题的任务间显式关系，**从feature到label全面利用起来**。这个角度对互联网行为建模是一个较有效的模式，后续我们还会有进一步工作。

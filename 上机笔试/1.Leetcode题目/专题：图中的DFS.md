@@ -104,3 +104,65 @@ class Solution:
 
 - 易错点1：`visited[x][y]`是需要回溯的，对于那种需要向四方”尝试“DFS的问题，都需要回溯
 - 易错点2：每个位置都需要重置visited矩阵，防止上一次的递归结果对这次产生干扰。
+
+
+
+#### [329. 矩阵中的最长递增路径](https://leetcode-cn.com/problems/longest-increasing-path-in-a-matrix/)（hard）
+
+给定一个 `m x n` 整数矩阵 `matrix` ，找出其中 **最长递增路径** 的长度。
+
+对于每个单元格，你可以往上，下，左，右四个方向移动。 你 **不能** 在 **对角线** 方向上移动或移动到 **边界外**（即不允许环绕）。
+
+
+
+**示例 1：**
+
+
+
+```
+输入：matrix = [[9,9,4],[6,6,8],[2,1,1]]
+输出：4 
+解释：最长递增路径为 [1, 2, 6, 9]。
+```
+
+![img](https://assets.leetcode.com/uploads/2021/01/05/grid1.jpg)
+
+解法：
+
+想清楚一件事情：一个点处的最长递增路径 = max(其四周比它大的点的最长递增路径 + 1). 那么，整个问题可以用dfs来解决。同时，我们发现每个节点的最长递增路径会被计算多次，所以使用记忆化dfs。这道题并不属于困难题，应该掌握。
+
+```python
+class Solution:
+    dp = None
+    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
+        m = len(matrix)
+        n = len(matrix[0])
+        self.dp = [[-1]*n for _ in range(m)]
+        for i in range(m):
+            for j in range(n):
+                self.dfs(matrix,i,j,m,n)
+        mmax = 0
+        for i in range(m):
+            for j in range(n):
+                mmax = max(mmax,self.dp[i][j])
+        return mmax
+        
+
+    def dfs(self,matrix,x,y,m,n): ##(x,y)位置出发的最长递增路径
+        dx = [-1,1,0,0]
+        dy = [0,0,-1,1]
+        if x < 0 or x >= m or y < 0 or y >= n:
+            return 0
+        if self.dp[x][y] != -1: ###记忆
+            return self.dp[x][y]
+        ans = 1
+        for i in range(4):
+            xx = x+dx[i]
+            yy = y+dy[i]
+            if xx >= 0 and xx < m and yy >= 0 and yy < n and matrix[xx][yy] > matrix[x][y]:
+                ans = max(ans,self.dfs(matrix,xx,yy,m,n)+1)
+        self.dp[x][y] = ans
+        return ans        
+
+```
+

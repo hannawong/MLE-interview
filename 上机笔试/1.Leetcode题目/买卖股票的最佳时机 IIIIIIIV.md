@@ -127,7 +127,7 @@ class Solution:
 
 
 
-一个非常非常容易错的地方是，状态2，4的初始化`dp[2][i],dp[4][i]`应该被初始化为`-price[0]`, 表示现在买入了第0支股票，之前还做过一次买入、卖出。
+一个非常非常容易错的地方是，状态2，4的初始化`dp[2][i],dp[4][i]`应该被初始化为`-price[0]`, 表示**现在买入了第0支股票**，之前还做过一次买入、卖出。
 
 ```python
 class Solution:
@@ -136,15 +136,15 @@ class Solution:
         dp = [[0]*n for _ in range(5)] ##这里的状态是从0开始标的，和上图不一样
         dp[1][0] = -prices[0]
         dp[3][0] = -prices[0] ##非常容易忽略！
-        ans = 0
+        mmax = 0
         for i in range(1,n):
             dp[0][i] = dp[0][i-1]
             dp[1][i] = max(dp[1][i-1],dp[0][i-1]-prices[i])
             dp[2][i] = max(dp[2][i-1],dp[1][i-1]+prices[i])
             dp[3][i] = max(dp[3][i-1],dp[2][i-1]-prices[i])
             dp[4][i] = max(dp[4][i-1],dp[3][i-1]+prices[i])
-            ans = max(max(dp[0][i],dp[2][i]),dp[4][i])
-        return ans
+            mmax = max(mmax,dp[0][i],dp[1][i],dp[2][i],dp[3][i],dp[4][i])
+        return mmax
 ```
 
 

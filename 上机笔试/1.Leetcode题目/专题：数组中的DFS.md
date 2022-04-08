@@ -100,6 +100,64 @@ class Solution:
         return self.ans_list
 ```
 
+#### [40. 组合总和 II](https://leetcode-cn.com/problems/combination-sum-ii/)
+
+给定一个候选编号的集合 `candidates` 和一个目标数 `target` ，找出 `candidates` 中所有可以使数字和为 `target` 的组合。
+
+`candidates` 中的每个数字在每个组合中只能使用 **一次** 。
+
+**注意：**解集不能包含重复的组合。 
+
+ 
+
+**示例 1:**
+
+```
+输入: candidates = [10,1,2,7,6,1,5], target = 8,
+输出:
+[
+[1,1,6],
+[1,2,5],
+[1,7],
+[2,6]
+]
+```
+
+
+
+```python
+class Solution:
+    ans = []
+    ans_list = []
+    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+        self.ans = []
+        self.ans_list = []
+        candidates = sorted(candidates)
+        n = len(candidates)
+        visited = [0]*n
+        
+        def DFS(now,idx):
+            if now == target:
+                self.ans_list.append(self.ans[:])
+                return
+            if now > target:
+                return 
+            for i in range(idx,len(candidates)): ###不吃回头草，只能选择idx之后的，而不能选择idx之前的元素
+                if visited[i]:
+                    continue
+
+                if i>= 1 and candidates[i] == candidates[i-1] and not visited[i-1]:
+                    continue
+                visited[i] = 1
+                self.ans.append(candidates[i])
+                DFS(now+candidates[i],i) ##这里是关键，直接idx跳变到了i，说明i之前都不能再选了，“不吃回头草”
+                self.ans.pop()
+                visited[i] = 0
+
+        DFS(0,0)
+        return self.ans_list
+```
+
 
 
 #### 剑指 Offer 38. 字符串的排列：去重
@@ -208,3 +266,4 @@ class Solution:
 
 - 当len(nums) >= 2 且第一个数为0时，说明有前导零。注意这里的长度是2，而不是1！
 - 终止条件就是  `ip_num == 4 and idx == len(s)`而不是`idx >= len(s)`
+

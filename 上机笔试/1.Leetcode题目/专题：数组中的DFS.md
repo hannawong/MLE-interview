@@ -28,6 +28,61 @@ class Solution:
 
 
 
+相似题： [60. 排列序列](https://leetcode-cn.com/problems/permutation-sequence/)(hard)
+
+给出集合 `[1,2,3,...,n]`，其所有元素共有 `n!` 种排列。
+
+按大小顺序列出所有排列情况，并一一标记，当 `n = 3` 时, 所有排列如下：
+
+1. `"123"`
+2. `"132"`
+3. `"213"`
+4. `"231"`
+5. `"312"`
+6. `"321"`
+
+给定 `n` 和 `k`，返回第 `k` 个排列。
+
+**示例 1：**
+
+```
+输入：n = 3, k = 3
+输出："213"
+```
+
+虽然本题有更难的数学解法，但是用暴力回溯生成全排列也可以过！但是要点是需要**剪枝**。即，当我们已经找到第k大的时候，后面的都直接返回。
+
+```python
+class Solution:
+    ans = []
+    cnt = 0 ##记到k
+    permute = "" ##记录答案
+    def getPermutation(self, n: int, k: int) -> str:
+
+        visited = [0]*(n+1)
+        def dfs(idx):
+            if self.cnt > k: ##这里剪枝！！！！
+                return 
+            if idx == n:
+                self.cnt += 1
+                if self.cnt == k: ##记录答案
+                    self.permute = "".join(str(_) for _ in self.ans)
+                return
+            for i in range(1,n+1):
+                if not visited[i]:
+                    visited[i] = 1
+                    self.ans.append(i)
+                    dfs(idx+1)
+                    self.ans.pop()
+                    visited[i] = 0
+        dfs(0)
+        return self.permute
+```
+
+
+
+
+
 #### 22. 括号生成
 
 数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。

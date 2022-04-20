@@ -108,7 +108,7 @@ def din_attention(self, query, facts, mask, sum = True):
         return output, scores
 ```
 
-
+注意力得分可以由一个MLP来完成；当然了，如果使用现在流行的Transformer结构，我们可以把target ad当成query，把用户历史行为当成Key和Value，来进行用户历史行为的加权求和。
 
 综合以上，一个用户历史行为的embedding为：
 
@@ -122,7 +122,7 @@ def din_attention(self, query, facts, mask, sum = True):
 
 #### 2.1 Mini-batch Aware Regularization
 
-在大规模稀疏场景下，一些**id类特征的维度很高**，例如在实验中goods_id有6亿维。如果不做正则化，会导致严重的过拟合 (**因为Embedding table的参数量巨大**)，如图中深绿色线所示：
+在大规模稀疏场景下，一些**id类特征的维度很高**（即：有非常多的取值），例如在实验中goods_id有6亿维。如果不做正则化，会导致严重的过拟合 (**因为Embedding table的参数量巨大**)，如图中深绿色线所示：
 
 ![img](https://pic3.zhimg.com/v2-aa2a7665a0a2dda59c601a8001da6f6a_b.png)
 
@@ -130,7 +130,7 @@ def din_attention(self, query, facts, mask, sum = True):
 
 > Only parameters of **non-zero** sparse features appearing in each mini-batch needs to be updated in the scenario of SGD based optimization methods without regularization. However, when adding ℓ2 regularization it needs to calculate L2-norm over the **whole** parameters for each mini-batch, which leads to extremely heavy computations and is unacceptable with parameters scaling up to hundreds of millions.
 
-**Mini-Batch Aware regularization** 主要解决的就是在大规模稀疏场景下，采用SGD对引入L2正则的loss进行更新时计算开销过大的问题。因为引入正则化以后，不管特征是不是0，都需要计算梯度，对大规模的稀疏特征，参数规模也非常庞大，增加的计算量就非常大。而MBA方法只对每一个mini-batch中参数不为0的进行梯度更新。
+**Mini-Batch Aware regularization** 主要解决的就是在大规模**稀疏**场景下，采用SGD对引入L2正则的loss进行更新时计算开销过大的问题。因为引入正则化以后，不管特征是不是0，都需要计算梯度，对大规模的稀疏特征，参数规模也非常庞大，增加的计算量就非常大。而MBA方法只对每一个mini-batch中**不为0的特征**对应的embedding table行进行梯度更新。
 
 “only update those parameters of sparse features **appearing** in each mini-batch”.
 
@@ -138,7 +138,7 @@ def din_attention(self, query, facts, mask, sum = True):
 
 ![L_2(W) = ||W||_2^2 = \sum_{j=1}^K||w_j||_2^2](https://www.zhihu.com/equation?tex=L_2(W)%20%3D%20%7C%7CW%7C%7C_2%5E2%20%3D%20%5Csum_%7Bj%3D1%7D%5EK%7C%7Cw_j%7C%7C_2%5E2)
 
-这样的计算量太大了。
+即对所有的特征取值的embedding（整个embedding table）都做正则化，而这样的计算量太大了。
 
 推导得到修改过的L2正则项为：
 
@@ -160,7 +160,7 @@ def din_attention(self, query, facts, mask, sum = True):
 
 ​                                                                                         (PRelu)
 
-所以文章对该激活函数机型了改进：**平滑**了rectified point附近曲线的同时，激活函数会**根据每层输入数据的分布来自适应调整rectified point的位置**，具体形式如下：
+所以文章对该激活函数进行了改进：**平滑**了rectified point附近曲线的同时，激活函数会**根据每层输入数据的分布来自适应调整rectified point的位置**，具体形式如下：
 
 "adaptively adjust the rectified point w.r.t. distribution of inputs"
 
@@ -171,3 +171,7 @@ def din_attention(self, query, facts, mask, sum = True):
 ![img](https://pic3.zhimg.com/v2-9913d7a001624f1f653d4f8de79d3756_b.png)
 
 左侧是PRelu的p(s)曲线，右侧是DICE的p(s)曲线
+
+
+
+DIN在线上表现：10.0%的CTR提升和3.8%的RPM(Revenue Per Mille) 提升

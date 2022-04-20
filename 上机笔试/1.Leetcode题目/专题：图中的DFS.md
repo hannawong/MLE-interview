@@ -97,13 +97,14 @@ class Solution:
         for i in range(m):
             for j in range(n):
                 visited = [[0]*n for _ in range(m)]
-                visited[i][j] = 1
+                visited[i][j] = 1 ##置为1
                 ans = ans or (DFS(board,word,i,j,0,visited))
         return ans
 ```
 
 - 易错点1：`visited[x][y]`是需要回溯的，对于那种需要向四方”尝试“DFS的问题，都需要回溯
 - 易错点2：每个位置都需要重置visited矩阵，防止上一次的递归结果对这次产生干扰。
+- 易错点3：终止条件是` if idx == len(word)-1 and board[x][y] == word[idx]`
 
 
 

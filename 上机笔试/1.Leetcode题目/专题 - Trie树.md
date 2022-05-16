@@ -4,16 +4,16 @@
 
 ```python
 class Trie:
-    def __init__(self):
+    def __init__(self): ##这里不要忘记写self
         self.children = [None]*26
         self.is_end = False
 
-    def insert(self,word):
+    def insert(self,word):##这里也不要忘记写self
         tmp = self
         for letter in word:
             idx = ord(letter) - ord('a')
-            if not tmp.children[idx]: ##还没有这个字符，建立一个！
-                tmp.children[idx] = Trie()
+            if not tmp.children[idx]: ##还没有这个字符，建立一个！注意是tmp，而不是self
+                tmp.children[idx] = Trie() ##如此建立Trie树
                 tmp = tmp.children[idx]
             else:
                 tmp = tmp.children[idx]
@@ -194,3 +194,73 @@ class Solution:
     ```
 
     注意这里是`31-i`而不是`32-i`, 需要注意细节
+
+
+
+
+
+#### [820. 单词的压缩编码](https://leetcode.cn/problems/short-encoding-of-words/)
+
+难度中等273
+
+单词数组 `words` 的 **有效编码** 由任意助记字符串 `s` 和下标数组 `indices` 组成，且满足：
+
+- `words.length == indices.length`
+- 助记字符串 `s` 以 `'#'` 字符结尾
+- 对于每个下标 `indices[i]` ，`s` 的一个从 `indices[i]` 开始、到下一个 `'#'` 字符结束（但不包括 `'#'`）的 **子字符串** 恰好与 `words[i]` 相等
+
+给你一个单词数组 `words` ，返回成功对 `words` 进行编码的最小助记字符串 `s` 的长度 。
+
+ 
+
+**示例 1：**
+
+```
+输入：words = ["time", "me", "bell"]
+输出：10
+解释：一组有效编码为 s = "time#bell#" 和 indices = [0, 2, 5] 。
+words[0] = "time" ，s 开始于 indices[0] = 0 到下一个 '#' 结束的子字符串，如加粗部分所示 "time#bell#"
+words[1] = "me" ，s 开始于 indices[1] = 2 到下一个 '#' 结束的子字符串，如加粗部分所示 "time#bell#"
+words[2] = "bell" ，s 开始于 indices[2] = 5 到下一个 '#' 结束的子字符串，如加粗部分所示 "time#bell#"
+```
+
+
+
+题解：
+
+把word逆序，插入trie树之中。需要注意的是，**需要先把words数组按照长度逆序排序！！** 
+
+**如果后面的word没有出现在trie树中，那么就需要记录全部长度 + “#”；** 如果已经出现在了trie树中，则不需要记录任何东西。(如`["time","atime","btime"]`, 虽然`atime`和`btime`前面有重合，但是由于不是完全重合，还是需要全部重新记录)
+
+```python
+
+class Trie:
+            def __init__(self):
+                self.children = [None]*26 ##26个字母
+                self.is_end = False ##是否表示一个字符串
+                self.ans = 0
+            def insert(self,string):
+                tmp = self
+                find = True ##判断是不是已经出现在了trie树中
+                for letter in string:
+                    idx = ord(letter) - ord('a')
+                    if tmp.children[idx]:
+                        tmp = tmp.children[idx]
+                    else: ##没有，需要创建一个
+                        tmp.children[idx] = Trie()
+                        tmp = tmp.children[idx]
+                        find = False
+                
+                tmp.is_end = True
+                if not find:##如果后面的word没有出现在trie树中，那么就需要记录全部长度 + “#”
+                    self.ans += len(string)+1
+
+class Solution:
+    def minimumLengthEncoding(self, words: List[str]) -> int:
+        trie = Trie()
+        words.sort(key = lambda x: -len(x)) ##排序
+        for word in words:
+            trie.insert(word[::-1]) ##倒序插入
+        return trie.ans
+```
+

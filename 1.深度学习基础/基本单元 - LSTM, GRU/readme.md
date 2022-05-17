@@ -223,9 +223,19 @@ LSTM能够让RNN一直保留原来的信息(preserve information over many times
 
 ----
 
+#### BPTT (Back prop through time) 推导
 
+![img](https://pica.zhimg.com/80/v2-7479107998d0c85eb1c094b54c52a2af_1440w.png)
 
-**Q/A：Relu 能否作为RNN的激活函数？**
+RNN的梯度消失的原因是什么？
+
+![img](https://pic2.zhimg.com/80/v2-08b44e82ff66a6b25086a50442d68100_1440w.png)
+
+为什么LSTM可以解决梯度消失？
+
+![img](https://pic1.zhimg.com/80/v2-6a6f6d8d0f9fa5388a96dc9b6d8488af_1440w.png)
+
+Q/A：Relu 能否作为RNN的激活函数？
 
 RNN 的梯度消失，梯度爆炸问题在于： 
 

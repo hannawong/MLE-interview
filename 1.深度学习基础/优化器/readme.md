@@ -205,7 +205,7 @@ BERT中的优化器用的就是AdamW。 AdamW是在**Adam+L2正则化**的基础
 
 Adam（L2正则）和AdamW（权重衰减）的区别如下图：
 
-![img](https:////upload-images.jianshu.io/upload_images/19036657-526f2e6d75337b2b.png?imageMogr2/auto-orient/strip|imageView2/2/w/689/format/webp)
+![img](https://pic3.zhimg.com/80/v2-0793bfd29ee59f57cd1bed6e6d3b4676_1440w.png)
 
 可见，Adam优化是在损失函数中直接加入L2正则项 -- 即参数的二范数$||\theta||_2^2$,那么求梯度的时候就会加上正则项求导的结果，那么一些本身较大的权重对应的梯度也会比较大。由于Adam在计算时每次减去的项为：
 

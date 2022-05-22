@@ -50,11 +50,25 @@ class Solution:
         for i in range(1,len1+1):
             for j in range(1,len2+1):
                 if text1[i-1] == text2[j-1]:
-                    dp[i][j] = max(max(dp[i-1][j],dp[i][j-1]),dp[i-1][j-1]+1)
+                    dp[i][j] = max(dp[i-1][j-1]+1,dp[i-1][j],dp[i][j-1])
                 else:
                     dp[i][j] = max(dp[i-1][j],dp[i][j-1])
+        print(dp)
+        ans = ""
+        i = len1; j = len2
+        while i > 0 and j > 0:
+            if dp[i][j] > dp[i-1][j] and dp[i][j] > dp[i][j-1]:
+                ans+=text1[i-1]
+                i -= 1; j-= 1
+            while i >= 1 and dp[i-1][j] == dp[i][j]: ##贪婪的向上移动
+                i -= 1
+            while j >= 1 and dp[i][j-1] == dp[i][j]:##贪婪的向左移动
+                j -= 1
+        print(ans)
         return dp[len1][len2]
 ```
+
+如果要求输出公共子序列，那么就从最右下角的地方开始，如果这个位置比左边、上边都要大的话，就向左上角移动一个单位；之后贪婪的向左、向上移动。
 
 
 

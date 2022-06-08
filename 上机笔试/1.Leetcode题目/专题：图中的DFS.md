@@ -53,7 +53,7 @@ class Solution:
 
 
 
-
+## 专题 2. 矩阵
 
 #### 79. 搜索单词
 
@@ -72,38 +72,39 @@ Output: true
 
 ```python
 class Solution:
-    def exist(self, board, word: str) -> bool:
+    def exist(self, board: List[List[str]], word: str) -> bool:
         m = len(board)
         n = len(board[0])
-        dx = [1,-1,0,0]
-        dy = [0,0,1,-1]
-
-        def DFS(board,word,x,y,idx,visited):
-            if board[x][y]!= word[idx]:
-                return False
-            if idx == len(word)-1 and board[x][y] == word[idx]: ##终止条件
+        def dfs(i,j,idx,m,n,visited): ###在矩阵的(i,j), 正在对应word中的idx
+            if idx == len(word):
                 return True
+            if idx == len(word)-1:
+                return word[idx] == board[i][j]
+            if word[idx] != board[i][j]:
+                return False
+            dx = [1,-1,0,0]
+            dy = [0,0,1,-1]
             ans = False
-            for i in range(4):
-                xx = x+dx[i]
-                yy = y+dy[i]
-                if xx < 0 or xx >= m or yy < 0 or yy >= n or visited[xx][yy]:
-                    continue
-                visited[xx][yy] = 1
-                ans = ans or DFS(board,word,xx,yy,idx+1,visited)
-                visited[xx][yy] = 0
+            for k in range(4):
+                xx = i+dx[k]
+                yy = j+dy[k]
+                if xx >= 0 and xx < m and yy >= 0 and yy < n and not visited[xx][yy]:
+                    if word[idx+1]  == board[xx][yy]:
+                        visited[xx][yy] = 1
+                        ans = ans or dfs(xx,yy,idx+1,m,n,visited)
+                        visited[xx][yy] = 0
             return ans
-        ans = False
         for i in range(m):
             for j in range(n):
                 visited = [[0]*n for _ in range(m)]
-                visited[i][j] = 1 ##置为1
-                ans = ans or (DFS(board,word,i,j,0,visited))
-        return ans
+                visited[i][j] = 1
+                if dfs(i,j,0,m,n,visited):
+                    return True
+        return False
 ```
 
-- 易错点1：`visited[x][y]`是需要回溯的，对于那种需要向四方”尝试“DFS的问题，都需要回溯
-- 易错点2：每个位置都需要重置visited矩阵，防止上一次的递归结果对这次产生干扰。
+- 易错点1：`visited[x][y]`是需要回溯的，对于那种需要向四方**”尝试“**DFS的问题，都需要回溯
+- 易错点2：每个位置都需要**重置**visited矩阵，防止上一次的递归结果对这次产生干扰。
 - 易错点3：终止条件是` if idx == len(word)-1 and board[x][y] == word[idx]`
 
 
@@ -130,40 +131,35 @@ class Solution:
 
 解法：
 
-想清楚一件事情：一个点处的最长递增路径 = max(其四周比它大的点的最长递增路径 + 1). 那么，整个问题可以用dfs来解决。同时，我们发现每个节点的最长递增路径会被计算多次，所以使用记忆化dfs。这道题并不属于困难题，应该掌握。
+想清楚一件事情：一个点处的最长递增路径 = max(其四周比它大的点的最长递增路径 + 1). 那么，整个问题可以用dfs来解决。同时，我们发现每个节点的最长递增路径会被计算多次，所以使用**记忆化**dfs。这道题并不属于困难题，应该掌握。
 
 ```python
 class Solution:
-    dp = None
+    dic = {}
     def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
+        self.dic = {}
         m = len(matrix)
         n = len(matrix[0])
-        self.dp = [[-1]*n for _ in range(m)]
+
+        def dfs(i,j,m,n): ##从(i,j)出发的最长递增路径
+            if str(i)+"+"+str(j) in self.dic: ##已经有值了
+                return self.dic[str(i)+"+"+str(j)]
+            dx = [1,-1,0,0]
+            dy = [0,0,1,-1]
+            ans = 0
+            for k in range(4): ##探索四个方向
+                xx = i + dx[k]
+                yy = j + dy[k]
+
+                if xx >= 0 and xx < m and yy >= 0 and yy < n:
+                    if matrix[xx][yy] > matrix[i][j]:
+                        ans = max(ans,dfs(xx,yy,m,n)) ##递归
+            self.dic[str(i)+"+"+str(j)] = 1+ans ##记忆化记录
+            return self.dic[str(i)+"+"+str(j)]
+        res = 0
         for i in range(m):
             for j in range(n):
-                self.dfs(matrix,i,j,m,n)
-        mmax = 0
-        for i in range(m):
-            for j in range(n):
-                mmax = max(mmax,self.dp[i][j])
-        return mmax
-        
-
-    def dfs(self,matrix,x,y,m,n): ##(x,y)位置出发的最长递增路径
-        dx = [-1,1,0,0]
-        dy = [0,0,-1,1]
-        if x < 0 or x >= m or y < 0 or y >= n:
-            return 0
-        if self.dp[x][y] != -1: ###记忆
-            return self.dp[x][y]
-        ans = 1
-        for i in range(4):
-            xx = x+dx[i]
-            yy = y+dy[i]
-            if xx >= 0 and xx < m and yy >= 0 and yy < n and matrix[xx][yy] > matrix[x][y]:
-                ans = max(ans,self.dfs(matrix,xx,yy,m,n)+1)
-        self.dp[x][y] = ans
-        return ans        
-
+                res = max(res,(dfs(i,j,m,n)))
+        return res
 ```
 

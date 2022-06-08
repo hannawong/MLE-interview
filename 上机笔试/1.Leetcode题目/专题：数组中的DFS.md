@@ -50,7 +50,7 @@ class Solution:
 输出："213"
 ```
 
-虽然本题有更难的数学解法，但是用暴力回溯生成全排列也可以过！但是要点是需要**剪枝**。即，当我们已经找到第k大的时候，后面的都直接返回。
+虽然本题有更难的数学解法，但是用暴力回溯生成全排列也可以过！但是要点是需要**剪枝**。即，**当我们已经找到第k大的时候，后面的都直接返回。**
 
 ```python
 class Solution:
@@ -81,6 +81,29 @@ class Solution:
 
 
 
+#### 17 电话号码的字母组合
+
+```python
+class Solution:
+    def letterCombinations(self, digits: str) -> List[str]:
+        self.ans = []
+        self.ans_list = []
+        if len(digits) == 0:
+            return []
+        dic = {'2':"abc",'3':"def",'4':"ghi",'5':"jkl",'6':"mno",'7':"pqrs",'8':"tuv",'9':"wxyz"}
+        def dfs(idx): ##到了第idx位
+            if idx >= len(digits):
+                self.ans_list.append("".join(self.ans))
+                return 
+            for i in range(len(dic[digits[idx]])): ##随意选一个
+                self.ans.append(dic[digits[idx]][i]) 
+                dfs(idx+1) ##后面接着选！
+                self.ans.pop()
+        dfs(0)
+        return self.ans_list
+
+```
+
 
 
 #### 22. 括号生成
@@ -89,31 +112,29 @@ class Solution:
 
 ```python
 class Solution:
-    ans = []
+    ans = ""
     ans_list = []
-    def generateParenthesis(self, n: int):
-        self.ans = []
+    def generateParenthesis(self, n: int) -> List[str]:
+        self.ans = ""
         self.ans_list = []
-        def DFS(left_num, right_num):
-            if left_num == right_num == n:
-                self.ans_list.append("".join(self.ans))
+        def dfs(left,right):
+            if left ==right == n:
+                print(self.ans)
+                self.ans_list.append(self.ans)
                 return
-            if left_num < right_num:
+            if left > n or right > n:
                 return 
-            if left_num > n or right_num > n:
+            if right > left:
                 return 
-            ####放左括号
-            self.ans.append("(")
-            DFS(left_num+1,right_num)
-            self.ans.pop()
+            self.ans+="("
+            dfs(left+1,right)
+            self.ans = self.ans[:-1]
 
-            ###放右括号
-            self.ans.append(")")
-            DFS(left_num,right_num+1)
-            self.ans.pop()
-        DFS(0,0)
+            self.ans+=")"
+            dfs(left,right+1)
+            self.ans = self.ans[:-1]
+        dfs(0,0)
         return self.ans_list
-
 ```
 
 #### 39. 组合总和
@@ -163,7 +184,9 @@ class Solution:
 
 **注意：**解集不能包含重复的组合。 
 
- 
+ 禁止重复的关键在于：**if not(idx >= 1 and candidates[idx] == candidates[idx-1] and not visited[idx-1]):**
+
+【千万不要忘记之前sorted】
 
 **示例 1:**
 
@@ -182,36 +205,87 @@ class Solution:
 
 ```python
 class Solution:
-    ans = []
-    ans_list = []
     def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
         self.ans = []
         self.ans_list = []
-        candidates = sorted(candidates)
-        n = len(candidates)
-        visited = [0]*n
-        
-        def DFS(now,idx):
+        candidates = sorted(candidates) ##排序
+        visited = [0]*len(candidates)
+        def DFS(idx,now,visited):
             if now == target:
                 self.ans_list.append(self.ans[:])
                 return
+            if idx >= len(candidates):
+                return
             if now > target:
                 return 
-            for i in range(idx,len(candidates)): ###不吃回头草，只能选择idx之后的，而不能选择idx之前的元素
-                if visited[i]:
-                    continue
-
-                if i>= 1 and candidates[i] == candidates[i-1] and not visited[i-1]:
-                    continue
-                visited[i] = 1
-                self.ans.append(candidates[i])
-                DFS(now+candidates[i],i) ##这里是关键，直接idx跳变到了i，说明i之前都不能再选了，“不吃回头草”
+            ###选
+            if not(idx >= 1 and candidates[idx] == candidates[idx-1] and not visited[idx-1]):  ##禁止重复！！
+                
+                self.ans.append(candidates[idx])
+                visited[idx] = 1
+                DFS(idx+1,now+candidates[idx],visited)
+                visited[idx] = 0
                 self.ans.pop()
-                visited[i] = 0
 
-        DFS(0,0)
+            ##不选
+            DFS(idx+1,now,visited)
+        DFS(0,0,visited)
         return self.ans_list
 ```
+
+
+
+
+
+#### [77. 组合](https://leetcode.cn/problems/combinations/)
+
+难度中等992
+
+给定两个整数 `n` 和 `k`，返回范围 `[1, n]` 中所有可能的 `k` 个数的组合。
+
+你可以按 **任何顺序** 返回答案。
+
+ 
+
+**示例 1：**
+
+```
+输入：n = 4, k = 2
+输出：
+[
+  [2,4],
+  [3,4],
+  [2,3],
+  [1,2],
+  [1,3],
+  [1,4],
+]
+```
+
+```python
+class Solution:
+    def combine(self, n: int, k: int) -> List[List[int]]:
+        self.ans = []
+        self.ans_list = []
+        def dfs(kk,idx): ##有了几个数，idx到了第几位
+            if idx > n and kk == k:
+                self.ans_list.append(self.ans[:])
+                return 
+            if kk > k:
+                return
+            if idx > n:
+                return 
+            ###选
+            self.ans.append(idx)
+            dfs(kk+1,idx+1)
+            self.ans.pop()
+            ###不选
+            dfs(kk,idx+1)
+        dfs(0,1)
+        return self.ans_list
+```
+
+【总结】还是对于每个位置，判断选or不选
 
 
 
@@ -276,42 +350,31 @@ class Solution:
 输出：["255.255.11.135","255.255.111.35"]
 ```
 
-```
+```python
 class Solution:
-    ans = []
-    ans_list = []
-
-    def restoreIpAddresses(self, s: str):
-        self.ans = []
-        self.ans_list = []
-        def is_valid(string): ##判断是否0~255之间
-            if len(string) == 0:
+    def restoreIpAddresses(self, s: str) -> List[str]:
+        def is_valid(str):
+            if len(str) == 0:
                 return False
-            if string[0] == ' ':
+            if int(str) < 0 or int(str) > 255:
                 return False
-            if int(string)<0 or int(string) > 255:
-                return False
-            if len(string) >= 2 and string[0] == "0":
+            if len(str) >= 2 and str[0] == "0":
                 return False
             return True
-        def DFS(s,idx,ip_num):
-            if ip_num == 4 and idx == len(s):
-                print(self.ans)
+        self.ans = []
+        self.ans_list = []
+        def dfs(s,idx,n):
+            if n > 4:
+                return 
+            if idx == len(s) and n == 4:
                 self.ans_list.append(".".join(self.ans[:]))
                 return
-            if ip_num > 4:
-                return
-            if idx > len(s):
-                return 
-
             for i in range(1,4):
                 if is_valid(s[idx:idx+i]):
                     self.ans.append(s[idx:idx+i])
-                    idx += i
-                    DFS(s,idx,ip_num+1)
-                    idx -= i
+                    dfs(s,idx+i,n+1)
                     self.ans.pop()
-        DFS(s,0,0)
+        dfs(s,0,0)
         return self.ans_list
         
 
@@ -321,4 +384,121 @@ class Solution:
 
 - 当len(nums) >= 2 且第一个数为0时，说明有前导零。注意这里的长度是2，而不是1！
 - 终止条件就是  `ip_num == 4 and idx == len(s)`而不是`idx >= len(s)`
+
+
+
+
+
+#### [140. 单词拆分 II](https://leetcode.cn/problems/word-break-ii/)
+
+难度困难596
+
+给定一个字符串 `s` 和一个字符串字典 `wordDict` ，在字符串 `s` 中增加空格来构建一个句子，使得句子中所有的单词都在词典中。**以任意顺序** 返回所有这些可能的句子。
+
+**注意：**词典中的同一个单词可能在分段中被重复使用多次。
+
+**示例 1：**
+
+```
+输入:s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]
+输出:["cats and dog","cat sand dog"]
+```
+
+题解：简单的递归
+
+```python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> List[str]:
+        self.ans = []
+        self.ans_list = []
+        def dfs(idx): 
+            if idx >= len(s):
+                self.ans_list.append(" ".join(self.ans[:]))
+                return 
+            for word in wordDict:
+                if s[idx:idx+len(word)] == word:
+                    self.ans.append(word)
+                    dfs(idx+len(word))
+                    self.ans.pop()
+        dfs(0)
+        return self.ans_list
+```
+
+
+
+
+
+#### [698. 划分为k个相等的子集](https://leetcode.cn/problems/partition-to-k-equal-sum-subsets/)
+
+难度中等563
+
+给定一个整数数组  `nums` 和一个正整数 `k`，找出是否有可能把这个数组分成 `k` 个非空子集，其总和都相等。
+
+ 
+
+**示例 1：**
+
+```
+输入： nums = [4, 3, 2, 3, 5, 2, 1], k = 4
+输出： True
+说明： 有可能将其分成 4 个子集（5），（1,4），（2,3），（2,3）等于总和。
+```
+
+题解：我们先找到所有和为target的子数组，然后记下其索引；第二步就是找有没有几个不重合的索引加起来是全集。每一步都使用上面说的方法：判断加/不加
+
+```
+class Solution:
+    def canPartitionKSubsets(self, nums: List[int], k: int) -> bool:
+        sums = sum(nums)
+        if sums % k != 0:
+            return False
+        target = sums // k
+        
+        self.ans = []
+        self.ans_list = []
+        def find_target(nums,target,now,idx):
+            if now == target: ##【易错】这里要放在最前面
+                self.ans_list.append(self.ans[:])
+                return 
+            if now > target:
+                return 
+            if idx >= len(nums):
+                return 
+        
+            ##选
+            self.ans.append(idx)
+            find_target(nums,target,now+nums[idx],idx+1)
+            self.ans.pop()
+            ##不选
+            find_target(nums,target,now,idx+1)
+        find_target(nums,target,0,0) ##self.ans_list中存放的是所有idx
+
+        self.visited = [0]*len(nums) ###每个都没有覆盖到
+
+        def find_range(idx,visited_cnt): ##试图找到能够覆盖的
+            if visited_cnt == len(nums): ##已经找到了覆盖全集的方法。【易错】这个要放在最前面
+                return True
+            if idx >= len(self.ans_list): ##【易错】这里别犯糊涂写成len(nums)了！
+                return False
+            ##检查看看能不能放
+            ok = True
+            ans = False
+            for num in self.ans_list[idx]:
+                if self.visited[num] == 1:
+                    ok = False
+                    break
+            if ok: ##没有overlap
+                tmp_idx = idx
+                for i in range(len(self.ans_list[idx])):
+                    self.visited[self.ans_list[idx][i]] = 1
+                ans = ans or find_range(idx+1,visited_cnt+len(self.ans_list[idx]))
+
+                for i in range(len(self.ans_list[tmp_idx])): ##回溯
+                    self.visited[self.ans_list[idx][i]] = 0
+            ##不选
+            ans = ans or find_range(idx+1,visited_cnt)
+            return ans
+        return find_range(0,0)
+            
+```
 

@@ -1,6 +1,6 @@
 # SimCSE
 
-Simple Contrastive Learning of Sentence Embeddings，其实就是把对比学习引入了SBERT，达到了**句子相似度**SOTA。SBERT本身并不复杂，仅仅是一个基于BERT的孪生网络而已，想要在SBERT的基础上改进指标，只能从训练目标下手。
+Simple Contrastive Learning of Sentence Embeddings，其实就是把对比学习引入了SBERT，达到了**句子相似度**SOTA。SBERT本身并不复杂，仅仅是一个基于BERT的孪生网络而已，想要在SBERT的基础上改进指标，只能从**训练目标**下手。
 
 ### 1. 对比学习概念
 
@@ -26,7 +26,7 @@ Simple Contrastive Learning of Sentence Embeddings，其实就是把对比学习
 
 自然是希望正样本和正样本的距离越近越好。
 
-- uniformity计算向量整体分布的均匀程度：
+- uniformity计算向量整体分布的**均匀**程度：
 
 
 ![[公式]](https://www.zhihu.com/equation?tex=%5Cell_%7B%5Ctext+%7Buniform+%7D%7D+%5Ctriangleq+%5Clog+%5Cunderset%7Bx%2C+y%5Csim+p_%7B%5Ctext%7Bdata%7D%7D%7D%7B%5Cmathbb%7BE%7D%7D+e%5E%7B-2%5C%7Cf%28x%29-f%28y%29%5C%7C%5E%7B2%7D%7D+%5C%5C)
@@ -43,11 +43,11 @@ Simple Contrastive Learning of Sentence Embeddings，其实就是把对比学习
 
 #### 2.1 无监督的SimCSE
 
-本文作者提出可以通过dropout 来生成正样本![[公式]](https://www.zhihu.com/equation?tex=x_%7Bi%7D%5E%7B%2B%7D)，回想一下，在标准的Transformer中，dropout mask被放置在**全连接层和注意力**操作上。由于dropout mask是随机生成的，所以在训练阶段，将同一个样本分两次输入到同一个编码器中，我们会得到两个不同的表示向量![[公式]](https://www.zhihu.com/equation?tex=z%2Cz%5E%5Cprime)，将![[公式]](https://www.zhihu.com/equation?tex=z%5E%5Cprime)作为正样本，则模型的训练目标为
+本文作者提出可以通过dropout 来生成正样本![[公式]](https://www.zhihu.com/equation?tex=x_%7Bi%7D%5E%7B%2B%7D)，回想一下，在标准的Transformer中，dropout mask被放置在**全连接层和注意力**操作上。由于dropout mask是**随机**生成的，所以在**训练阶段**，将同一个样本分两次输入到同一个编码器中，我们会得到两个不同的表示向量![[公式]](https://www.zhihu.com/equation?tex=z%2Cz%5E%5Cprime)，将![[公式]](https://www.zhihu.com/equation?tex=z%5E%5Cprime)作为正样本，则模型的训练目标为
 
 ![[公式]](https://www.zhihu.com/equation?tex=%5Cell_%7Bi%7D%3D-%5Clog+%5Cfrac%7Be%5E%7B%5Coperatorname%7Bsim%7D%5Cleft%28%5Cmathbf%7Bh%7D_%7Bi%7D%5E%7Bz_%7Bi%7D%7D%2C+%5Cmathbf%7Bh%7D_%7Bi%7D%5E%7Bz_%7Bi%7D%5E%7B%5Cprime%7D%7D%5Cright%29+%2F+%5Ctau%7D%7D%7B%5Csum_%7Bj%3D1%7D%5E%7BN%7D+e%5E%7B%5Coperatorname%7Bsim%7D%5Cleft%28%5Cmathbf%7Bh%7D_%7Bi%7D%5E%7Bz_%7Bi%7D%7D%2C+%5Cmathbf%7Bh%7D_%7Bj%7D%5E%7B%7Bz_%7Bj%7D%7D%5E%7B%5Cprime%7D%7D%5Cright%29+%2F+%5Ctau%7D%7D+%5C%5C)
 
-这种通过改变dropout mask生成正样本的方法可以看作是**数据增强**的最小形式，因为原样本和生成的正样本的语义是完全一致的，只是生成的embedding不同而已。所以，其实SimCSE生成正样本的方式就是把样本过两次预训练好的BERT，用dropout来获得两个不一样的embedding作为正例对；负样本做mini-batch采样....对，就这。
+这种通过改变dropout mask生成正样本的方法可以看作是**数据增强**的最小形式，因为原样本和生成的正样本的语义是完全一致的，只是**生成的embedding不同而已**。所以，其实SimCSE生成正样本的方式就是把样本过两次预训练好的BERT，用dropout来获得两个不一样的embedding作为正例对；负样本做mini-batch采样....对，就这。
 
 #### 2.2 有监督的SimCSE
 

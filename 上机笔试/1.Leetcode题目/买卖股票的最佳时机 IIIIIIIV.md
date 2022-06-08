@@ -1,6 +1,27 @@
 # 买卖股票的最佳时机 I/II/III/IV
 
-#### 122. 买卖股票的最佳时机 II
+#### [121. 买卖股票的最佳时机](https://leetcode.cn/problems/best-time-to-buy-and-sell-stock/) I (easy)
+
+给定一个数组 `prices` ，它的第 `i` 个元素 `prices[i]` 表示一支给定股票第 `i` 天的价格。
+
+你只能选择 **某一天** 买入这只股票，并选择在 **未来的某一个不同的日子** 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+
+返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 `0` 。
+
+**示例 1：**
+
+```
+输入：[7,1,5,3,6,4]
+输出：5
+解释：在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+```
+
+题解：
+
+只能购买并卖出**一次**。从左到右维护一个最小值即可！很简单吧。
+
+#### 122. 买卖股票的最佳时机 II (medium)
 
 给定一个数组 prices ，其中 prices[i] 表示股票第 i 天的价格。
 
@@ -14,6 +35,8 @@
 
 **解法：**
 
+可以购买和卖出**任意多次**。这是和I的差别。
+
 因为题中说“最多只能持有一股股票”，所以不妨以每天持有股票的个数来分类。`dp[i][0]`表示第i天，不持有股票的收益；`dp[i][1]`表示第i天，持有股票的收益。想要持有股票，就必须花钱来买它，所以收益是要减去当前股票的价格的。在卖掉的时候，**收益要加上当前股票的价格**，因为卖出了就可以得到收益。所以，可以得到如下的状态转移函数：
 
 ```python
@@ -23,26 +46,29 @@ dp[1][i] = max(dp[1][i-1], dp[0][i-1] - prices[i])##前一天没有，后一天�
 
 初始状态：
 
-`dp[0][0] = 0`, `dp[0][1] = -price[0]` 
+`dp[0][0] = 0`, `dp[1][0] = -price[0]` 
 
 最后一天一定是不持有股票的收益最大，故返回`dp[0][n-1]`
 
 ```python
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        n = len(prices)
-        dp_zero = [0]*n ##不持有股票
-        dp_one = [0]*n
-        dp_one[0] = -prices[0]
-        mmax = 0
-        for i in range(1,n):
-            dp_one[i] = max(dp_one[i-1],dp_zero[i-1]-prices[i]) ##buy in 
-            dp_zero[i] = max(dp_zero[i-1],dp_one[i-1]+prices[i]) ## sell
-            mmax = max(mmax,dp_zero[i])
-        return mmax
+        dp = [[0]*len(prices) for _ in range(2)]
+        dp[0][0] = 0 ##持有0支股票
+        dp[1][0] = -prices[0] ##持有一个，需要花钱买吧
+        ans = 0
+        for i in range(1,len(prices)):
+            dp[0][i] = max(dp[0][i-1],dp[1][i-1] + prices[i])
+            dp[1][i] = max(dp[1][i-1],dp[0][i-1] - prices[i])
+            ans = max(ans,dp[0][i],dp[1][i])
+        return ans
 ```
 
+【易错点】
 
+注意每个dp数组的第一位是0/1，表示状态。第二位才是i。
+
+我们看到，这里已经引入自动机的思想了，状态0和状态1如何相互转换。
 
 ### 714. 买卖股票的最佳时机含手续费
 
@@ -56,19 +82,19 @@ class Solution:
 
 解法：
 
-还是和上一题一样，有两个状态：持有1个股票、不持有股票。区别就是，在卖出的时候需要花掉手续费。
+还是和上一题一样，有两个状态：持有1个股票、不持有股票。区别就是，在卖出的时候需要花掉手续费。我们规定，在**买入的时候**需要交手续费就完事儿了。
 
 ```python
 class Solution:
-    def maxProfit(self, prices, fee: int) -> int:
-        n = len(prices)
-        dp = [[0]*n for _ in range(2)]
-        dp[1][0] = -prices[0]
+    def maxProfit(self, prices: List[int], fee: int) -> int:
+        dp = [[0]*len(prices) for _ in range(2)]
+        dp[0][0] = 0 ##持有0支股票
+        dp[1][0] = -prices[0]-fee ##持有一个，需要花钱买吧
         ans = 0
-        for i in range(1,n):
-            dp[0][i] = max(dp[0][i-1],dp[1][i-1]-fee+prices[i])
-            dp[1][i] = max(dp[1][i-1],dp[0][i-1]-prices[i])
-            ans = max(ans,dp[0][i])
+        for i in range(1,len(prices)):
+            dp[0][i] = max(dp[0][i-1],dp[1][i-1] + prices[i])
+            dp[1][i] = max(dp[1][i-1],dp[0][i-1] - prices[i]-fee)
+            ans = max(ans,dp[0][i],dp[1][i])
         return ans
 ```
 
@@ -88,24 +114,24 @@ class Solution:
 
 其实，这是一个**有限自动机**。总共无非有三个状态：
 
-- 状态0：持有一股，（必非冷冻期）
-- 状态1：持有0股，且不在冷冻期
-- 状态2：持有0股，且在冷冻期（现在是卖掉）
+- 状态0：持有0股，非冷冻期
+- 状态1：持有0股，且在冷冻期 (刚刚卖掉)
+- 状态2：持有1股，（必非冷冻期，因为是买入的状态）
 
 
 
 ```python
 class Solution:
-    def maxProfit(self, prices) -> int:
-        n = len(prices)
-        dp = [[0]*n for _ in range(3)]
-        dp[0][0] = -prices[0] 
+    def maxProfit(self, prices: List[int]) -> int:
+        dp = [[0]*len(prices) for _ in range(3)]
+        dp[0][0] = 0
+        dp[2][0] = -prices[0]
         ans = 0
-        for i in range(1,n):
-            dp[0][i] = max(dp[1][i-1]-prices[i],dp[0][i-1]) ##原来就有 or 非冷冻期买入
-            dp[1][i] = max(dp[1][i-1],dp[2][i-1]) #原来就无 or 冷冻期过去
-            dp[2][i] = dp[0][i-1]+prices[i] ##原来持有一股，现在卖掉
-            ans = max(max(dp[0][i],dp[1][i]),dp[2][i])
+        for i in range(1,len(prices)):
+            dp[0][i] = max(dp[0][i-1],dp[1][i-1])
+            dp[1][i] = max(dp[1][i-1],dp[2][i-1]+prices[i])
+            dp[2][i] = max(dp[2][i-1],dp[0][i-1]-prices[i])
+            ans = max(ans,dp[0][i],dp[1][i],dp[2][i])
         return ans
 ```
 
@@ -121,7 +147,7 @@ class Solution:
 
 **解法：**
 
-题中的一个重要限制：“最多可以完成两笔交易”。受到上面题目的启发，想到用有限自动机来表示不同的状态，并画出状态转移图：
+题中的一个重要限制：“**最多可以完成两笔交易**”。受到上面题目的启发，想到用有限自动机来表示不同的状态，并画出状态转移图：
 
 ![img](https://pic1.zhimg.com/80/v2-3abd42ba6c29475ddd9ef060500b72ce_1440w.png)
 

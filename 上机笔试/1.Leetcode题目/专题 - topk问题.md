@@ -1,7 +1,5 @@
 [TOC]
 
-
-
 # Top-K问题
 
 #### [215. 数组中的第K个最大元素](https://leetcode.cn/problems/kth-largest-element-in-an-array/)
@@ -39,9 +37,67 @@ class Solution:
         return heap[0]
 ```
 
-时间复杂度 O(klogn). 因为堆的插入是O(logn), 最多需要插入k次。堆的大小为k，所以空间复杂度为O(k).
+时间复杂度 O(nlogn). 因为堆的插入是O(logn), 需插入n次。堆的大小为k，所以空间复杂度为O(k).
+
+
+
+
 
 ##### 【方法2：利用快排】
+
+**快排的原始写法：**
+
+```python
+class Solution:
+    def sortArray(self, nums: List[int]) -> List[int]:
+        
+        def partitionsort(nums,low,high): ##排序[low,high]之间的数组
+            if low > high: ##单元素区间，必定有序
+                return
+            partition = find_partition(nums,low,high) ##寻找轴点的位置
+            partitionsort(nums,low,partition-1) ##原地排序左边
+            partitionsort(nums,partition+1,high) ##原地排序右边
+            
+        def find_partition(nums,low,high): ##构造轴点
+            rand = random.randint(low,high) ##随机选一个轴点
+            nums[rand],nums[high] = nums[high],nums[rand] ##和末尾交换，末尾作为轴点
+            pivot = nums[high]
+            split = low-1
+            for j in range(low,high):
+                if nums[j] < pivot: 
+                    nums[j],nums[split+1] = nums[split+1],nums[j] ##注意这里是split+1
+                    split+=1
+            nums[split+1],nums[high] = nums[high],nums[split+1]
+            return split+1
+        partitionsort(nums,0,len(nums)-1)
+        return nums
+```
+
+具体的方法：
+
+1. 首先，选择最后一个元素 -- `pivot = A[right]`作为我们要培养的轴点。
+2. 一个指针 `j` 从 `low` 遍历到 `high-1`；另外维护一个split，使得[low,split]的值都<轴点，[split+1,high]的值都>轴点
+
+![img](https://pic1.zhimg.com/80/v2-92472f2ca7ae0c67b3ec74db9fda4027_1440w.png)
+
+在考察 j 时，
+
+- 如果arr[j]>=pivot, 不用特殊处理，直接考虑下一个j+1即可；
+- 如果arr[j] < pivot, 则需要把它移到 "<= pivot"那一类中，那么需要交换arr[split+1]和arr[j],并且 split++。
+
+最终，交换arr[split+1]和arr[right], 返回split+1，此点即为轴点
+
+【注】如果不用随机选轴点，最坏情况（**数组已经接近有序**）时，复杂度O(n^2)，因为只有越接近“平均二分”，才能达到O(nlogn)复杂度。但是平均情况还是O(nlogn)。 为了能够达到这个“期望”复杂度，我们需要**随机选择轴点**才行。
+
+【总结】
+
+- 快排是不稳定的排序方法
+
+
+
+----
+
+
 
 **划分：**  将数组 `a[l⋯r]` 划分成两个子数组 `a[l⋯q−1]`、`a[q+1⋯r]`，使得 `a[l⋯q−1] `中的每个元素小于等于 a[q]，且 a[q]小于等于 `a[q+1⋯r] 中的每个元素`。这个a[q]就称为“**轴点**”。
 **递归**： 通过递归调用快速排序，对子数组`a[l⋯q−1]` 和`a[q+1⋯r]` 进行**排序**。
@@ -54,48 +110,64 @@ class Solution:
 
 ```python
 class Solution:
-    ans = 0
+    ans = 0 ##记录答案
     def findKthLargest(self, nums: List[int], k: int) -> int:
-        def partitionsort(nums,low,high): ##排序[low,high]之间的数组
-            if low > high: ##单元素区间，必定有序
-                return
-            partition = find_partition(nums,low,high) ##寻找轴点的位置
-            if partition == len(nums)-k: ##添加
-                self.ans = nums[partition]##添加
-                return ##添加
-            if partition > len(nums)-k:##添加
-                partitionsort(nums,low,partition-1) ####添加，原地排序左边
-            if partition < len(nums)-k:##添加
-                partitionsort(nums,partition+1,high) ####添加，原地排序右边
-            
-        def find_partition(nums,low,high): ##构造轴点
-            rand = random.randint(low,high) ##随机选一个轴点
-            nums[rand],nums[high] = nums[high],nums[rand] ##和末尾交换，末尾作为轴点
-            pivot = nums[high]
-            split = low-1
-            for j in range(low,high):
-                if nums[j] < pivot: 
-                    nums[j],nums[split+1] = nums[split+1],nums[j]
-                    split+=1
-            nums[split+1],nums[high] = nums[high],nums[split+1]
-            return split+1
         
-        partitionsort(nums,0,len(nums)-1)
+        def quicksort(nums,left,right):
+            if left > right: ##注意这里不是 >= 
+                return 
+            pivot = get_pivot(nums,left,right)
+            if pivot == len(nums)-k: ##已经找到了答案
+                self.ans = nums[pivot]
+                return 
+            elif pivot > len(nums)-k:
+                quicksort(nums,left,pivot-1) ##递归左区间
+            else:
+                quicksort(nums,pivot+1,right) ##递归右区间
+
+        def get_pivot(nums,left,right):
+            rand = random.randint(left,right)
+            nums[rand],nums[right] = nums[right],nums[rand]
+            pivot = nums[right]
+            split =left-1
+            for j in range(left,right):
+                if nums[j] > pivot:
+                    continue
+                else:
+                    nums[split+1],nums[j] = nums[j],nums[split+1]
+                    split += 1
+            nums[split+1],nums[right] = nums[right],nums[split+1]
+            return split+1
+
+
+        quicksort(nums,0,len(nums)-1)
         return self.ans
 ```
 
 `find_partition`函数最后的结果是，arr的左边都<轴点，arr的右边都>轴点，轴点的位置是`split+1`
 
-【注意】randint是左闭右闭，这个和range不一样！
-
 【易错点】
 
 - 可以看到，这里是用一个变量self.ans来记录答案，只要有一次符合条件，self.ans便会记录下来答案。
-- 返回条件是low > high, 而不是low >= high, 因为如果是low >= high的话，会导致单元素区间不能记录self.ans. 
+- 返回条件是low > high**, 而不是low >= high**, 因为如果是low >= high的话，会导致单元素区间不能记录self.ans. 
 
-【复杂度分析】T(n) = T(n/2) + n, 这不是一个完全的递归树，按照每次排序刚好定位到中间来想，递归树的下一层只有T(n/2)，不考虑另一半。根据master theorem，复杂度为O(n). 当然，最坏情况是O(n^2). 
+【复杂度分析】T(n) = T(n/2) + n, 这不是一个完全的递归树，按照每次排序刚好定位到中间来想，递归树的下一层只有T(n/2)，不考虑另一半。根据master theorem，复杂度为**O(n)**. 当然，最坏情况是O(n^2). 
 
 空间复杂度为递归栈的大小，平均情况为O(logn), 最坏情况为O(n). 不过，快排的这个递归是尾递归，可以比较容易的改写成迭代形式。如果编译器有尾递归优化，空间复杂度为O(1).
+
+
+
+【master theorem】
+
+![img](https://pic1.zhimg.com/80/v2-ca7830ee5d665aa8d4437322830bac60_1440w.jpg)
+
+
+
+
+
+
+
+
 
 
 

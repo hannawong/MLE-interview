@@ -28,23 +28,24 @@
 
 ```python
 class Solution:
-    def findContinuousSequence(self, target: int):
+    def findContinuousSequence(self, target: int) -> List[List[int]]:
+        end = target //2 +10
         left = 1
         right = 1
         cnt = 0
-        ans = []
         ans_list = []
-        while left <= target // 2+2 and right <= target // 2+2:
-            if cnt == target:
-                ans_list.append(ans[:])
-            cnt += right ##无脑移动右窗口
-            ans.append(right)
+        while left < end and right < end:
+            cnt += right ##无脑滑动右窗口
             right += 1
-            while cnt > target: ##直到cnt的值>target
-                cnt -= left ##移动左窗口
+            while cnt >= target:
+                if cnt == target:
+                    if right - left >= 2:
+                        print(left,right)
+                        ans_list.append([_ for _ in range(left,right)])
+                cnt -= left
                 left += 1
-                ans  = ans[1:]
-
         return ans_list
+            
+
 ```
 

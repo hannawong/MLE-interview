@@ -191,42 +191,30 @@ class Solution:
 
 动态规划，`dp[i][j]`用来表示**s1的前i个元素和s2的前j个元素能否组成s3的前i+j个元素**。
 
-为了做好初始化，把整个字符串想象成在前面加一个相同的#号。那么，第一行、第一列就分别表示s2、s1是不是和s3的开头完全匹配。其实，把初始化做好了之后，后面的递推公式就很简单了。
-
-![img](https://pic1.zhimg.com/80/v2-ad34a0af58ef0c01cff9c56f65441995_1440w.png)
+为了做好初始化，把整个字符串想象成在前面加一个相同的#号。那么，第一行、第一列就分别表示s2、s1是不是和s3的开头完全匹配。
 
 ```python
 class Solution:
     def isInterleave(self, s1: str, s2: str, s3: str) -> bool:
         len1 = len(s1)
         len2 = len(s2)
-        len3 = len(s3)
-        if len3 != len2 + len1:
+        if len1 + len2 != len(s3):
             return False
-        dp = [[True]*(len2+1) for _ in range(len1+1)]
-        ###############初始化 ##################
-        for i in range(1,len2+1):
-            if s2[i-1] != s3[i-1] or not dp[0][i-1]:
-                dp[0][i] = False
-        for i in range(1,len1+1):
-            if s1[i-1] != s3[i-1] or not dp[i-1][0]:
-                dp[i][0] = False
-        print(dp)
-        ######################################
-        for i in range(1,len1+1):
-            for j in range(1,len2+1):
-                ans = False
-                if s1[i-1] == s3[i+j-1]:
-                    ans = ans or dp[i-1][j]
-                if s2[j-1] == s3[i+j-1]:
-                    ans = ans or dp[i][j-1]
-                dp[i][j] = ans
+        dp = [[False]*(len2+1) for _ in range(len1+1)]
+        dp[0][0] = True
+        
+        for i in range(len1+1):
+            for j in range(len2+1):
+                if i + j >= 1 and j >= 1:
+                    if s3[i+j-1] == s2[j-1]:
+                        dp[i][j] = dp[i][j] or dp[i][j-1]
+                if i + j >= 1 and i >= 1:
+                    if s3[i+j-1] == s1[i-1]:
+                        dp[i][j] = dp[i][j] or dp[i-1][j]
         return dp[len1][len2]
 ```
 
-
-
-
+【易错点】`dp[i][j]` 对应的字符串应该是s3[i+j-1], 而不是s3[i+j-2]. 
 
 #### [115. 不同的子序列](https://leetcode.cn/problems/distinct-subsequences/)
 

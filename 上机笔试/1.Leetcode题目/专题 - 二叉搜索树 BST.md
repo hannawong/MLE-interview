@@ -10,50 +10,6 @@
 
 
 
-#### [剑指 Offer 54. 二叉搜索树的第k大节点](https://leetcode.cn/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/)
-
-难度简单302
-
-给定一棵二叉搜索树，请找出其中第 `k` 大的节点的值。
-
-**示例 1:**
-
-```
-输入: root = [3,1,4,null,2], k = 1
-   3
-  / \
- 1   4
-  \
-   2
-输出: 4
-```
-
-由于本题要求第k**大**的节点，而不是第k**小**，所以我们需要对二叉树进行**反向中序遍历**。
-
-中序遍历顺序是左->根->右，那么反向中序遍历顺序就是右->根->左。直到第k个元素就停止，所谓“剪枝”。
-
-```python
-class Solution:
-    k = 0
-    ans = -1
-    def kthLargest(self, root: TreeNode, k: int) -> int:
-        def inverse_inorder(root):
-            if not root:
-                return 
-            inverse_inorder(root.right)
-            self.k += 1
-            if self.k == k:
-                self.ans = root.val
-                return
-            inverse_inorder(root.left)
-        inverse_inorder(root)
-        return self.ans
-```
-
-时间复杂度为O(树高+k)，因为在开始遍历之前我们还需要到达**最底下的全局第一个访问位置**。所以，平均情况下，复杂度为O(logn+k)；最坏情况下复杂度为O(n+k). 
-
-
-
 #### [99. 恢复二叉搜索树](https://leetcode-cn.com/problems/recover-binary-search-tree/)
 
 难度中等699

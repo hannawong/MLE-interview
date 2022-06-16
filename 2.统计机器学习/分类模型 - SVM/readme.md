@@ -16,6 +16,8 @@
 
 *什么是margin？*
 
+![img](https://pic1.zhimg.com/80/v2-444eb631832101fe107ffa22ccd752e6_1440w.png)
+
 引入跟分类超平面平行的两个超平面：![w_1x_1+w_2x_2+...w_nx_n + b = \pm1](https://www.zhihu.com/equation?tex=w_1x_1%2Bw_2x_2%2B...w_nx_n%20%2B%20b%20%3D%20%5Cpm1)。这两个超平面的距离 ![\frac{2}{||w||_2}](https://www.zhihu.com/equation?tex=%5Cfrac%7B2%7D%7B%7C%7Cw%7C%7C_2%7D) 就是margin。（分母是二范数）
 
 ![img](https://pic4.zhimg.com/v2-6ad2f9da0310bb797d324533f600829b_b.png)

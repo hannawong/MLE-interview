@@ -38,42 +38,43 @@ L = [8, 12, 16, 22, 100]   R = [9, 26, 55, 64, 91]  M = [8, 9]
 
 ```python
 class Solution:
-    def reversePairs(self, nums) -> int:
-        return self.mergesort(nums,0,len(nums)-1)
+    def reversePairs(self, nums: List[int]) -> int:
+        def mergesort(nums,begin,end): ##左闭右闭
+            if begin >= end:  ##单元素区间，必然有序
+                return 0
+            middle = (begin+end) // 2
+            left_ans = mergesort(nums,begin,middle) ##排左边（就地）
+            right_ans = mergesort(nums,middle+1,end) ##排右边
+            merge_ans = merge(nums,begin,middle,end) ##合并（就地）
+            return left_ans + right_ans + merge_ans
 
+        def merge(nums,begin,middle,end):
+            ptr1 = begin
+            ptr2 = middle+1
+            tmp = []
+            cnt = 0
+            while(ptr1 <= middle and ptr2 <= end): ##move ptr1 
+                if nums[ptr1] <= nums[ptr2]:
+                    tmp.append(nums[ptr1])
+                    ptr1 += 1
+                    cnt += ptr2 - middle - 1 ##has contribution to inverse pair
+                else:
+                    tmp.append(nums[ptr2])
+                    ptr2 += 1
 
-    def mergesort(self,nums,begin,end): ##左闭右闭
-        if begin >= end:  ##单元素区间，必然有序
-            return 0
-        middle = (begin+end) // 2
-        cnt_left = self.mergesort(nums,begin,middle)
-        cnt_right = self.mergesort(nums,middle+1,end)
-        return cnt_left+cnt_right+self.merge(nums,begin,middle,end)
-
-    def merge(self,nums,begin,middle,end): ##两件事：排序+返回逆序对个数
-        ptr1 = begin
-        ptr2 = middle+1
-        tmp = []
-        reverse_cnt = 0
-        while(ptr1 <= middle and ptr2 <= end):
-            if nums[ptr1] <= nums[ptr2]:
+            while(ptr1 <= middle):
                 tmp.append(nums[ptr1])
-                reverse_cnt += ptr2-middle-1
                 ptr1 += 1
-            else:
+                cnt += end - middle ##has contribution to inverse pair
+
+            while(ptr2 <= end):
                 tmp.append(nums[ptr2])
                 ptr2 += 1
-        while(ptr1 <= middle):
-            tmp.append(nums[ptr1])
-            reverse_cnt += ptr2 - middle - 1
-            ptr1 += 1
-        while(ptr2 <= end):
-            tmp.append(nums[ptr2])
-            ptr2 += 1
 
-        for i in range(len(tmp)):
-            nums[begin+i] = tmp[i]
-        return reverse_cnt
+            for i in range(begin,end+1):
+                nums[i] = tmp[i-begin]
+            return cnt
+        return mergesort(nums,0,len(nums)-1)
 ```
 
 【技巧】要先写完mergesort，然后在此结果上修改，使之能够统计逆序对个数。

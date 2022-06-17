@@ -47,7 +47,11 @@
   - 当所有约束条件都满足时，所有![y_i(w^Tx_i+b)](https://www.zhihu.com/equation?tex=y_i(w%5ETx_i%2Bb))都>0, 此时只需要让 ![\alpha_i](https://www.zhihu.com/equation?tex=%5Calpha_i)=0, 就可以最大化![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha))，其最大值为 ![\frac{1}{2}||w||^2](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%7C%7Cw%7C%7C%5E2) , 就是我们下一步要最小化的东西。
 - 下一步改变w,b, 去最小化 ![L(w,b,\alpha)](https://www.zhihu.com/equation?tex=L(w%2Cb%2C%5Calpha))。假如上一步的约束条件都满足，现在就是要最小化![\frac{1}{2}||w||^2](https://www.zhihu.com/equation?tex=%5Cfrac%7B1%7D%7B2%7D%7C%7Cw%7C%7C%5E2).
 
-如果直接求解，那么一上来便得面对w和b两个参数，而 ![\alpha_i](https://www.zhihu.com/equation?tex=%5Calpha_i)又是不等式约束，这个求解过程不好做。不妨把最小和最大的位置交换一下，交换以后的新问题是原始问题的对偶问题。在满足某些条件的情况下，这两者相等，这个时候就可以通过求解对偶问题来间接地求解原始问题。
+如果直接求解，那么一上来便得面对w和b两个参数，而 ![\alpha_i](https://www.zhihu.com/equation?tex=%5Calpha_i)又是不等式约束，这个求解过程不好做。不妨把最小和最大的位置交换一下，交换以后的新问题是原始问题的对偶问题。在满足某些条件的情况下，这两者相等，这个时候就可以通过求解对偶问题来间接地求解原始问题。- 
+
+```
+I am a MS student in Computer Science at Columbia University. I have earned bachelor's degree in Computer Science from Tsinghua University. My research and development interest lies in web search, advertisement and recommendation system.  I served as a AI researcher at JP Morgan, machine learning engineer at Bytedance (Chinese short video giant), as a machine learning intern at Alibaba (Amazon of China). I also worked with China Meteorological Administration to put forward a method to improve the accuracy of weather prediction for the 2022 Winter Olympics in Beijing, and worked with Yelp to develop a semantic search engine. I hope to get the position of machine learning engineer in your company. Thanks for considering my application!
+```
 
 对偶问题求解：
 

@@ -21,10 +21,9 @@ class Solution:
     def cuttingRope(self, n: int) -> int:
         dp = [0]*(n+1)
         dp[1] = 1
-        dp[2] = 1
-        for i in range(3,n+1):
-            for k in range(1,i):###遍历所有切分的长度
-                dp[i] = max(dp[i],dp[i-k]*k,(i-k)*k) ##这里易错！！！前面的(i-k)长度可不可以不再切分呢？可以的！
+        for i in range(2,n+1):
+            for j in range(1,i):
+                dp[i] = max(dp[i],dp[i-j]*dp[j],dp[i-j]*j,(i-j)*j)##这里易错！！！前面的(i-k)长度可不可以不再切分呢？可以的！
         return dp[-1]
 ```
 

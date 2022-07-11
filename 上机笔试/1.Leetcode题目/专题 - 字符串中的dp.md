@@ -254,4 +254,34 @@ class Solution:
         return dp[lens][lent]
 ```
 
- 
+ 滚动数组优化：
+
+```python
+class Solution:
+    def numDistinct(self, s: str, t: str) -> int:
+        lens = len(s)
+        lent = len(t)
+        dp = [[0]*lent for _ in range(2)]
+        cnt = 0
+        init = []
+        for i in range(lens):
+            if s[i] == t[0]:
+                cnt += 1
+            init.append(cnt)
+        dp[0][0] = init[0]
+        if len(s) == 1:
+            return dp[0][0]
+
+        for i in range(1,lens):
+            for j in range(1,lent):
+                if s[i] == t[j]:
+                    dp[1][j] = dp[0][j-1] + dp[0][j]
+                else:
+                    dp[1][j] = dp[0][j]
+            for j in range(1,lent):
+                dp[0][j] = dp[1][j]
+            dp[0][0] = init[i]
+
+        return dp[0][-1]
+```
+

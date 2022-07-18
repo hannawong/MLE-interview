@@ -1,3 +1,25 @@
+```
+class self_attention(nn.Module):
+    def __init__(self,hidden_size,embedding_size): ##(batchsize,seq_len,embedding_size)
+        super(self_attention,self).__init__()
+        self.Q_layer = nn.Linear(embedding_size,hidden_size)
+        self.K_layer = nn.Linear(embedding_size,hidden_size)
+        self.V_layer = nn.Linear(embedding_size,hidden_size)
+        
+    def forward(self,input): ####(batchsize,seq_len,embedding_size)
+        Q = self.Q_layer(input)##(batchsize,seq_len,hidden_size)
+        K = self.K_layer(input)
+        V = self.V_layer(input)
+        attention_score = torch.bmm(Q.T,K)   ##(batchsize,seq_len,seq_len)
+        attention_score = torch.multiply(attention_score,1.0/math.sqrt(hidden_size))
+        m = nn.Softmax()
+        attention_score = m(attention_score)##(batchsize,seq_len,seq_len)
+        ouput = torch.bmm(attention_score,V)
+        return output
+```
+
+
+
 ### 1. Transformer的整体结构
 
 当我们对每个位置的token都有一个hidden_size大小的embedding之后，把这个序列输入到Transformer中。由以下的代码可以知道，每层Transformer都先计算multi-head self-attention，之后的结果再经过dropout, residual connection, layernorm, 还有feed-forward network。

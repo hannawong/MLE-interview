@@ -1,6 +1,6 @@
 #### [剑指 Offer 54. 二叉搜索树的第k大节点](https://leetcode.cn/problems/er-cha-sou-suo-shu-de-di-kda-jie-dian-lcof/)
 
-难度简单309
+难度简单
 
 给定一棵二叉搜索树，请找出其中第 `k` 大的节点的值。
 
@@ -20,27 +20,24 @@
 
 
 
-题解：反中序遍历
+题解：反中序遍历 + 剪枝
 
 ```python
 class Solution:
-
     def kthLargest(self, root: TreeNode, k: int) -> int:
-        self.cnt = 1
+        self.cnt = 0
         self.ans = -1
-        def inverse_inorder(root): ##右中左
-            if self.ans != -1:
-                return
+        def inorder(root):
             if not root:
                 return 
-            inverse_inorder(root.right)
-            ##访问root
+            inorder(root.right)
+            #print(root.val)
+            self.cnt += 1
             if self.cnt == k:
                 self.ans = root.val
-            self.cnt += 1
-            ##
-            inverse_inorder(root.left)
-        inverse_inorder(root)
+                return 
+            inorder(root.left)
+        inorder(root)
         return self.ans
 ```
 

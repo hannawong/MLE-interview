@@ -8,13 +8,11 @@ https://www.freecodecamp.org/news/a-deep-dive-into-part-of-speech-tagging-using-
 
 ----
 
-
-
 词性标注任务就是给每个词语标上动词、名词、副词、形容词这样的标签，就像下面的图这样：
 
 ![img](https://miro.medium.com/max/993/1*AyPfvdmnz5uF2UIiOX2ctA.png)
 
-POS tagging给出了一个词在句子中的词性角色，因此可以用来做命名实体识别(NER)，指代消解等。
+POS tagging给出了一个词在句子中的**词性角色**，因此可以用来做命名实体识别(NER)，指代消解等。
 
 #### 1. Markov Chain
 
@@ -26,7 +24,7 @@ POS tagging给出了一个词在句子中的词性角色，因此可以用来做
 
 #### 2. Hidden Markov Model
 
-带隐藏状态的Markov 过程则称为Hidden Markov Model。在POS tagging问题中，隐藏状态则是词语的POS tagging，因为它们是不能直接从句子中看出来的。和Markov Model一样，HMM也有转移概率（描述从一个隐藏状态转移到另一个隐藏状态的概率），除此之外还有emission probability（从隐藏状态，即POS tagging，转移到可观察状态，即词语，的概率）
+带隐藏状态的Markov 过程则称为Hidden Markov Model。在POS tagging问题中，**隐藏状态则是词语的POS tagging**，因为它们是不能直接从句子中看出来的。和Markov Model一样，HMM也有转移概率（描述从一个隐藏状态转移到另一个隐藏状态的概率），除此之外还有**emission probability**（从隐藏状态，即POS tagging，转移到可观察状态，即词语，的概率）
 
 ![img](https://miro.medium.com/max/866/1*sSfQ0DJnQNLC-illR3UdSQ.png)
 
@@ -34,9 +32,9 @@ emission probability的矩阵：
 
 ![img](https://miro.medium.com/max/1035/1*ITb6TnMqjNhVaiXQBfvibQ.png)
 
-记得我们之前讲过生成式模型和判别式模型吧，对于生成式模型，我们是要求 $argmax_{y} P(x,y)$. 即是求label y，使得P(x,y)最大。
+记得我们之前讲过生成式模型和判别式模型吧，对于生成式模型，我们是要求 $argmax_{y} P(x,y)$ . 即是求label y，使得P(x,y)最大。
 
-对于POS问题，$(x_1,x_2,...x_n)$表示文本，$(y_1,y_2,...y_n)$表示文本每个词对应的POS。那么**第一个问题**就是，如何求$P(x_1,x_2,...x_n,y_1,y_2,...y_n)$呢？就像下面的这个句子和对应的tagging，我们可以求出它的likelihood嘛？
+对于POS问题，$(x_1,x_2,...x_n)$ 表示文本，$(y_1,y_2,...y_n)$ 表示文本每个词对应的POS。那么**第一个问题**就是，如何求 $P(x_1,x_2,...x_n,y_1,y_2,...y_n)$ 呢？就像下面的这个句子和对应的tagging，我们可以求出它的likelihood嘛？
 
 ![35SQfert2ZVmpA4biNBYbdh18x1E8CaxpfYI](https://cdn-media-1.freecodecamp.org/images/35SQfert2ZVmpA4biNBYbdh18x1E8CaxpfYI)
 
@@ -44,7 +42,7 @@ emission probability的矩阵：
 
 ![QXdufboQ1sB0ZSP3vta1yiteOpT47xDCy6xf](https://cdn-media-1.freecodecamp.org/images/QXdufboQ1sB0ZSP3vta1yiteOpT47xDCy6xf)
 
-注意这里我们是用二阶markov假设，所以$q(y_i|y_{i-2},y_{i-1})$指的是前两个状态分别是$y_{i-2},y_{i-1}$的情况下，下一个状态为$y_i$的概率。$e(x_i|y_i)$是emission probability。
+注意这里我们是用**二阶markov**假设，所以 $q(y_i|y_{i-2},y_{i-1})$ 指的是前两个POS状态分别是 $y_{i-2},y_{i-1}$ 的情况下，下一个状态为 $y_i$ 的概率。$e(x_i|y_i)$ 是emission probability。
 
 需要指出的是，$q(y_i|y_{i-2},y_{i-1})$和$e(x_i|y_i)$都是可以很容易的用训练数据估计出来的，只要用统计方法就可以了：
 
@@ -56,7 +54,7 @@ emission probability的矩阵：
 
 ###### Finding the most probable sequence — Viterbi Algorithm
 
-上面我们已经知道了怎么去求$P(x_1,x_2,...x_n,y_1,y_2,...y_n)$。那么一个暴力的方法就是遍历所有可能的POS tagging序列 $(y_1,y_2,...y_n)$, 然后求出使得$P(x_1,x_2,...x_n,y_1,y_2,...y_n)$最大的那个序列$(y_1,y_2,...y_n)$. 但是，这样的做法复杂度是指数级别的。但是好消息是，我们可以用基于动态规划的Viterbi算法，来把复杂度降到多项式时间复杂度。
+上面我们已经知道了怎么去求 $P(x_1,x_2,...x_n,y_1,y_2,...y_n)$ 。那么一个暴力的方法就是遍历所有可能的POS tagging序列 $(y_1,y_2,...y_n)$ , 然后求出使得 $P(x_1,x_2,...x_n,y_1,y_2,...y_n)$ 最大的那个序列$(y_1,y_2,...y_n)$. 但是，这样的做法复杂度是**指数级别**的。但是好消息是，我们可以用基于动态规划的Viterbi算法，来把复杂度降到多项式时间复杂度。
 
 首先，我们来看前k个词语，它的$P(x_1,x_2,...x_k,y_1,...y_k)$为：![Df1ie2E2jxAmM38UZ7UrartTKLYjfOcPXHcS](https://cdn-media-1.freecodecamp.org/images/Df1ie2E2jxAmM38UZ7UrartTKLYjfOcPXHcS)
 
@@ -81,7 +79,7 @@ $π(k, u, v)$ 定义为序列长度为k，且隐藏状态以(u, v)为结尾的�
 #### 3. CRF（条件随机场）
 
 先来看一句话：“Bob drank coffee at Starbucks”，注明每个单词的词性后是这样的：“Bob (名词) drank(动词) coffee(名词) at(介词) Starbucks(名词)”。下面，就用CRF来解决这个问题。
-以上面的话为例，有5个单词，我们将：**(名词，动词，名词，介词，名词)** 作为一个标注序列，称为$I$，可选的标注序列有很多种，比如还可以是这样：**（名词，动词，动词，介词，名词）**，我们要在这么多的可选标注序列中，挑选出一个**最靠谱**的作为我们对这句话的标注。
+以上面的话为例，有5个单词，我们将：**(名词，动词，名词，介词，名词)** 作为一个标注序列，称为 $I$ ，可选的标注序列有很多种，比如还可以是这样：**（名词，动词，动词，介词，名词）**，我们要在这么多的可选标注序列中，挑选出一个**最靠谱**的作为我们对这句话的标注。
 **怎么判断一个标注序列靠谱不靠谱呢？**
 就我们上面展示的两个标注序列来说，第二个显然不如第一个靠谱，因为它把第二、第三个单词都标注成了动词，动词后面接动词，这在一个句子中通常是说不通的。
 假如我们给每一个标注序列**打分**，打分越高代表这个标注序列越靠谱，我们至少可以说，凡是标注中出现了**动词后面还是动词**的标注序列，要给它**负分！！**
@@ -91,14 +89,14 @@ $π(k, u, v)$ 定义为序列长度为k，且隐藏状态以(u, v)为结尾的�
 
 现在，我们正式地定义一下什么是CRF中的特征函数，所谓特征函数，就是这样的函数，它接受四个参数：
 
-- 句子$s$（就是我们要标注词性的句子）
-- $i$，用来表示句子s中第i个单词
-- $l_i$，表示要评分的标注序列给第i个单词标注的词性
+- 句子 $s$（就是我们要标注词性的句子）
+- $i$ ，用来表示句子s中第i个单词
+- $l_i$，表示要评分的标注序列给第i个单词标注的**词性**
 - $l_{i-1}$，表示要评分的标注序列给第i-1个单词标注的词性
 
 它的输出值是0或者1,0表示要评分的标注序列不符合这个特征，1表示要评分的标注序列符合这个特征。
 
-**Note:**这里，我们的特征函数仅仅依靠**当前单词的标签和它前面的单词的标签**对标注序列进行评判，这样建立的CRF也叫作线性链CRF，这是CRF中的一种简单情况。为简单起见，本文中我们仅考虑线性链CRF(也就是符合一阶Markov假设)。
+**Note:**这里，我们的特征函数仅仅依靠**当前单词的标签和它前面的单词的标签**对标注序列进行评判，这样建立的CRF也叫作线性链CRF，这是CRF中的一种简单情况。为简单起见，本文中我们仅考虑线性链CRF(也就是符合**一阶Markov**假设)。
 
 ######  从特征函数到概率
 
@@ -158,7 +156,7 @@ $π(k, u, v)$ 定义为序列长度为k，且隐藏状态以(u, v)为结尾的�
 ![img](https://pic1.zhimg.com/80/v2-804a62f01cae5dd45e9448cc67203174_720w.jpg)
 
 不难发现，我们可以构造一个CRF，使它与HMM的对数形式相同。怎么构造呢？
-对于HMM中的每一个转移概率$p(l_i=y|l_i-1=x)$,我们就可以定义这样的一个特征函数：
+对于HMM中的每一个转移概率 $p(l_i=y|l_{i-1}=x)$ ,我们就可以定义这样的一个特征函数：
 
 ![img](https://pic4.zhimg.com/80/v2-efb0b3ef55448e99f5413c4c4ba50317_720w.jpg)
 

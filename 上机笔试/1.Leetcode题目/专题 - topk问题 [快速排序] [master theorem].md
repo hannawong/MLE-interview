@@ -106,36 +106,28 @@ class Solution:
 
 ```python
 class Solution:
-    ans = 0
     def findKthLargest(self, nums: List[int], k: int) -> int:
-        
+        self.ans = 0 ##用一个全局变量来记录
         def quicksort(nums,left,right):
             if left > right:
                 return 
-            pivot = get_pivot(nums,left,right)
-            if pivot == len(nums)-k:
+            pivot = partition(nums,left,right)
+            if pivot == len(nums)-k: ###找到！
                 self.ans = nums[pivot]
                 return 
-            elif pivot > len(nums)-k:
+            elif pivot > len(nums)-k: ##轴点偏右了，向左找
                 quicksort(nums,left,pivot-1)
             else:
                 quicksort(nums,pivot+1,right)
-
-        def get_pivot(nums,left,right):
-            rand = random.randint(left,right)
-            nums[rand],nums[right] = nums[right],nums[rand]
+        def partition(nums,left,right):
+            split = left-1
             pivot = nums[right]
-            split =left-1
-            for j in range(left,right):
-                if nums[j] > pivot:
-                    continue
-                else:
-                    nums[split+1],nums[j] = nums[j],nums[split+1]
+            for i in range(left,right):
+                if nums[i] < pivot:
+                    nums[i],nums[split+1] = nums[split+1], nums[i]
                     split += 1
-            nums[split+1],nums[right] = nums[right],nums[split+1]
+            nums[right], nums[split+1] = nums[split+1], nums[right]
             return split+1
-
-
         quicksort(nums,0,len(nums)-1)
         return self.ans
 ```

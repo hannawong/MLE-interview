@@ -26,13 +26,11 @@
 
 特别地，我们希望可以就地完成转换操作。当转化完成以后，树中节点的左指针需要指向前驱，树中节点的右指针需要指向后继。还需要返回链表中的第一个节点的指针。
 
+解：
 
+【易错】注意节点的定义中，是用`left`和`right`, 而不是`prev`, `next`!!! 所以一定不要写错了
 
-
-
-
-
-```
+```python
 """
 # Definition for a Node.
 class Node:
@@ -42,29 +40,25 @@ class Node:
         self.right = right
 """
 class Solution:
-
     def treeToDoublyList(self, root: 'Node') -> 'Node':
-        if root == None:
-            return None
-        self.prev = None
         self.head = None
+        self.prev = None
+        if not root: return None
         def inorder(root):
-            if not root:
-                return 
+            if not root: return 
             inorder(root.left)
-            ###访问root
-            if self.prev == None:
-                self.prev = root
-                self.head = root ##记录头节点
+            if self.head == None: 
+                self.head = root
             else:
                 self.prev.right = root
                 root.left = self.prev
-                self.prev = root
-            ###
+            self.prev = root
             inorder(root.right)
         inorder(root)
-        self.head.left = self.prev
+        print(self.prev.val)
+        print(self.head.val)
         self.prev.right = self.head
+        self.head.left = self.prev
         return self.head
 ```
 

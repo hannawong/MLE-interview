@@ -23,7 +23,7 @@ class Solution:
             pivot = nums[high]
             split = low-1
             for j in range(low,high):
-                if nums[j] < pivot: 
+                if nums[j] < pivot: ###【记忆】每次都是访问split+1
                     nums[j],nums[split+1] = nums[split+1],nums[j]
                     split+=1
             nums[split+1],nums[high] = nums[high],nums[split+1]
@@ -40,7 +40,7 @@ class Solution:
 具体的方法：
 
 1. 首先，选择最后一个元素 -- `pivot = A[right]`作为我们要培养的轴点。
-2. 一个指针 `j` 从 `low` 遍历到 `high-1`；另外维护一个split，使得[low,split]的值都<轴点，[split+1,high]的值都>轴点
+2. 一个指针 `j` 从 `low` 遍历到 `high-1`；另外维护一个split，使得**split及**左边的值都<轴点，split右边的值都>轴点
 
 ![img](https://pic1.zhimg.com/80/v2-92472f2ca7ae0c67b3ec74db9fda4027_1440w.png)
 
@@ -85,46 +85,41 @@ def bubble_sort(arr,length):
 
 #### 1.3 归并排序
 
-归并排序采用分而治之的思想，其基本框架十分简单：
+归并排序采用分而治之的思想：
 
 ```python
-def mergesort(self,nums,begin,end): ##左闭右闭
-    if begin >= end:  ##单元素区间，必然有序
-        return
-    middle = (begin+end) // 2
-    self.mergesort(nums,begin,middle) ##排左边（就地）
-    self.mergesort(nums,middle+1,end) ##排右边
-    self.merge(nums,begin,middle,end) ##合并（就地）
-```
-
-那么，该如何实现Merge()呢？
-
-```python
-    def merge(self,nums,begin,middle,end):
-        ptr1 = begin
-        ptr2 = middle+1
-        tmp = []
-        while(ptr1 <= middle and ptr2 <= end):
-            if nums[ptr1] <= nums[ptr2]:
-                tmp.append(nums[ptr1])
+class Solution:
+    def sortArray(self, nums: List[int]) -> List[int]:
+        def mergesort(nums,begin,end):
+            if begin >= end: return ###单元素区间，必然有序
+            middle = (begin+end) // 2
+            mergesort(nums,begin,middle)
+            mergesort(nums,middle+1,end)
+            merge(nums,begin,middle,end)
+            
+        def merge(nums,begin,middle,end): #[begin,middle] is sorted, [middle+1,end] is sorted 
+            ans = []
+            ptr1 = begin; ptr2 = middle+1
+            while ptr1 <= middle and ptr2 <= end:
+                if nums[ptr1] <= nums[ptr2]: ###【注意】这里是<=, 方可实现稳定排序。同时，这样写也是为了逆序对实现的方便
+                    ans.append(nums[ptr1])
+                    ptr1 += 1
+                else:
+                    ans.append(nums[ptr2])
+                    ptr2 += 1
+            while ptr1 <= middle:
+                ans.append(nums[ptr1])
                 ptr1 += 1
-            else:
-                tmp.append(nums[ptr2])
+            while ptr2 <= end:
+                ans.append(nums[ptr2])
                 ptr2 += 1
-        while(ptr1 <= middle):
-            tmp.append(nums[ptr1])
-            ptr1 += 1
-        while(ptr2 <= end):
-            tmp.append(nums[ptr2])
-            ptr2 += 1
-
-        for i in range(begin,end+1):
-            nums[i] = tmp[i-begin]
-
-
+            for i in range(begin,end+1):
+                nums[i] = ans[i-begin]
+        mergesort(nums,0,len(nums)-1)
+        return nums
 ```
 
-复杂度O(nlogn).
+复杂度$O(nlogn)$.
 
 归并排序是稳定的排序算法：出现雷同元素时，左侧子向量优先。
 

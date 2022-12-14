@@ -1,6 +1,6 @@
 # CMake 教程
 
-CMake就是个用来生成针对各个平台生成Makefile的工具。
+简单来说，CMake就是个用来生成针对**各个平台**的Makefile的工具。
 
 ### step1 一个简单的起点
 
@@ -195,7 +195,7 @@ project(Tutorial VERSION 1.0)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-option(USE_MYMATH "Use tutorial provided math implementation" ON) ##把MathFunctions库做成可选的,并且默认值为ON,这个设置将会被保存到CACHE当中,所以用户每次打开工程时不必重新配置.
+option(USE_MYMATH "Use tutorial provided math implementation" ON) ##把MathFunctions库做成可选的,并且默认值为ON,这个设置将会被保存到CACHE当中,所以用户每次打开工程时不必重新配置. 值得注意的是，哪怕这里默认值写的是OFF，USE_MYMATH的值也是ON，只有在命令行显式说明 -DUSE_MYMATH=OFF，才能够把它关掉。
 
 configure_file(TutorialConfig.h.in TutorialConfig.h)
 
@@ -291,4 +291,111 @@ The square root of 1000 is 31.6228
 
 #### Step3. 安装和测试
 
-,为了安装MathFunctions库和头文件,我们需要在MathFunctions文件夹的CMakeLists.txt文件中,添加如下内容:
+install的部分十分简单：对于MathFunctions，我们需要安装库(lib)和头文件(include); 对于Tutorial，我们需要安装可执行文件(bin)和库文件(include)
+
+所以，现在主文件夹下的CMakeLists.txt长这样：
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+
+project(Tutorial VERSION 1.0)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+option(USE_MYMATH "Use tutorial provided math implementation" ON)
+
+configure_file(TutorialConfig.h.in TutorialConfig.h)
+
+if(USE_MYMATH)
+  add_subdirectory(MathFunctions)
+  list(APPEND EXTRA_LIBS MathFunctions)
+  list(APPEND EXTRA_INCLUDES "${PROJECT_SOURCE_DIR}/MathFunctions")
+endif()
+
+add_executable(Tutorial tutorial.cpp)
+
+target_link_libraries(Tutorial PUBLIC ${EXTRA_LIBS})
+
+install(TARGETS Tutorial DESTINATION bin) ##把主程序Tutorial安装成可执行二进制文件
+install(FILES "${PROJECT_BINARY_DIR}/TutorialConfig.h"
+  DESTINATION include  ##把TutorialConfig.h 安装到头文件include中去。
+  )
+
+target_include_directories(Tutorial PUBLIC
+                           "${PROJECT_BINARY_DIR}"
+                           ${EXTRA_INCLUDES}
+                           )
+```
+
+MathFunction下的CMakeLists.txt长这样：
+
+```cmake
+add_library(MathFunctions mysqrt.cpp)
+
+install(TARGETS MathFunctions DESTINATION lib) ##把MathFunctions安装到库(lib)中
+install(FILES MathFunctions.h DESTINATION include) ##把MathFunctions.h安装到头文件中
+```
+
+之后执行:
+
+```
+cmake --install . --prefix "/path/to/installdir"
+```
+
+其中，--prefix 指的是**安装的路径**。
+
+现在的安装路径中出现了新的文件夹：
+
+```
+- bin/
+	- Tutorial* （可执行文件）
+- include/
+	- MathFunctions.h
+	- TutorialConfig.h
+- lib/
+	- libMathFunctions.a （库文件）
+```
+
+现在，我们来**测试**我们写的sqrt函数的正确性。测试的方法是在主文件夹的CMakeLists.txt中增加测试代码：
+
+```cmake
+enable_testing() ##开始测试
+
+add_test(NAME Runs COMMAND Tutorial 25) ##测试的名字叫做"Runs", 运行的命令行为`./Tutorial 25`.这是一个最基本的test，只是测试程序有没有崩溃、有没有正常地返回0。
+  
+add_test(NAME Usage COMMAND Tutorial) ##测试的名字叫做"Usage", 运行的命令为"./Tutorial"。这个时在测试没有传入参数的时候，我们的程序能否正确的打印出"Usage: " << argv[0] << " number".
+set_tests_properties(Usage
+    PROPERTIES PASS_REGULAR_EXPRESSION "Usage:.*number"
+    ) ##正则表达式，看Usage测试的输出是否包含模式"Usage:.*number"
+  
+function(do_test target arg result) ##一个函数，名称叫做"do_test", 传入参数有三个：target, arg, result. 
+    add_test(NAME Comp${arg} COMMAND ${target} ${arg}) ##测试的名字叫做"Comp+${arg}", 运行的命令行是${target} ${arg}（例如./Tutorial 25）
+    MESSAGE( STATUS "this var key = ${Comp${arg}}.") ##打印
+    set_tests_properties(Comp${arg} ##看看输出的结果是否包含${result}这个模式
+      PROPERTIES PASS_REGULAR_EXPRESSION ${result}
+      )
+endfunction()
+  
+  # do a bunch of result based tests
+do_test(Tutorial 4 "4 is 2")
+do_test(Tutorial 9 "9 is 3")
+do_test(Tutorial 5 "5 is 2.236")
+do_test(Tutorial 7 "7 is 2.645")
+do_test(Tutorial 25 "25 is 5")
+do_test(Tutorial -25 "-25 is (nan|-nan|0)")
+do_test(Tutorial 0.0001 "0.0001 is 0.01")
+```
+
+输出结果：
+
+![img](https://pic1.zhimg.com/80/v2-ae296e2cf4cac7156e5e0db03b013eb9_720w.png)
+
+测试全部通过啦！
+
+
+
+## Cmake其他语法
+
+- 打印：`MESSAGE( STATUS "this var key = ${arg}.")` 可以打印出`arg`变量的值。`STATUS`表示这句话只是普通输出，而不是ERROR.
+- `${PROJECT_SOURCE_DIR}`指的是CMakeLists.txt所在的那个文件夹。

@@ -37,38 +37,23 @@
 
 可以购买和卖出**任意多次**。这是和I的差别。
 
-因为题中说“最多只能持有一股股票”，所以不妨以每天持有股票的个数来分类。`dp[i][0]`表示第i天，不持有股票的收益；`dp[i][1]`表示第i天，持有股票的收益。想要持有股票，就必须花钱来买它，所以收益是要减去当前股票的价格的。在卖掉的时候，**收益要加上当前股票的价格**，因为卖出了就可以得到收益。所以，可以得到如下的状态转移函数：
-
-```python
-dp[0][i] = max(dp[0][i-1], dp[1][i-1] + prices[i]) ##前一天持有，后一天卖掉
-dp[1][i] = max(dp[1][i-1], dp[0][i-1] - prices[i])##前一天没有，后一天买入
-```
-
-初始状态：
-
-`dp[0][0] = 0`, `dp[1][0] = -price[0]` 
-
-最后一天一定是不持有股票的收益最大，故返回`dp[0][n-1]`
+因为题中说“最多只能持有一股股票”，所以不妨以每天持有股票的个数来分类。`dp[i][0]`表示第i天，不持有股票的收益；`dp[i][1]`表示第i天，持有股票的收益。想要持有股票，就必须花钱来买它，所以收益是要减去当前股票的价格的。在卖掉的时候，**收益要加上当前股票的价格**，因为卖出了就可以得到收益。
 
 ```python
 class Solution:
     def maxProfit(self, prices: List[int]) -> int:
-        dp = [[0]*len(prices) for _ in range(2)]
-        dp[0][0] = 0 ##持有0支股票
-        dp[1][0] = -prices[0] ##持有一个，需要花钱买吧
-        ans = 0
+        dp_one = [0] * len(prices) ##当前持有一支股票
+        dp_zero = [0] * len(prices) ##当前不持有股票
+        dp_one[0] = -prices[0]
         for i in range(1,len(prices)):
-            dp[0][i] = max(dp[0][i-1],dp[1][i-1] + prices[i])
-            dp[1][i] = max(dp[1][i-1],dp[0][i-1] - prices[i])
-            ans = max(ans,dp[0][i],dp[1][i])
-        return ans
+            dp_one[i] = max(dp_one[i-1],dp_zero[i-1] - prices[i]) ##现在买入
+            dp_zero[i] = max(dp_zero[i-1],dp_one[i-1] + prices[i]) ##现在卖出
+        return max(max(dp_one),max(dp_zero))
 ```
 
-【易错点】
+我们看到，这里已经引入**自动机**的思想了，状态0和状态1如何相互转换。
 
-注意每个dp数组的第一位是0/1，表示状态。第二位才是i。
 
-我们看到，这里已经引入自动机的思想了，状态0和状态1如何相互转换。
 
 ### 714. 买卖股票的最佳时机含手续费
 
@@ -157,20 +142,18 @@ class Solution:
 
 ```python
 class Solution:
-    def maxProfit(self, prices) -> int:
-        n = len(prices)
-        dp = [[0]*n for _ in range(5)] ##这里的状态是从0开始标的，和上图不一样
-        dp[1][0] = -prices[0]
-        dp[3][0] = -prices[0] ##非常容易忽略！
-        mmax = 0
-        for i in range(1,n):
-            dp[0][i] = dp[0][i-1]
-            dp[1][i] = max(dp[1][i-1],dp[0][i-1]-prices[i])
-            dp[2][i] = max(dp[2][i-1],dp[1][i-1]+prices[i])
-            dp[3][i] = max(dp[3][i-1],dp[2][i-1]-prices[i])
-            dp[4][i] = max(dp[4][i-1],dp[3][i-1]+prices[i])
-            mmax = max(mmax,dp[0][i],dp[1][i],dp[2][i],dp[3][i],dp[4][i])
-        return mmax
+    def maxProfit(self, prices: List[int]) -> int:
+        dp = [[0] * len(prices) for _ in range(6)]
+        dp[1][0] = dp[3][0] = dp[5][0] = -prices[0] ##【易错】这个初始状态容易忽略！
+        ans = 0
+        for i in range(1,len(prices)):
+            dp[1][i] = max(dp[1][i-1],dp[0][i-1] - prices[i])
+            dp[2][i] = max(dp[2][i-1],dp[1][i-1] + prices[i])
+            dp[3][i] = max(dp[3][i-1],dp[2][i-1] - prices[i])
+            dp[4][i] = max(dp[4][i-1],dp[3][i-1] + prices[i])
+            dp[5][i] = max(dp[5][i-1],dp[4][i-1] - prices[i])
+            ans = max(ans,dp[1][i],dp[2][i],dp[3][i],dp[4][i],dp[5][i])
+        return ans
 ```
 
 

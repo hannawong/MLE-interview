@@ -54,7 +54,7 @@ class Solution:
             tmp = []
             cnt = 0
             while(ptr1 <= middle and ptr2 <= end): ##move ptr1 
-                if nums[ptr1] <= nums[ptr2]:
+                if nums[ptr1] <= nums[ptr2]: ###【易错】这里是小于等于！！
                     tmp.append(nums[ptr1])
                     ptr1 += 1
                     cnt += ptr2 - middle - 1 ##has contribution to inverse pair
@@ -65,7 +65,7 @@ class Solution:
             while(ptr1 <= middle):
                 tmp.append(nums[ptr1])
                 ptr1 += 1
-                cnt += end - middle ##has contribution to inverse pair
+                cnt += ptr2 - middle - 1 ##has contribution to inverse pair
 
             while(ptr2 <= end):
                 tmp.append(nums[ptr2])

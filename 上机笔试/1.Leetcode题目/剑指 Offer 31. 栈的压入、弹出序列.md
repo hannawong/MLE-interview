@@ -22,23 +22,20 @@ push(5), pop() -> 5, pop() -> 3, pop() -> 2, pop() -> 1
 
 ```python
 class Solution:
-    def validateStackSequences(self, pushed, popped) -> bool:
-        pushed_idx = 0 ##指向pushed数组
-        popped_idx = 0 ##指向popped数组
-
+    def validateStackSequences(self, pushed: List[int], popped: List[int]) -> bool:
+        pushed_ptr = 0; popped_ptr = 0
         stack = []
-        while popped_idx < len(popped):
-            if pushed_idx < len(popped) and popped[popped_idx] == pushed[pushed_idx]:##直接和push匹配上了
-                pushed_idx+=1
-                popped_idx+=1
-            elif len(stack) and popped[popped_idx] == stack[-1]: ##和栈顶匹配上了
-                popped_idx += 1
+        while pushed_ptr < len(pushed) or len(stack): ##【易错】两个条件，只要一个满足即可
+            if len(stack) and stack[-1] == popped[popped_ptr]: ##和栈中匹配
                 stack.pop()
-            else:##现在都匹配不上，sigh...，那么只能继续积累！
-                if pushed_idx >= len(pushed):
+                popped_ptr += 1
+            else: ##和栈中不匹配，只能继续积累
+                if pushed_ptr < len(pushed):
+                    stack.append(pushed[pushed_ptr])
+                    pushed_ptr += 1
+                else: ##完全不行
                     return False
-                stack.append(pushed[pushed_idx])
-                pushed_idx+=1
-        return len(stack) == 0
+        return popped_ptr == len(popped)
+                
 ```
 

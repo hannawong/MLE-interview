@@ -4,40 +4,42 @@
 
 ```python
 class Trie:
-    def __init__(self): ##这里不要忘记写self
-        self.children = [None]*26
-        self.is_end = False
 
-    def insert(self,word):##这里也不要忘记写self
+    def __init__(self):
+        self.children = [None] * 26
+        self.isend = False
+
+    def insert(self, word: str) -> None:
         tmp = self
-        for letter in word:
-            idx = ord(letter) - ord('a')
-            if not tmp.children[idx]: ##还没有这个字符，建立一个！注意是tmp，而不是self
-                tmp.children[idx] = Trie() ##如此建立Trie树
+        for c in word:
+            idx = ord(c) - ord("a")
+            if tmp.children[idx]: ###already has one
+                tmp = tmp.children[idx]
+            else: ###make one!
+                tmp.children[idx] = Trie()
+                tmp = tmp.children[idx]
+        tmp.isend = True
+
+    def search(self, word: str) -> bool:
+        tmp = self
+        for c in word:
+            idx = ord(c) - ord("a")
+            if tmp.children[idx]:
                 tmp = tmp.children[idx]
             else:
+                return False
+        return tmp.isend
+
+
+    def startsWith(self, prefix: str) -> bool:
+        tmp = self
+        for c in prefix:
+            idx = ord(c) - ord("a")
+            if tmp.children[idx]:
                 tmp = tmp.children[idx]
-        tmp.is_end = True
-
-    def search(self,word): ##word是否在trie树中
-        tmp = self
-        for letter in word:
-            idx = ord(letter) - ord('a')
-            if not tmp.children[idx]:
+            else:
                 return False
-            tmp = tmp.children[idx]
-        return tmp.is_end
-        
-    def startsWith(self,prefix):
-        tmp = self
-        for letter in prefix:
-            idx = ord(letter) - ord('a')
-            if not tmp.children[idx]:
-                return False
-            tmp = tmp.children[idx]
         return True
-
-
 ```
 
 

@@ -25,61 +25,28 @@
 class MaxQueue:
 
     def __init__(self):
+        self.max_stack = []
         self.queue = []
-        self.max_queue = []
+
 
     def max_value(self) -> int:
-        if not len(self.queue):
-            return -1
-        return self.max_queue[0]
+        if not self.max_stack: return -1
+        return self.max_stack[0]
+
 
     def push_back(self, value: int) -> None:
         self.queue.append(value)
-        if len(self.max_queue) == 0:
-            self.max_queue.append(value)
-        else:
-            while len(self.max_queue):
-                top = self.max_queue[-1]
-                if value > top: ##维护单调栈性质
-                    self.max_queue = self.max_queue[:-1]
-                else:
-                    break
-            self.max_queue.append(value)
+        while self.max_stack and self.max_stack[-1] < value: ##单调栈push
+            self.max_stack.pop()
+        self.max_stack.append(value)
 
     def pop_front(self) -> int:
-        if not len(self.queue):
-            return -1
-        if self.queue[0] == self.max_queue[0]:
-            front = self.queue[0]
-            self.queue = self.queue[1:]
-            self.max_queue = self.max_queue[1:]
-            return front
-        else:
-            front = self.queue[0]
-            self.queue = self.queue[1:]
-            return front
-        
-
-
-
-# Your MaxQueue object will be instantiated and called as such:
-# obj = MaxQueue()
-# param_1 = obj.max_value()
-# obj.push_back(value)
-# param_3 = obj.pop_front()
+        if not len(self.queue): return -1
+        ans = self.queue[0]
+        if ans == self.max_stack[0]: ##pop单调栈
+            self.max_stack = self.max_stack[1:]
+        self.queue = self.queue[1:]
+        return ans
 ```
 
-【总结】
-
-单调栈：
-
-```python
-            while len(self.max_queue):
-                top = self.max_queue[-1]
-                if value > top: ##维护单调栈性质
-                    self.max_queue = self.max_queue[:-1]
-                else:
-                    break
-            self.max_queue.append(value)
-```
 

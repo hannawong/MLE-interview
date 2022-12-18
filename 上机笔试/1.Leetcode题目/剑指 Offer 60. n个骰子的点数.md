@@ -26,15 +26,13 @@
 ```python
 class Solution:
     def dicesProbability(self, n: int) -> List[float]:
-        def dfs(n):
-            if n == 1:
-                return [1/6,1/6,1/6,1/6,1/6,1/6]
-            prev_prob = dfs(n-1)
-            curr_prob = [0]*(len(prev_prob)+5)
-            for i in range(len(prev_prob)):
-                for j in range(6):
-                    curr_prob[i+j] += prev_prob[i]*1/6
-            return curr_prob
-        return dfs(n)
+        if n == 1: return [1/6] * 6
+        prev_prob = self.dicesProbability(n-1)
+        new_prob = [0] * (len(prev_prob)+6)
+        for i in range(len(prev_prob)):
+            for j in range(1,7):
+                new_prob[i+j] += prev_prob[i] / 6
+        return new_prob[1:]
+
 ```
 

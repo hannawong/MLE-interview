@@ -10,7 +10,7 @@
 
 ## 模型框架
 
-![img](https://pic4.zhimg.com/80/v2-f57e833b71eb1a41fcca6a5b35301537_1440w.webp)
+![img](https://pic1.zhimg.com/80/v2-611e188b1198926df99068b70f9ac4d3_1440w.png)
 
 - UniLM 为 backbone，它包含一个用于理解的双向编码器和一个用于生成的单向解码器，编码器和解码器是权重共享的
 - 输入表示包括四个部分：**位置编码、轮次编码、角色编码、token 编码**

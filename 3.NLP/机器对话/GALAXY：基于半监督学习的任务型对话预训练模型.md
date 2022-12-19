@@ -18,45 +18,43 @@
 ### 预训练任务
 
 - Response Selection：构造正负样例进行二分类，负例是进行in-batch采样得到的：
-
-![img](https://pic2.zhimg.com/80/v2-5a12d1bb33a46197eddfe39ff9921ba9_1440w.webp)
+  ![img](https://picx.zhimg.com/80/v2-afb3c32fec8b9bece5da94727fe7e972_1440w.png)
 
 - Response Generation：根据context和response已经生成的部分来生成剩下的部分
-
-![img](https://pic3.zhimg.com/80/v2-d00e529dddc6ab88442485f06ffa338a_1440w.webp)
+  ![img](https://pica.zhimg.com/80/v2-37450339bdd90d2e3b24cc141a81f39d_1440w.png)
 
 - Dialog Action Prediction：由于可以有多个Action，所以是多分类任务。仅对有标注数据有用
+  ![img](https://picx.zhimg.com/80/v2-37ccceba419d1f4eff51c3b87e3396e2_1440w.png)
 
-![img](https://pic2.zhimg.com/80/v2-a1f02a85cbc0415abdf8e5b80ca794cd_1440w.webp)
+
 
 - **一致性正则化(Consistent Regularization)**：将一段对话context输入编码器，由于 dropout 扰动会得到两个不同的分布，采用 **KL loss 来最小化**这两个分布之间的距离，如下图所示。
 
-![img](https://pic4.zhimg.com/80/v2-3cf7b9a86e3f242ea3329728a6ac446b_1440w.webp)
 
-![img](https://pic2.zhimg.com/80/v2-a52a06a5100c55b3bfdaf6cf3355fb01_1440w.webp)
+  ![img](https://picx.zhimg.com/80/v2-b5ef14b1480e49a92808ec34f9f16a2c_1440w.png)
+
+  ![img](https://picx.zhimg.com/80/v2-4100c791f2613bf67cb2ec2bba9b5daf_1440w.png)
 
 ### 半监督预训练范式
 
 - **有标注数据**的损失函数，就是上面说的四种Loss之和：
 
-![img](https://pic1.zhimg.com/80/v2-da8b9f075dc056eecdfca835d0ecc0dc_1440w.webp)
+![img](https://picx.zhimg.com/80/v2-70aca685747b619cb1a53c059eba301e_1440w.png)
 
 - **无标注数据**的损失函数：
 
-![img](https://pic4.zhimg.com/80/v2-78334cab5dfdfc8fe4965b5b41fe661b_1440w.webp)
+![img](https://pica.zhimg.com/80/v2-6d2a01b1eb9a5733628f278ec298e55c_1440w.png)
 
 这个g表示一个selection gate，因为有些无标注数据太noisy，不适合用来计算loss。
 
 - 总的损失函数（有标和无标数据混合训练）
 
-![img](https://pic1.zhimg.com/80/v2-f5f70249640f3aff731bb7cbd5dcc1f8_1440w.webp)
+![img](https://picx.zhimg.com/80/v2-62ee7300df68104bdb4557f57cabd4eb_1440w.png)
 
 ### Finetuning and Inference
 
 对于有标注信息的对话数据，损失函数为：
 
 ![img](https://pic2.zhimg.com/80/v2-7539c9f0f9fe48d1b7eca8c00d4f879d_1440w.webp)
-
-微调的损失函数
 
 GALAXY 的实验结果表明大规模任务型对话数据进行预训练可以带了很好的收益，且有监督对话动作预测任务对学习对话策略是有效的。

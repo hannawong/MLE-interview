@@ -20,7 +20,7 @@
 
 **Shortlist Softmax**：将decoder hidden state经过全连接，输出**词表**里的所有词的条件概率。选中词 wt 的概率为 p(wt|zt=1,(y,z)<t,x) ,其中 zt=1 表示这一步模型选择从词表的概率。
 
-![img](https://pic4.zhimg.com/80/v2-eca612d7b89cd0e7a4376d372b5a0baf_1440w.webp)
+![img](https://pic1.zhimg.com/80/v2-83b1fd00290836cf4cf6a0b0a23ca57f_1440w.png)
 
 选择词语w_t的概率 * 决定从词表中选的概率
 
@@ -61,5 +61,3 @@
 ![img](https://pic2.zhimg.com/80/v2-d893494e6ac50820c692b0da7dd94b69_1440w.webp)
 
 
-
-发布于 2022-11-30 21:35・IP 属地美国

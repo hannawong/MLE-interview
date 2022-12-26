@@ -72,15 +72,13 @@ class Solution:
 ```python
 class Solution:
     def maxProfit(self, prices: List[int], fee: int) -> int:
-        dp = [[0]*len(prices) for _ in range(2)]
-        dp[0][0] = 0 ##持有0支股票
-        dp[1][0] = -prices[0]-fee ##持有一个，需要花钱买吧
-        ans = 0
+        dp_one = [0] * len(prices) ##持有一支
+        dp_zero = [0] * len(prices) ##不持有
+        dp_one[0] = -prices[0]
         for i in range(1,len(prices)):
-            dp[0][i] = max(dp[0][i-1],dp[1][i-1] + prices[i])
-            dp[1][i] = max(dp[1][i-1],dp[0][i-1] - prices[i]-fee)
-            ans = max(ans,dp[0][i],dp[1][i])
-        return ans
+            dp_zero[i] = max(dp_zero[i-1],dp_one[i-1] + prices[i] - fee)
+            dp_one[i] = max(dp_one[i-1],dp_zero[i-1] - prices[i])
+        return dp_zero[-1] 
 ```
 
 

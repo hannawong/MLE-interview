@@ -56,11 +56,13 @@ emission probability的矩阵：
 
 上面我们已经知道了怎么去求 $P(x_1,x_2,...x_n,y_1,y_2,...y_n)$ 。那么一个暴力的方法就是遍历所有可能的POS tagging序列 $(y_1,y_2,...y_n)$ , 然后求出使得 $P(x_1,x_2,...x_n,y_1,y_2,...y_n)$ 最大的那个序列$(y_1,y_2,...y_n)$. 但是，这样的做法复杂度是**指数级别**的。但是好消息是，我们可以用基于动态规划的Viterbi算法，来把复杂度降到多项式时间复杂度。
 
-首先，我们来看前k个词语，它的$P(x_1,x_2,...x_k,y_1,...y_k)$为：![Df1ie2E2jxAmM38UZ7UrartTKLYjfOcPXHcS](https://cdn-media-1.freecodecamp.org/images/Df1ie2E2jxAmM38UZ7UrartTKLYjfOcPXHcS)
+首先，我们来看前k个词语，它的$P(x_1,x_2,...x_k,y_1,...y_k)$为：
+
+​                                                    $r(y_1,...,y_k) = \prod_{i=1}^k q(y_i|y_{i-2},y_{i-1}) \prod_{i=1}^k e(x_i|y_i)$ 
 
 $S(k, u, v)$定义为序列长度为k，且隐藏状态以(u, v)为结尾的那些序列的集合。
 
-$π(k, u, v)$ 定义为序列长度为k，且隐藏状态以(u, v)为结尾的那些序列中，取得$P(x_1,x_2,...x_k,y_1,...y_k)$的最大值![L4CHoJ6epH9hjOrvEzbN3SpyCcudEkdnHlE6](https://cdn-media-1.freecodecamp.org/images/L4CHoJ6epH9hjOrvEzbN3SpyCcudEkdnHlE6)  
+$π(k, u, v)$ 定义为序列长度为k，且隐藏状态以(u, v)为结尾的那些序列中，取得$P(x_1,x_2,...x_k,y_1,...y_k)$的最大值  
 
 显然，$π(n, u, v)$就是我们要求的东西，它可以用动态规划的方式求得。
 

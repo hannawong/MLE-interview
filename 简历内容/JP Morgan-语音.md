@@ -1,3 +1,81 @@
+# 语音特征提取
+
+#### 1. 梅尔倒频谱系数（MFCC）
+
+step1. 预加重（Pre-Emphasis)
+
+预加重是一个滤波器，主要目的是为了**放大高频区域**。这是为了**平衡**频谱，因为高频通常与较低频率相比具有较小的**幅度**。
+
+step2. 分帧(framing)
+
+我们需要将信号分成短时帧。因此在大多数情况下，语音信号是非平稳的，对整个信号进行傅里叶变换是没有意义的。
+
+![img](https://pic2.zhimg.com/80/v2-af67d1cab46cd31ef002eb1a867e31cd_1440w.webp)
+
+step3. 加窗
+
+我们再对每个帧乘以一个Hamming窗，以增加帧左端和右端的连续性。
+
+$$ W(n,a)=(1−a)−a×cos(2πnN−1) $$
+
+![img](https://pic4.zhimg.com/80/v2-8261aa8fd816f67f8d0c0c503b2feb6f_1440w.webp)
+
+step4. 短时傅里叶变换
+
+对时域信号做FFT，转换为频域上的能量分布。
+
+![img](https://pic2.zhimg.com/80/v2-0ccd286e1dd36d71127f046f31e32eb9_1440w.webp)
+
+step5. Mel 滤波器组
+
+将频谱通过一组Mel刻度(通常取40个滤波器)的三角滤波器来提取频带(frequency bands)。这个Mel滤波器组就像人类的耳朵，人耳只关注某些特定的频率分量。它对不同频率信号的灵敏度是不同的，换言之，它只让某些频率的信号通过，而压根就直接无视它不想感知的某些频率信号。但是这些滤波器**在频率坐标轴上却不是统一分布**的，在低频区域有很多的滤波器；但在高频区域，滤波器的数目就变得比较少，分布很稀疏。这是因为人耳对声音是非线性感知的，在较低的频率下更具辨别力，在较高的频率下则不具辨别力。我们可以使用以下公式在赫兹（f）和梅尔（m）之间进行转换$fmel=2595∗log10(1+f/700)$
+
+![img](https://pic1.zhimg.com/80/v2-503338f5777c474fc43b4d232a2356bc_1440w.webp)
+
+经过滤波器，得到mel-filter bank energy
+
+#### 2. Allosaurus
+
+phoneme(音素)和phone是不同的，有很多时候相同的音素会有不同的发音(phone). 例如"peak" /pik/和"speak" /spik/的音素都是/p/, 但是发音却是不同的。allophones是同一个音素所对应的不同的phone的集合。Allosaurus模型是为了解决音素分类的问题。首先，audio先经过encoder，然后首先进行phone的分类。这里对于多语言，是直接求所有phone的并集。然后经过allophone layer，这个层有一个可训练的矩阵 $W^i \in R ^{|phoneme|\times |phone|}$, 它的初始化矩阵是0/1矩阵，1代表这个phoneme具有某种phone。
+![img](https://picx.zhimg.com/80/v2-dc32ea7af278d92fee32992970fda1d7_1440w.png)
+
+encoder 是40维MFCC + 6层BiLSTM。
+
+#### 3. Wav2vec
+
+wav2vec是无监督学习。模型将原始音频信号 $x$ 作为输入，基于历史信息和当前输入的信息预测**未来**的某些采样点，这里使用了两个编码器进行计算。
+
+![img](https://pic1.zhimg.com/80/v2-a0f2d30a3c510de9100a7d7d899f933c_1440w.webp)
+
+- 编码器网络 f （encoder network）将音频信号嵌入到特征空间（latent space）中,将每个 xi 映射为一个特征向量 zi ，类似于language model模型那样获得一个编码向量，再基于此预测某个 zj ，这里 j>i；
+- 上下文网络 g （context network）结合了多个时间步长编码器以获得上下文表示（contextualized representations）如图1。将多个 zi 转化为context representation C: $c_i=g(z_i,z_{i−1}...z_v)$。
+
+损失函数是类似word2vec的,预测 i + k时刻的向量是什么
+
+$$Lk=−Σ_{i=1}^{T−k}(logσ(z_{i+k}^Th_k(c_i))+λE[logσ(−z_{\~T}h_k(c_i))])$$
+
+问：Wav2vec是在英语上训练的，那么对于其他语言，能够起到一个好的特征提取效果吗？
+
+答：实际上，情感分类的任务可以看成两部分：what is spoken & how is it spoken, 对于那些小语种，没有一个speech to text预训练模型，那么我们的模型就应该更关注"how is it spoken"，那么wav2vec确实能够提取到这个信息。这也解释了为什么ge2e的效果是最好的，因为ge2e完全不考虑"what is it spoken",而全部关注"how is it spoken"
+
+
+
+问：你们的模型效果如何？
+
+答：在英语上达不到state-of-the-art，这是因为英语作为一个大语种，本身是有speech-to-text模型的，目前的sota模型也都使用了transcript，而我们不用transcript，自然损失了很多信息。但是，在小语种上远超sota。
+
+#### 4. GE2E
+
+GE2E 其实是一个loss function，是用于Speaker verification的。一个batch中有N个speaker，每个speaker有M个utterance；那么构建一个相似度矩阵，记录每个utterance到所有speaker聚类簇中心的距离。我们希望离自己的簇中心越近越好，离其他的簇中心越远越好。
+
+
+
+
+
+----
+
+代码：
+
 ```
 import torch
 import torch.nn as nn
@@ -753,3 +831,4 @@ class SpeakerEncoder(nn.Module):
             
         return loss, eer
 ```
+

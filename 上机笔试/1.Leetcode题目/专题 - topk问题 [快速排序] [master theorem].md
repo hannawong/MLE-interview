@@ -27,13 +27,13 @@
 class Solution:
     def findKthLargest(self, nums: List[int], k: int) -> int:
         heap = []
-        for i in range(len(nums)):
-            if len(heap) < k: ##如果堆尚未满，可以随意插入
+        for i in range(k):  ##前k个，可以直接push到堆中
+            heapq.heappush(heap,nums[i])
+        #### python中堆是小根堆
+        for i in range(k,len(nums)): ###对于后面的元素
+            if nums[i] > heap[0]: ###只有当元素比小根堆的根大时
+                heapq.heappop(heap)
                 heapq.heappush(heap,nums[i])
-            else: ##堆已满
-                if nums[i] > heap[0]: ###言外之意：如果现在这个元素比堆顶还小，那么一定不是topk
-                    heapq.heappop(heap)
-                    heapq.heappush(heap,nums[i])
         return heap[0]
 ```
 

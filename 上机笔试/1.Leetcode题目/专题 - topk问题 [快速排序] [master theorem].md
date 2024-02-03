@@ -1,5 +1,3 @@
-[TOC]
-
 # Top-K问题
 
 #### [215. 数组中的第K个最大元素](https://leetcode.cn/problems/kth-largest-element-in-an-array/)
@@ -40,117 +38,124 @@ class Solution:
 时间复杂度 O(nlogk). 因为堆的插入是O(logk), 需插入n次。堆的大小为k，所以空间复杂度为O(k).
 
 ##### 【方法2：利用快排】
-
 **快排的原始写法：**
-
 ```python
 class Solution:
     def sortArray(self, nums: List[int]) -> List[int]:
-        
-        def partitionsort(nums,low,high): ##排序[low,high]之间的数组
-            if low > high: ##单元素区间，必定有序
+        def quicksort(nums,begin,end): ##排序[begin,end]之间的数组
+            if begin >= end: ###单元素或无元素区间，必定有序.【易错】千万不要写成begin<=end了！！
                 return
-            partition = find_partition(nums,low,high) ##寻找轴点的位置
-            partitionsort(nums,low,partition-1) ##原地排序左边
-            partitionsort(nums,partition+1,high) ##原地排序右边
-            
-        def find_partition(nums,low,high): ##构造轴点
-            rand = random.randint(low,high) ##随机选一个轴点
-            nums[rand],nums[high] = nums[high],nums[rand] ##和末尾交换，末尾作为轴点
-            pivot = nums[high]
-            split = low-1
-            for j in range(low,high):
-                if nums[j] < pivot: 
-                    nums[j],nums[split+1] = nums[split+1],nums[j]
-                    split+=1
-            nums[split+1],nums[high] = nums[high],nums[split+1]
-            return split+1
-        partitionsort(nums,0,len(nums)-1)
+            pivot_pos = find_pivot(nums,begin,end) ##重点在于选择轴点，并将数组组织成：
+            ###左边的元素都小于轴点，右边的元素都大于轴点
+            quicksort(nums,begin,pivot_pos-1) ##排序轴点之前的（原地）
+            quicksort(nums,pivot_pos+1,end) ##排序轴点之后的（原地）
+        
+        def find_pivot(nums,begin,end):
+            rand_pos = random.randint(begin,end)  ##随机选一个轴点
+            nums[end],nums[rand_pos] = nums[rand_pos], nums[end] ##并和最后一个交换
+            pivot_value = nums[end] ##轴点的值
+            split = begin
+            for i in range(begin,end): ###遍历所有（除了最后一个）的位置
+                if nums[i] <= pivot_value: ###【易错】只有当当前位置小于轴点时，才需要和轴点交换，并将轴点+1
+                    nums[split],nums[i] = nums[i],nums[split]
+                    split += 1
+                #### 否则，什么都不做
+            ###遍历之后
+            nums[end], nums[split] = nums[split], nums[end]
+            return split
+
+        quicksort(nums,0,len(nums)-1)
         return nums
 ```
 
+培养一个轴点：
+
+![img](https://pic1.zhimg.com/80/v2-2b70124e17ea9fea9eda1e9bfb745a58_1440w.jpg)
+
 具体的方法：
 
-1. 首先，选择最后一个元素 -- `pivot = A[right]`作为我们要培养的轴点。
-2. 一个指针 `j` 从 `low` 遍历到 `high-1`；另外维护一个split，使得[low,split]的值都<轴点，[split+1,high]的值都>轴点
+1. 首先，选择最后一个元素 -- `pivot = A[begin]`作为我们要培养的轴点。
+2. 一个指针 `j` 从 `begin` 遍历到 `end-1`；另外维护一个split，使得**split及**左边的值都<轴点，split右边的值都>轴点
 
 ![img](https://pic1.zhimg.com/80/v2-92472f2ca7ae0c67b3ec74db9fda4027_1440w.png)
 
 在考察 j 时，
 
 - 如果arr[j]>=pivot, 不用特殊处理，直接考虑下一个j+1即可；
-- 如果arr[j] < pivot, 则需要把它移到 "<= pivot"那一类中，那么需要交换arr[split+1]和arr[j],并且 split++。
 
-最终，交换arr[split+1]和arr[right], 返回split+1，此点即为轴点
+- 如果arr[j] < pivot, 则需要把它移到 "<= pivot"那一类中，那么需要交换arr[split]和arr[j],并且 split++。
 
-【注】如果不用随机选轴点，最坏情况（**数组已经接近有序**）时，复杂度O(n^2)，因为只有越接近“平均二分”，才能达到O(nlogn)复杂度。但是平均情况还是O(nlogn)。 为了能够达到这个“期望”复杂度，我们需要**随机选择轴点**才行。
+3. 最终，交换arr[split]和arr[right], 返回split，此点即为轴点
+
+
+
+【复杂度分析】
+由于选取轴点的复杂度为O(n), 则有公式$T(n) = 2T(n/2) + n$。根据master theorem，复杂度为O(nlogn). 当然，最坏情况是O(n^2).空间复杂度为递归栈的大小，平均情况为O(logn), 最坏情况为O(n). 不过，快排的这个递归是尾递归，可以比较容易的改写成迭代形式。如果编译器有尾递归优化，空间复杂度为O(1).
+如果不用随机选轴点，最坏情况（**数组已经接近有序**）时，复杂度O(n^2)，因为只有越接近“平均二分”，才能达到O(nlogn)复杂度。但是平均情况还是O(nlogn)。 为了能够达到这个“期望”复杂度，我们需要**随机选择轴点**才行。
+
+[master theorem] ![img](https://pic1.zhimg.com/80/v2-ca7830ee5d665aa8d4437322830bac60_1440w.jpg)
 
 【总结】
 
+- `random.randint(low,high)` 随机选取[low,high]之间的一个元素，左闭右闭。
 - 快排是不稳定的排序方法
-
 
 
 ----
 
-
+那么如何将快排改造成能解topk问题呢？首先，我们再来分析一下快排，其中有“划分”和“递归”两个过程：
 
 **划分：**  将数组 `a[l⋯r]` 划分成两个子数组 `a[l⋯q−1]`、`a[q+1⋯r]`，使得 `a[l⋯q−1] `中的每个元素小于等于 a[q]，且 a[q]小于等于 `a[q+1⋯r] 中的每个元素`。这个a[q]就称为“**轴点**”。
 **递归**： 通过递归调用快速排序，对子数组`a[l⋯q−1]` 和`a[q+1⋯r]` 进行**排序**。
 
-由此可以发现**每次经过划分操作后，我们一定可以确定一个元素的最终位置**！如果位置q是在第 **n-k** 位，那么说明我们已经找到了这个topk元素！
+由此可以发现**每次经过划分操作后，我们一定可以确定一个元素（轴点）的最终位置**！如果轴点是在第 **n-k** 位，那么说明我们已经找到了这个topk元素了！
 
-**如果 q 比目标下标（n-k）小，就递归右子区间，否则递归左子区间。**这样就可以把原来递归两个区间变成只递归一个区间，提高了时间效率。
+**如果轴点位置比目标下标（n-k）小，就递归右子区间，否则递归左子区间**。 这样就可以把原来递归两个区间变成只递归一个区间！
 
 我们只需要在快排的基础上添加一些代码：
 
 ```python
 class Solution:
     def findKthLargest(self, nums: List[int], k: int) -> int:
-        self.ans = 0 ##用一个全局变量来记录
-        def quicksort(nums,left,right):
-            if left > right:
+        self.ans = -1  ###使用这个来记录答案
+        def quicksort(nums,begin,end): 
+            if begin > end: ###无元素区间.【易错】不是begin>=end
+                return
+            pivot_pos = find_pivot(nums,begin,end) 
+            if pivot_pos == len(nums)-k: ##已经找到！
+                self.ans = nums[pivot_pos]
                 return 
-            pivot = partition(nums,left,right)
-            if pivot == len(nums)-k: ###找到！
-                self.ans = nums[pivot]
-                return 
-            elif pivot > len(nums)-k: ##轴点偏右了，向左找
-                quicksort(nums,left,pivot-1)
-            else:
-                quicksort(nums,pivot+1,right)
-        def partition(nums,left,right):
-            split = left-1
-            pivot = nums[right]
-            for i in range(left,right):
-                if nums[i] < pivot:
-                    nums[i],nums[split+1] = nums[split+1], nums[i]
+            if pivot_pos > len(nums)-k: ###递归左边的
+                quicksort(nums,begin,pivot_pos-1) ##排序轴点之前的（原地）
+            else: ##递归右边的
+                quicksort(nums,pivot_pos+1,end) ##排序轴点之后的（原地）
+        
+        def find_pivot(nums,begin,end):
+            rand_pos = random.randint(begin,end) 
+            nums[end],nums[rand_pos] = nums[rand_pos], nums[end] 
+            pivot_value = nums[end] 
+            split = begin
+            for i in range(begin,end): 
+                if nums[i] <= pivot_value:
+                    nums[split],nums[i] = nums[i],nums[split]
                     split += 1
-            nums[right], nums[split+1] = nums[split+1], nums[right]
-            return split+1
+            nums[end], nums[split] = nums[split], nums[end]
+            return split
+
         quicksort(nums,0,len(nums)-1)
         return self.ans
 ```
 
-`find_partition`函数最后的结果是，arr的左边都<轴点，arr的右边都>轴点，轴点的位置是`split+1`
+`find_partition`函数最后的结果是，arr的左边都<轴点，arr的右边都>轴点，轴点的位置是`split`
 
 【易错点】
 
 - 可以看到，这里是用一个变量self.ans来记录答案，只要有一次符合条件，self.ans便会记录下来答案。
-- 返回条件是low > high**, 而不是low >= high**, 因为如果是low >= high的话，会导致单元素区间不能记录self.ans. 
+- 返回条件是**low > high, 而不是low >= high**, 因为如果是low >= high的话，会导致单元素区间不能记录self.ans. 
 
-【复杂度分析】T(n) = T(n/2) + n, 这不是一个完全的递归树，按照每次排序刚好定位到中间来想，递归树的下一层只有T(n/2)，不考虑另一半。根据master theorem，复杂度为**O(n)**. 当然，最坏情况是O(n^2). 
-
-空间复杂度为递归栈的大小，平均情况为O(logn), 最坏情况为O(n). 不过，快排的这个递归是尾递归，可以比较容易的改写成迭代形式。如果编译器有尾递归优化，空间复杂度为O(1).
-
-
+【复杂度分析】T(n) = T(n/2) + O(n), 这不是一个完全的递归树，按照每次排序刚好定位到中间来想，递归树的下一层只有T(n/2)，不考虑另一半。根据master theorem，复杂度为**O(n)**. 当然，最坏情况是O(n^2). 
 
 [master theorem] ![img](https://pic1.zhimg.com/80/v2-ca7830ee5d665aa8d4437322830bac60_1440w.jpg)
-
-
-
-
-
 
 
 

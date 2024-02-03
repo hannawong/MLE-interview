@@ -1,5 +1,3 @@
-[TOC]
-
 # 专题 - 排序
 
 ### 1. 排序算法
@@ -9,28 +7,30 @@
 ```python
 class Solution:
     def sortArray(self, nums: List[int]) -> List[int]:
-        
-        def partitionsort(nums,low,high): ##排序[low,high]之间的数组
-            if low > high: ##单元素区间，必定有序
+        def quicksort(nums,begin,end): ##排序[begin,end]之间的数组
+            if begin >= end: ###单元素或无元素区间，必定有序.【易错】千万不要写成begin<=end了！！
                 return
-            partition = find_partition(nums,low,high) ##寻找轴点的位置
-            partitionsort(nums,low,partition-1) ##原地排序左边
-            partitionsort(nums,partition+1,high) ##原地排序右边
-            
-        def find_partition(nums,low,high): ##构造轴点
-            rand = random.randint(low,high) ##随机选一个轴点
-            nums[rand],nums[high] = nums[high],nums[rand] ##和末尾交换，末尾作为轴点
-            pivot = nums[high]
-            split = low-1
-            for j in range(low,high):
-                if nums[j] < pivot: ###【记忆】每次都是访问split+1
-                    nums[j],nums[split+1] = nums[split+1],nums[j]
-                    split+=1
-            nums[split+1],nums[high] = nums[high],nums[split+1]
-            return split+1
-        partitionsort(nums,0,len(nums)-1)
-        return nums
+            pivot_pos = find_pivot(nums,begin,end) ##重点在于选择轴点，并将数组组织成：
+            ###左边的元素都小于轴点，右边的元素都大于轴点
+            quicksort(nums,begin,pivot_pos-1) ##排序轴点之前的（原地）
+            quicksort(nums,pivot_pos+1,end) ##排序轴点之后的（原地）
+        
+        def find_pivot(nums,begin,end):
+            rand_pos = random.randint(begin,end)  ##随机选一个轴点
+            nums[end],nums[rand_pos] = nums[rand_pos], nums[end] ##并和最后一个交换
+            pivot_value = nums[end] ##轴点的值
+            split = begin
+            for i in range(begin,end): ###遍历所有（除了最后一个）的位置
+                if nums[i] <= pivot_value: ###【易错】只有当当前位置小于轴点时，才需要和轴点交换，并将轴点+1
+                    nums[split],nums[i] = nums[i],nums[split]
+                    split += 1
+                #### 否则，什么都不做
+            ###遍历之后
+            nums[end], nums[split] = nums[split], nums[end]
+            return split
 
+        quicksort(nums,0,len(nums)-1)
+        return nums
 ```
 
 培养一个轴点：
@@ -39,8 +39,8 @@ class Solution:
 
 具体的方法：
 
-1. 首先，选择最后一个元素 -- `pivot = A[right]`作为我们要培养的轴点。
-2. 一个指针 `j` 从 `low` 遍历到 `high-1`；另外维护一个split，使得**split及**左边的值都<轴点，split右边的值都>轴点
+1. 首先，选择最后一个元素 -- `pivot = A[begin]`作为我们要培养的轴点。
+2. 一个指针 `j` 从 `begin` 遍历到 `end-1`；另外维护一个split，使得**split及**左边的值都<轴点，split右边的值都>轴点
 
 ![img](https://pic1.zhimg.com/80/v2-92472f2ca7ae0c67b3ec74db9fda4027_1440w.png)
 
@@ -48,9 +48,9 @@ class Solution:
 
 - 如果arr[j]>=pivot, 不用特殊处理，直接考虑下一个j+1即可；
 
-- 如果arr[j] < pivot, 则需要把它移到 "<= pivot"那一类中，那么需要交换arr[split+1]和arr[j],并且 split++。
+- 如果arr[j] < pivot, 则需要把它移到 "<= pivot"那一类中，那么需要交换arr[split]和arr[j],并且 split++。
 
-3. 最终，交换arr[split+1]和arr[right], 返回split+1，此点即为轴点
+3. 最终，交换arr[split]和arr[right], 返回split，此点即为轴点
 
 
 

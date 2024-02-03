@@ -37,7 +37,7 @@ class Solution:
         return heap[0]
 ```
 
-时间复杂度 O(nlogn). 因为堆的插入是O(logn), 需插入n次。堆的大小为k，所以空间复杂度为O(k).
+时间复杂度 O(nlogk). 因为堆的插入是O(logk), 需插入n次。堆的大小为k，所以空间复杂度为O(k).
 
 ##### 【方法2：利用快排】
 
